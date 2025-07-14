@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  drcell-app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - DRCELL_DB_CONNECTION=Server=db;Database=DrCellDB;User Id=drcell_user;Password=${DB_PASSWORD:-YourStrong!Passw0rd};TrustServerCertificate=true;
+      - DRCELL_JWT_SECRET=${JWT_SECRET:-YourSuperSecureJWTSecretKeyMustBeAtLeast64Characters1234567890}
+      - DRCELL_JWT_ISSUER=${JWT_ISSUER:-https://localhost:5000}
+      - DRCELL_JWT_AUDIENCE=${JWT_AUDIENCE:-https://localhost:5000}
+      - DRCELL_CORS_ORIGINS=${CORS_ORIGINS:-https://localhost:5000}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - app_logs:/app/logs
+      - app_uploads:/app/uploads
+    restart: unless-stopped
+    networks:
+      - drcell-network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_SA_PASSWORD:-YourStrong!Passw0rd}
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./BD:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - drcell-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${DB_SA_PASSWORD:-YourStrong!Passw0rd} -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - drcell-app
+    restart: unless-stopped
+    networks:
+      - drcell-network
+
+volumes:
+  sqlserver_data:
+    driver: local
+  app_logs:
+    driver: local
+  app_uploads:
+    driver: local
+  nginx_logs:
+    driver: local
+
+networks:
+  drcell-network:
+    driver: bridge
