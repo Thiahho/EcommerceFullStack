@@ -252,6 +252,7 @@ const ConsultaReparacionSection: React.FC = () => {
       if (varianteSeleccionada.arreglomodulo) servicios.push(`Módulo: $${varianteSeleccionada.arreglomodulo}`);
       if (varianteSeleccionada.arreglobat) servicios.push(`Batería: $${varianteSeleccionada.arreglobat}`);
       if (varianteSeleccionada.arreglopin) servicios.push(`Pin: $${varianteSeleccionada.arreglopin}`);
+      if (varianteSeleccionada.placa) servicios.push(`Placa: $${varianteSeleccionada.placa}`);
       
       if (servicios.length > 0) {
         setPrecio(servicios.join(' | '));
@@ -339,7 +340,7 @@ const ConsultaReparacionSection: React.FC = () => {
     
 
     // Codificar el mensaje para URL
-    const mensajeCodificado = encodeURIComponent(mensaje);
+    const mensajeCodificado = encodeURIComponent(mensaje + "\n\n" + "Los precios se confirman al momento de la reparación");
     
     // Construir la URL de WhatsApp
     const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.PHONE_NUMBER}?text=${mensajeCodificado}`;
@@ -380,6 +381,7 @@ const ConsultaReparacionSection: React.FC = () => {
                       {item.arreglomodulo && <span className="text-green-600 mr-1">M:${item.arreglomodulo}</span>}
                       {item.arreglobat && <span className="text-green-600 mr-1">B:${item.arreglobat}</span>}
                       {item.arreglopin && <span className="text-green-600">P:${item.arreglopin}</span>}
+                      {item.placa && <span className="text-green-600">P:${item.placa}</span>}
                     </div>
                   </div>
                 </div>

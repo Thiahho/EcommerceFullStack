@@ -35,11 +35,11 @@ const Footer: React.FC = () => {
             <h4 className="text-3x1 text-[#217AB6] font-bold mb-4">
              <span className="text-3xl">DrCell</span> <span className="text-white">Reparacion de Celulares</span>
             </h4>
-            <p className="text-white/70 text-sm leading-relaxed">
+            <p className="text-white/70 text-base leading-relaxed">
               Ubicados hace 18 años en el mismo lugar, atendido por su dueño.
               <br />
               </p>
-              <p className="text-white/70 text-sm leading-relaxed hover:text-[#217AB6] transition duration-300 transform hover:scale-105 cursor-pointer"
+              <p className="text-white/70 text-base leading-relaxed hover:text-[#217AB6] transition duration-300 transform hover:scale-105 cursor-pointer"
               onClick={() => window.open('https://www.google.com/maps/place/Dr.+Cell/@-34.6456948,-58.7926662,17z/data=!3m1!4b1!4m6!3m5!1s0x95bc9451ecf381a7:0x3b2ca7b87e0d586c!8m2!3d-34.6456992!4d-58.7900859!16s%2Fg%2F11j8zg3616?entry=ttu&g_ep=EgoyMDI1MDYyMi4wIKXMDSoASAFQAw%3D%3D', '_blank')}>
               Libertador 362, Moreno, Buenos Aires, Argentina.
             </p>
@@ -50,14 +50,9 @@ const Footer: React.FC = () => {
           <div>
             <h5 className="font-semibold text-lg mb-4">Soporte</h5>
             <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-white/70 hover:text-white transition-colors duration-200 text-sm">
-                  FAQ
-                </a>
-              </li>
               
               <li>
-                <a onClick={handleWhatsAppOrder} className="text-white/70 hover:text-white transition-colors duration-200 text-sm">
+                <a onClick={handleWhatsAppOrder} className="text-white/70 hover:text-white transition-colors duration-200 text-base">
                   Hablar con expertos
                 </a>
               </li>
@@ -71,7 +66,7 @@ const Footer: React.FC = () => {
             <h5 className="font-semibold text-lg mb-4">Datos generales</h5>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-colors duration-200 text-sm">
+                <a href="./TerminosYCondiciones" className="text-white/70 hover:text-white transition-colors duration-200 text-base">
                   Condiciones
                 </a>
               </li>
@@ -89,7 +84,7 @@ const Footer: React.FC = () => {
         {/* Footer inferior */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div className="text-center sm:text-left">
-            <p className="text-white/70 text-sm">
+            <p className="text-white/70 text-base">
               &copy; {new Date().getFullYear()} DrCell. Todos los derechos reservados.
             </p>
           </div>

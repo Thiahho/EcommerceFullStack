@@ -5,21 +5,62 @@ import { Link } from 'react-router-dom';
 const servicios = [
   {
     icon: (
-      <svg className="w-8 h-8 text-blue-600 mx-auto" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 10-4-4l-8 8v3a1 1 0 001 1z" /></svg>
+      <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="w-12 h-12 text-blue-600 mx-auto"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
+      />
+    </svg>
+    
     ),
     title: 'Módulos',
     desc: 'Reparación y cambio de pantallas y módulos en 3 horas. Garantía de 15 días.'
   },
   {
     icon: (
-      <svg className="w-8 h-8 text-green-600 mx-auto" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m4 0h-1v4h-1m-4 0h-1v-4h-1m4 0h-1v4h-1" /></svg>
+      <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="w-12 h-12 text-blue-600 mx-auto"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+d="M21 10.5h.375c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125H21M4.5 10.5H18V15H4.5v-4.5ZM3.75 18h15A2.25 2.25 0 0 0 21 15.75v-6a2.25 2.25 0 0 0-2.25-2.25h-15A2.25 2.25 0 0 0 1.5 9.75v6A2.25 2.25 0 0 0 3.75 18Z"
+      />
+    </svg>
     ),
     title: 'Baterías',
     desc: 'Cambio de baterías originales y compatibles. Garantía de 15 días.'
   },
   {
     icon: (
-      <svg className="w-8 h-8 text-yellow-600 mx-auto" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg>
+    <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="w-12 h-12 text-blue-600 mx-auto"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+  </svg>
+
+
     ),
     title: 'Pines',
     desc: 'Reparación de pines de carga y placa. Garantía de 15 días.'
