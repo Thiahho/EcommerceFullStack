@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrCell-V01", "DrCell-V01\DrCell-V01.csproj", "{3E370787-D12C-4D7D-B011-BFBA20F9B258}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrCell-V02", "DrCell-V02.csproj", "{3E370787-D12C-4D7D-B011-BFBA20F9B258}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

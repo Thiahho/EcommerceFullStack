@@ -1,44 +1,12 @@
-# # Etapa de compilación
-# FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-# WORKDIR /src
-# COPY . .
-# RUN dotnet restore
-# RUN dotnet publish -c Release -o /app/publish
-
-# # Etapa final para ejecución
-# FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
-# WORKDIR /app
-# COPY --from=build /app/publish .
-# EXPOSE 80
-# ENTRYPOINT ["dotnet", "DrCell-V01.dll"]
-
-
-
--
-
-    # Usa la imagen base de ASP.NET Core 8
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 80
-
-# Usa la imagen del SDK para build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-
-# Copia el archivo del proyecto y restaura dependencias
-COPY ["*.csproj", "./"]
-RUN dotnet restore
-
-# Copia el resto del código y compila
-COPY . .
-RUN dotnet build -c Release -o /app/build
-
-# Publica la aplicación
-FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
-
-# Imagen final
-FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DrCell-V01.dll"]
+COPY ./ ./
+RUN dotnet restore
+RUN dotnet publish -c Release -o out
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /app/out ./
+ENV ASPNETCORE_URLS=http://+:5000
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "DrCell-V02.dll"]

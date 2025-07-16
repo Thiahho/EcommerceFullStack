@@ -4,7 +4,7 @@
 			<TargetFramework>net8.0</TargetFramework>
 			<Nullable>enable</Nullable>
 			<ImplicitUsings>enable</ImplicitUsings>
-			<RootNamespace>DrCell_V01</RootNamespace>
+			<RootNamespace>DrCell_V02</RootNamespace>
 		</PropertyGroup>
 
 		<!--<ItemGroup>
