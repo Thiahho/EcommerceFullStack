@@ -19,14 +19,17 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
-      - DATABASE_CONNECTION_STRING=Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-
+       - DATABASE_CONNECTION_STRING=Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+       - JWT_SECRET=${JWT_SECRET}
+       - JWT_ISSUER=${JWT_ISSUER}
+       - JWT_AUDIENCE=${JWT_AUDIENCE}
+       - CORS_ORIGINS=${CORS_ORIGINS}
+       - ASPNETCORE_ENVIRONMENT=Production
+       - ASPNETCORE_URLS=http://+:5000
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     depends_on:
       - db
 
