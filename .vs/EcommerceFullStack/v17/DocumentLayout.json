@@ -1,0 +1,220 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\data\\dtos\\productodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\dtos\\productodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\services\\interfaces\\iproductoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\interfaces\\iproductoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\services\\productosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\productosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\data\\dtos\\productosvariantesdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\dtos\\productosvariantesdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\data\\modelos\\productosvariantes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\productosvariantes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\data\\modelos\\productos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\productos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\data\\modelos\\categorias.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\categorias.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\ecommercefullstack\\data\\modelos\\usuarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\usuarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 164,
+          "SelectedChildIndex": 9,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ProductosService.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Services\\ProductosService.cs",
+              "RelativeDocumentMoniker": "Services\\ProductosService.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Services\\ProductosService.cs",
+              "RelativeToolTip": "Services\\ProductosService.cs",
+              "ViewState": "AgIAANcAAAAAAAAAAAAAAOoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:28:36.119Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAkAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:12:45.099Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Productos.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\Productos.cs",
+              "RelativeDocumentMoniker": "Data\\Modelos\\Productos.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\Productos.cs",
+              "RelativeToolTip": "Data\\Modelos\\Productos.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAoAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:15:22.156Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ProductosVariantesDto.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Dtos\\ProductosVariantesDto.cs",
+              "RelativeDocumentMoniker": "Data\\Dtos\\ProductosVariantesDto.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Dtos\\ProductosVariantesDto.cs",
+              "RelativeToolTip": "Data\\Dtos\\ProductosVariantesDto.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAADgvxAAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:34:01.27Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Usuarios.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\Usuarios.cs",
+              "RelativeDocumentMoniker": "Data\\Modelos\\Usuarios.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\Usuarios.cs",
+              "RelativeToolTip": "Data\\Modelos\\Usuarios.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:18:10.182Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Categorias.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\Categorias.cs",
+              "RelativeDocumentMoniker": "Data\\Modelos\\Categorias.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\Categorias.cs",
+              "RelativeToolTip": "Data\\Modelos\\Categorias.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:16:19.685Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 72,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ProductoDto.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Dtos\\ProductoDto.cs",
+              "RelativeDocumentMoniker": "Data\\Dtos\\ProductoDto.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Dtos\\ProductoDto.cs",
+              "RelativeToolTip": "Data\\Dtos\\ProductoDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:29:44.325Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ProductosVariantes.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\ProductosVariantes.cs",
+              "RelativeDocumentMoniker": "Data\\Modelos\\ProductosVariantes.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Data\\Modelos\\ProductosVariantes.cs",
+              "RelativeToolTip": "Data\\Modelos\\ProductosVariantes.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAADgvxAAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:30:38.104Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IProductoService.cs",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Services\\Interfaces\\IProductoService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IProductoService.cs",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\EcommerceFullStack\\Services\\Interfaces\\IProductoService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IProductoService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-06T23:29:03.989Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 76,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
