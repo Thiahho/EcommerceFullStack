@@ -184,3 +184,4 @@ SELECT COUNT(*) as total_productos FROM productos;
 SELECT COUNT(*) as total_variantes FROM productos_variantes;
 SELECT COUNT(*) as total_usuarios FROM usuarios;
 
+
