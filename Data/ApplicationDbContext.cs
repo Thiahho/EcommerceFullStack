@@ -1,4 +1,4 @@
-﻿using EcommerceFullStack.Data.Modelos;
+using EcommerceFullStack.Data.Modelos;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceFullStack.Data
@@ -18,17 +18,17 @@ namespace EcommerceFullStack.Data
 
             // Configuración de Usuarios
             modelBuilder.Entity<Usuarios>()
-                .ToTable("usuarios")
+                .ToTable("Usuarios")
                 .HasKey(x => x.Id);
 
             // Configuración de Categorias
             modelBuilder.Entity<Categorias>()
-                .ToTable("categorias")
+                .ToTable("Categorias")
                 .HasKey(x => x.Id);
 
             // Configuración de Productos
             modelBuilder.Entity<Productos>()
-                .ToTable("productos")
+                .ToTable("Productos")
                 .HasKey(x => x.Id);
 
             modelBuilder.Entity<Productos>()
@@ -45,7 +45,7 @@ namespace EcommerceFullStack.Data
 
             // Configuración de ProductosVariantes
             modelBuilder.Entity<ProductosVariantes>()
-                .ToTable("productos_variantes")
+                .ToTable("Producto_Variantes")
                 .HasKey(x => x.Id);
 
             modelBuilder.Entity<ProductosVariantes>()
