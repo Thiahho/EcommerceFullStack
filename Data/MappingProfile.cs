@@ -1,8 +1,8 @@
 using AutoMapper;
-using EcommerceFS.Data.Dtos;
-using EcommerceFS.Data.Modelos;
+using EcommerceFullStack.Data.Dtos;
+using EcommerceFullStack.Data.Modelos;
 
-namespace EcommerceFS.Data
+namespace EcommerceFullStack.Data
 {
     public class MappingProfile : Profile
     {

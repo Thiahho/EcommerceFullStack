@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace EcommerceFS.Middleware
+namespace EcommerceFullStack.Middleware
 {
     /// <summary>
     /// Middleware para manejar autenticación JWT con cookies httpOnly

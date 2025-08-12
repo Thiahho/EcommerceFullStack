@@ -1,4 +1,4 @@
-﻿namespace EcommerceFS.Data.Dtos
+﻿namespace EcommerceFullStack.Data.Dtos
 {
     public class CategoriaDto
     {

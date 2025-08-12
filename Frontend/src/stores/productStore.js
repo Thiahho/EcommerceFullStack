@@ -10,6 +10,7 @@ const useProductStore = create((set, get) => ({
   selectedVariante: null,
   isLoading: false,
   error: null,
+  hasFetchedProducts: false,
   
   // Filtros y opciones
   ramOptions: [],
@@ -17,15 +18,20 @@ const useProductStore = create((set, get) => ({
   colorOptions: [],
 
   // Acciones para productos
-  fetchProducts: async () => {
+  fetchProducts: async (force = false) => {
+    const { hasFetchedProducts } = get();
+    if (hasFetchedProducts && !force) {
+      return { success: true, data: get().products };
+    }
+
     set({ isLoading: true, error: null });
-    
     try {
       const result = await productService.getAllProducts();
       if (result.success) {
         set({ 
           products: result.data, 
-          isLoading: false 
+          isLoading: false,
+          hasFetchedProducts: true
         });
         return { success: true, data: result.data };
       } else {
@@ -192,8 +198,8 @@ const useProductStore = create((set, get) => ({
     if (!searchTerm) return products;
     
     return products.filter(product => 
-      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      product.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
 }));

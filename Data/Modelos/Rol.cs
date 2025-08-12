@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EcommerceFS.Data.Modelos
+namespace EcommerceFullStack.Data.Modelos
 {
     public class Rol
     {

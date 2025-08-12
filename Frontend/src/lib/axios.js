@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuración base de Axios
-const API_BASE_URL = 'https://localhost:5218'; // Puerto HTTPS del backend
+const API_BASE_URL = 'http://localhost:5218'; // Puerto HTTPS del backend
 
 const api = axios.create({
   baseURL: API_BASE_URL,

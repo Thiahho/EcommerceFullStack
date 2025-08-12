@@ -12,7 +12,7 @@ using EcommerceFullStack.Data;
 using EcommerceFullStack.Services.Interfaces;
 using EcommerceFullStack.Data.Modelos;
 using EcommerceFullStack.Data.Dtos;
-namespace EcommerceFS.Controllers
+namespace EcommerceFullStack.Controllers
 {
     [Route("[controller]")]
     [ApiController]

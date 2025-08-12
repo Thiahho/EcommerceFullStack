@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using EcommerceFullStack.Data;
 using EcommerceFullStack.Services.Interfaces;
 
-namespace EcommerceFS.Services
+namespace EcommerceFullStack.Services
 {
 
     public class AdminService : IAdminService

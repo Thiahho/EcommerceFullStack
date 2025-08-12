@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text;
 
-namespace EcommerceFS.Middleware
+namespace EcommerceFullStack.Middleware
 {
     public class SwaggerSecurityMiddleware
     {

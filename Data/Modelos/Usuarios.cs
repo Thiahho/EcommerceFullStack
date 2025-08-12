@@ -1,4 +1,4 @@
-﻿namespace EcommerceFS.Data.Modelos
+﻿namespace EcommerceFullStack.Data.Modelos
 {
     public class Usuarios
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EcommerceFS.Data.Modelos
+namespace EcommerceFullStack.Data.Modelos
 {
     public class Auth
     {

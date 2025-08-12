@@ -1,4 +1,5 @@
 import React from "react";
+import placeholderProduct from "../../assets/product/p-1.jpg";
 
 const ProductCard = ({ 
   producto = {},
@@ -7,11 +8,11 @@ const ProductCard = ({
 }) => {
   const {
     id,
-    name = "Producto",
-    description = "",
-    images = "",
-    category = "",
-    brand = "",
+    nombre,
+    descripcion,
+    images,
+    categoria = null,
+    marca,
     // Para mostrar el precio de la primera variante disponible
     variantes = []
   } = producto;
@@ -29,11 +30,22 @@ const ProductCard = ({
 
   // Obtener imagen principal
   const getMainImage = () => {
-    if (images) {
+    if (!images) return placeholderProduct;
+
+    // Si viene una lista separada por comas, tomar la primera
+    if (typeof images === 'string' && images.includes(',')) {
       const imageList = images.split(',');
-      return imageList[0]?.trim() || "/placeholder-product.jpg";
+      const first = imageList[0]?.trim();
+      return first || placeholderProduct;
     }
-    return "/placeholder-product.jpg";
+
+    // Si parece URL absoluta o relativa
+    if (typeof images === 'string' && (images.startsWith('http') || images.startsWith('/'))) {
+      return images;
+    }
+
+    // Asumir base64 desde backend
+    return `data:image/jpeg;base64,${images}`;
   };
 
   const handleClick = () => {
@@ -51,10 +63,11 @@ const ProductCard = ({
       <div className="aspect-square mb-3 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
         <img
           src={getMainImage()}
-          alt={name}
+          alt={nombre}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           onError={(e) => {
-            e.target.src = "/placeholder-product.jpg";
+            e.currentTarget.onerror = null; // evita bucle de reintentos
+            e.currentTarget.src = placeholderProduct;
           }}
         />
       </div>
@@ -62,21 +75,21 @@ const ProductCard = ({
       {/* Información del producto */}
       <div className="space-y-2">
         {/* Categoría/Marca */}
-        {(category || brand) && (
+        {(categoria?.nombre || marca) && (
           <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            {brand || category}
+            {marca || categoria?.nombre}
           </p>
         )}
 
         {/* Nombre del producto */}
         <h4 className="font-semibold text-sm leading-tight line-clamp-2">
-          {name}
+          {nombre}
         </h4>
 
         {/* Descripción */}
-        {description && (
+        {descripcion && (
           <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
-            {description}
+            {descripcion}
           </p>
         )}
 

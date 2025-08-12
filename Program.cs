@@ -9,7 +9,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using AutoMapper;
-using EcommerceFS.Services;
+using EcommerceFullStack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

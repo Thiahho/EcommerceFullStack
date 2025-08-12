@@ -1,8 +1,8 @@
-﻿using EcommerceFS.Data.Modelos;
+﻿using EcommerceFullStack.Data.Modelos;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace EcommerceFS.Data.Dtos
+namespace EcommerceFullStack.Data.Dtos
 {
     public class ProductosVariantesDto
     {

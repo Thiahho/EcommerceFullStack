@@ -2,7 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
 using System.Net;
 
-namespace EcommerceFS.Middleware
+namespace EcommerceFullStack.Middleware
 {
     public class RateLimitingMiddleware
     {

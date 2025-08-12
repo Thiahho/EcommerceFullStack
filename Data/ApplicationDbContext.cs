@@ -1,7 +1,7 @@
-﻿using EcommerceFS.Data.Modelos;
+﻿using EcommerceFullStack.Data.Modelos;
 using Microsoft.EntityFrameworkCore;
 
-namespace EcommerceFS.Data
+namespace EcommerceFullStack.Data
 {
     public class ApplicationDbContext : DbContext
     {

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using EcommerceFullStack.Data;
 using EcommerceFullStack.Services.Interfaces;
 using EcommerceFullStack.Data.Modelos;
-namespace EcommerceFS.Controllers
+namespace EcommerceFullStack.Controllers
 {
     [Route("[controller]")]
     [ApiController]

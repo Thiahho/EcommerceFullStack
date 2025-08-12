@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Heading from "../Shared/Heading";
 import ProductCard from "./ProductCard";
 import useProductStore from "../../stores/productStore";
@@ -13,10 +13,13 @@ const Products = () => {
   
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Cargar productos al montar el componente
+  // Cargar productos al montar el componente (evitar doble llamada en StrictMode)
+  const loadedOnceRef = useRef(false);
   useEffect(() => {
+    if (loadedOnceRef.current) return;
+    loadedOnceRef.current = true;
     fetchProducts();
-  }, [fetchProducts]);
+  }, []);
 
   // Manejar click en producto
   const handleProductClick = (producto) => {

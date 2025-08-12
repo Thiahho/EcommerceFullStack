@@ -11,7 +11,7 @@ using EcommerceFullStack.Services.Interfaces;
 using EcommerceFullStack.Data;
 using EcommerceFullStack.Data.Modelos;
 
-namespace EcommerceFS.Services
+namespace EcommerceFullStack.Services
 {
     public class UsuarioService : IUsuarioService
     {
