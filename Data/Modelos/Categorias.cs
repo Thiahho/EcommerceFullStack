@@ -1,4 +1,4 @@
-﻿namespace EcommerceFullStack.Data.Modelos
+﻿namespace EcommerceFS.Data.Modelos
 {
     public class Categorias
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using EcommerceFullStack.Data.Modelos;
+using EcommerceFS.Data.Modelos;
 
-namespace EcommerceFullStack.Data.Dtos
+namespace EcommerceFS.Data.Dtos
 {
     public class ProductoDto
     {

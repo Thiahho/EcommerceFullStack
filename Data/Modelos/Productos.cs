@@ -1,28 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EcommerceFullStack.Data.Modelos
+namespace EcommerceFS.Data.Modelos
 {
     public class Productos
     {
         public int Id { get; set; }
         
         [Required]
+        [Column("Nombre")]
         [MaxLength(100)]
         public string Nombre { get; set; } = string.Empty;
         
         [Required]
+        [Column("Marca")]
         [MaxLength(50)]
         public string Marca { get; set; } = string.Empty;
         
         [Required]
+        [Column("Descripcion")]
         [MaxLength(1000)]
         public string Descripcion { get; set; } = string.Empty;
         
-        [Column("images")]
+        [Column("Images")]
         public byte[]? Images { get; set; }
         
-        [Column("categoria_id")]
+        [Column("CategoriaId")]
         public int? CategoriaId { get; set; }
         
         // Navigation properties

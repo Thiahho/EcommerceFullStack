@@ -3488,11 +3488,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFS\\EcommerceFullStack.csproj",
+      "projectUniqueName": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\EcommerceFullStack.csproj",
       "projectName": "EcommerceFullStack",
-      "projectPath": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFS\\EcommerceFullStack.csproj",
+      "projectPath": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\EcommerceFullStack.csproj",
       "packagesPath": "C:\\Users\\thiag\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFS\\obj\\",
+      "outputPath": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
