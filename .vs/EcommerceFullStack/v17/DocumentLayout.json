@@ -3,115 +3,119 @@
   "WorkspaceRootPath": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Frontend\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Frontend\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\ApplicationDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\ApplicationDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Frontend\\lib\\config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Frontend\\lib\\config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\frontend\\lib\\config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:frontend\\lib\\config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\DrCellV-02\\DrCell-V02\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Middleware\\RateLimitingMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Middleware\\RateLimitingMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\middleware\\ratelimitingmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:middleware\\ratelimitingmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Middleware\\JwtCookieMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Middleware\\JwtCookieMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\middleware\\jwtcookiemiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:middleware\\jwtcookiemiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Middleware\\SwaggerSecurityMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Middleware\\SwaggerSecurityMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\EcommerceFullStack.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:EcommerceFullStack.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\middleware\\swaggersecuritymiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:middleware\\swaggersecuritymiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\ProductosController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controller\\ProductosController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\ecommercefullstack.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:ecommercefullstack.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\AdminService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\AdminService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\controller\\productoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:controller\\productoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\AdminController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controller\\AdminController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\LoginController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controller\\LoginController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\controller\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:controller\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\UsuarioService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\UsuarioService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\controller\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:controller\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\Rol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\Modelos\\Rol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\usuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\usuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\ISuarioService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\Interfaces\\ISuarioService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\data\\modelos\\rol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\rol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\CategoriasService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\CategoriasService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\interfaces\\isuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\interfaces\\isuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\categoriasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\categoriasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\Usuarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\Modelos\\Usuarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\ICategoriaService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\Interfaces\\ICategoriaService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\data\\modelos\\usuarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\usuarios.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\CategoriasController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controller\\CategoriasController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\frontend\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:frontend\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\Productos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\Modelos\\Productos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\IAdminSerivce.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\Interfaces\\IAdminSerivce.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\interfaces\\icategoriaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\interfaces\\icategoriaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\ProductosService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\ProductosService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\controller\\categoriascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:controller\\categoriascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\IProductoService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\Interfaces\\IProductoService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\data\\modelos\\productos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\productos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Dtos\\ProductosVariantesDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\Dtos\\ProductosVariantesDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\interfaces\\iadminserivce.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\interfaces\\iadminserivce.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Dtos\\ProductoDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\Dtos\\ProductoDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\productosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\productosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\ProductosVariantes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\Modelos\\ProductosVariantes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\services\\interfaces\\iproductoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:services\\interfaces\\iproductoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\data\\dtos\\productosvariantesdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\dtos\\productosvariantesdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\data\\dtos\\productodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\dtos\\productodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|c:\\users\\thiag\\source\\repos\\thiahho\\ecommercefullstack\\data\\modelos\\productosvariantes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1FBE393-AC4D-4909-846F-109BEA2B2328}|EcommerceFullStack.csproj|solutionrelative:data\\modelos\\productosvariantes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -169,7 +173,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
+              "Title": ".gitignore",
+              "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\.gitignore",
+              "RelativeDocumentMoniker": ".gitignore",
+              "ToolTip": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\.gitignore",
+              "RelativeToolTip": ".gitignore",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAACoAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-13T18:08:23.21Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "config.js",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Frontend\\lib\\config.js",
               "RelativeDocumentMoniker": "Frontend\\lib\\config.js",
@@ -182,7 +199,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "RateLimitingMiddleware.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Middleware\\RateLimitingMiddleware.cs",
               "RelativeDocumentMoniker": "Middleware\\RateLimitingMiddleware.cs",
@@ -194,7 +211,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 4,
               "Title": "JwtCookieMiddleware.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Middleware\\JwtCookieMiddleware.cs",
               "RelativeDocumentMoniker": "Middleware\\JwtCookieMiddleware.cs",
@@ -206,7 +223,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -214,12 +231,11 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-10T20:25:34.971Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-10T20:25:34.971Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 6,
               "Title": "SwaggerSecurityMiddleware.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Middleware\\SwaggerSecurityMiddleware.cs",
               "RelativeDocumentMoniker": "Middleware\\SwaggerSecurityMiddleware.cs",
@@ -231,7 +247,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 7,
               "Title": "EcommerceFullStack.csproj",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\EcommerceFullStack.csproj",
               "RelativeDocumentMoniker": "EcommerceFullStack.csproj",
@@ -243,7 +259,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 8,
               "Title": "ProductosController.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\ProductosController.cs",
               "RelativeDocumentMoniker": "Controller\\ProductosController.cs",
@@ -255,7 +271,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 9,
               "Title": "AdminService.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\AdminService.cs",
               "RelativeDocumentMoniker": "Services\\AdminService.cs",
@@ -267,7 +283,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 10,
               "Title": "AdminController.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\AdminController.cs",
               "RelativeDocumentMoniker": "Controller\\AdminController.cs",
@@ -279,7 +295,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 11,
               "Title": "LoginController.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\LoginController.cs",
               "RelativeDocumentMoniker": "Controller\\LoginController.cs",
@@ -291,7 +307,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 12,
               "Title": "UsuarioService.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\UsuarioService.cs",
               "RelativeDocumentMoniker": "Services\\UsuarioService.cs",
@@ -303,7 +319,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 13,
               "Title": "Rol.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\Rol.cs",
               "RelativeDocumentMoniker": "Data\\Modelos\\Rol.cs",
@@ -315,7 +331,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 14,
               "Title": "ISuarioService.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\ISuarioService.cs",
               "RelativeDocumentMoniker": "Services\\Interfaces\\ISuarioService.cs",
@@ -327,7 +343,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 15,
               "Title": "CategoriasService.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\CategoriasService.cs",
               "RelativeDocumentMoniker": "Services\\CategoriasService.cs",
@@ -339,7 +355,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\DrCellV-02\\DrCell-V02\\appsettings.json",
               "RelativeDocumentMoniker": "..\\DrCellV-02\\DrCell-V02\\appsettings.json",
@@ -351,7 +367,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 16,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -363,7 +379,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 17,
               "Title": "Usuarios.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\Usuarios.cs",
               "RelativeDocumentMoniker": "Data\\Modelos\\Usuarios.cs",
@@ -381,7 +397,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 18,
               "Title": ".gitignore",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Frontend\\.gitignore",
               "RelativeDocumentMoniker": "Frontend\\.gitignore",
@@ -394,7 +410,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 19,
               "Title": "ApplicationDbContext.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\ApplicationDbContext.cs",
               "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
@@ -402,12 +418,11 @@
               "RelativeToolTip": "Data\\ApplicationDbContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-12T16:45:27.153Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-12T16:45:27.153Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "ICategoriaService.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\ICategoriaService.cs",
               "RelativeDocumentMoniker": "Services\\Interfaces\\ICategoriaService.cs",
@@ -419,7 +434,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "CategoriasController.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Controller\\CategoriasController.cs",
               "RelativeDocumentMoniker": "Controller\\CategoriasController.cs",
@@ -431,7 +446,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "Productos.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\Productos.cs",
               "RelativeDocumentMoniker": "Data\\Modelos\\Productos.cs",
@@ -443,7 +458,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "IAdminSerivce.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\IAdminSerivce.cs",
               "RelativeDocumentMoniker": "Services\\Interfaces\\IAdminSerivce.cs",
@@ -455,7 +470,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "ProductosService.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\ProductosService.cs",
               "RelativeDocumentMoniker": "Services\\ProductosService.cs",
@@ -467,7 +482,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "IProductoService.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Services\\Interfaces\\IProductoService.cs",
               "RelativeDocumentMoniker": "Services\\Interfaces\\IProductoService.cs",
@@ -479,7 +494,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "ProductosVariantesDto.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Dtos\\ProductosVariantesDto.cs",
               "RelativeDocumentMoniker": "Data\\Dtos\\ProductosVariantesDto.cs",
@@ -491,7 +506,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 27,
               "Title": "ProductoDto.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Dtos\\ProductoDto.cs",
               "RelativeDocumentMoniker": "Data\\Dtos\\ProductoDto.cs",
@@ -503,7 +518,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 28,
               "Title": "ProductosVariantes.cs",
               "DocumentMoniker": "C:\\Users\\thiag\\source\\repos\\Thiahho\\EcommerceFullStack\\Data\\Modelos\\ProductosVariantes.cs",
               "RelativeDocumentMoniker": "Data\\Modelos\\ProductosVariantes.cs",
