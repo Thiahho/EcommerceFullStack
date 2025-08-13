@@ -72,7 +72,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
         builder =>
         {
-            builder.WithOrigins("http://localhost:3000", "http://localhost:5173")
+            builder.WithOrigins(
+                    "http://localhost:5173",  // Vite
+                    "http://localhost:3000",  // Next.js
+                    "https://localhost:3000"  // Next.js HTTPS
+                )
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
@@ -138,7 +142,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+// En producción, forzar HTTPS. En desarrollo evitamos redirección automática si no hay endpoint HTTPS configurado
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 // Configuración de CORS
 app.UseCors("AllowSpecificOrigin");

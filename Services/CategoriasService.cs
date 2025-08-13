@@ -68,6 +68,7 @@ namespace EcommerceFullStack.Services
 
             if (categorias != null)
             {
+                categorias.Nombre = categoriaDto.Nombre;
                 _dbContext.Categorias.Update(categorias);
                 await _dbContext.SaveChangesAsync();
 

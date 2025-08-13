@@ -24,8 +24,8 @@ namespace EcommerceFullStack.Controllers
         private readonly IConfiguration _configuration;
         private readonly IProductoService _productoService;
         private readonly ICategoriaService _categoriaService;
-        private readonly ILogger<AdminController> _logger;
-        public CategoriasController(ApplicationDbContext context, IConfiguration config, IProductoService productoService, ICategoriaService categoriaService, ILogger<AdminController> logger)
+        private readonly ILogger<CategoriasController> _logger;
+        public CategoriasController(ApplicationDbContext context, IConfiguration config, IProductoService productoService, ICategoriaService categoriaService, ILogger<CategoriasController> logger)
         {
             _context = context;
             _configuration = config;
@@ -34,13 +34,13 @@ namespace EcommerceFullStack.Controllers
             _logger = logger;
         }
 
-        [HttpPost("crearCategoria")]
+        [HttpPost]
         public async Task<IActionResult> CrearCategoria([FromBody] CategoriaDto categoria)
         {
             try
             {
                 var nuevaCategoria = await _categoriaService.AddCategoriaAsync(categoria);
-                return Ok(nuevaCategoria);
+                return CreatedAtAction(nameof(GetCategoriaById), new { id = nuevaCategoria.Id }, nuevaCategoria);
 
             }
             catch (Exception ex)
@@ -50,7 +50,7 @@ namespace EcommerceFullStack.Controllers
             }
         }
 
-        [HttpPut("actualizarCategoria/{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> ActualizarCategoria(int id, [FromBody] CategoriaDto categoria)
         {
             try
@@ -77,7 +77,7 @@ namespace EcommerceFullStack.Controllers
             }
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id:int}")]
         [Authorize(Roles = "ADMIN")]
        // [EnableRateLimiting("CriticalPolicy")]
         public async Task<IActionResult> EliminarCategoria(int id)
@@ -102,7 +102,7 @@ namespace EcommerceFullStack.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("categorias")]
+        [HttpGet]
         public async Task<IActionResult> GetCategorias()
         {
             try
@@ -113,6 +113,26 @@ namespace EcommerceFullStack.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener las categorias");
+                return StatusCode(500, "Error interno del servidor");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetCategoriaById(int id)
+        {
+            try
+            {
+                var categoria = await _categoriaService.GetCategoriaByIdAsync(id);
+                if (categoria == null)
+                {
+                    return NotFound("Categoria no encontrada");
+                }
+                return Ok(categoria);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener la categoria por id");
                 return StatusCode(500, "Error interno del servidor");
             }
         }
