@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Menu, X, Filter } from 'lucide-react';
-import axios from '@/lib/axios';
+import axios from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 import SidebarFilters from './SidebarFilters';
 
@@ -18,7 +18,7 @@ const Shop: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('/api/Producto')
+    axios.get('/Productos/GetAll')
       .then(res => {
         setProductos(res.data);
         // Calcular rango de precios inicial
@@ -89,7 +89,7 @@ const Shop: React.FC = () => {
       {/* Header con título y botón de filtros móvil */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Tienda</h1>
-        
+
         {/* Botón de filtros para móvil */}
         <button
           onClick={handleSidebarToggle}
@@ -118,11 +118,11 @@ const Shop: React.FC = () => {
         {isSidebarOpen && (
           <div className="lg:hidden fixed inset-0 z-50">
             {/* Overlay */}
-            <div 
+            <div
               className="absolute inset-0 bg-black bg-opacity-50"
               onClick={handleSidebarClose}
             />
-            
+
             {/* Sidebar */}
             <div className="absolute top-0 left-0 h-full w-80 max-w-[85vw] bg-white shadow-xl">
               <div className="flex items-center justify-between p-4 border-b">
@@ -156,17 +156,17 @@ const Shop: React.FC = () => {
             <p className="text-gray-600">
               {productosFiltrados.length} producto{productosFiltrados.length !== 1 ? 's' : ''} encontrado{productosFiltrados.length !== 1 ? 's' : ''}
             </p>
-            
+
             {/* Botón limpiar filtros */}
-            {(filtros.marcas.length > 0 || filtros.categorias.length > 0 || 
+            {(filtros.marcas.length > 0 || filtros.categorias.length > 0 ||
               filtros.precio[0] !== rangoPrecio[0] || filtros.precio[1] !== rangoPrecio[1]) && (
-              <button
-                onClick={handleLimpiarFiltros}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
-              >
-                Limpiar filtros
-              </button>
-            )}
+                <button
+                  onClick={handleLimpiarFiltros}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+                >
+                  Limpiar filtros
+                </button>
+              )}
           </div>
 
           {/* Grid de productos */}
@@ -188,13 +188,13 @@ const Shop: React.FC = () => {
                 <div key={p.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border overflow-hidden">
                   {/* Imagen del producto */}
                   <div className="aspect-square overflow-hidden">
-                    <img 
-                      src={`data:image/jpeg;base64,${p.img}`} 
-                      alt={`${p.marca} ${p.modelo}`} 
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
+                    <img
+                      src={`data:image/jpeg;base64,${p.img}`}
+                      alt={`${p.marca} ${p.modelo}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  
+
                   {/* Información del producto */}
                   <div className="p-4 space-y-3">
                     <div>
@@ -203,13 +203,13 @@ const Shop: React.FC = () => {
                       </h3>
                       <p className="text-gray-600 text-sm">{p.categoria}</p>
                     </div>
-                    
+
                     <div className="text-green-600 font-semibold text-lg">
                       {p.variantes && p.variantes.length > 0
                         ? `$${Math.min(...p.variantes.map((v: any) => v.precio)).toLocaleString()}`
                         : 'Sin stock'}
                     </div>
-                    
+
                     <button
                       className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                       onClick={() => navigate(`/tienda/${p.id}`)}

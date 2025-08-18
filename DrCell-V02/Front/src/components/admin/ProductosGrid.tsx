@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import api from '@/lib/axios';
+import api from '../../config/axios';
 import EditProductForm from './EditProductForm';
 
 interface Producto {
@@ -37,7 +37,7 @@ const ProductosGrid = () => {
 
     const fetchProductos = async () => {
         try {
-            const response = await api.get('/api/Producto');
+            const response = await api.get('/Productos');
             setProductos(response.data);
         } catch (error) {
             console.error('Error al obtener productos:', error);
@@ -111,7 +111,7 @@ const ProductosGrid = () => {
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             />
                         </div>
-                        
+
                         {/* Información del producto */}
                         <div className="space-y-3">
                             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 line-clamp-2">
@@ -120,7 +120,7 @@ const ProductosGrid = () => {
                             <p className="text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded inline-block">
                                 {producto.categoria}
                             </p>
-                            
+
                             {/* Variantes */}
                             <div className="space-y-2">
                                 <h3 className="font-medium text-sm text-gray-700">Variantes:</h3>
@@ -164,7 +164,7 @@ const ProductosGrid = () => {
                         {searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda.' : 'No hay productos disponibles.'}
                     </div>
                     {searchTerm && (
-                        <Button 
+                        <Button
                             onClick={() => setSearchTerm('')}
                             variant="outline"
                             className="mt-4"

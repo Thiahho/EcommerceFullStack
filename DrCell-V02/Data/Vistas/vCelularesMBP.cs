@@ -1,4 +1,4 @@
-﻿namespace DrCell_V01.Data.Vistas
+﻿namespace DrCell_V02.Data.Vistas
 {
     public class vCelularesMBP
     {

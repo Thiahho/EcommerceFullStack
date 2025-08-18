@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import axios from '@/lib/axios';
+import axios from '../../config/axios';
 import { toWebpBase64 } from '@/lib/utils';
 
 interface EditProductFormProps {
@@ -49,7 +49,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setEditedProducto(prev => ({ ...prev, img: file }));
-      
+
       // Crear vista previa
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -83,13 +83,13 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
         img: imgBase64
       };
 
-      await axios.put(`/api/Producto/${producto.id}`, productoData);
-      
+      await axios.put(`/admin/productos/${producto.id}`, productoData);
+
       toast.success('¡Producto actualizado exitosamente!', {
         description: 'El producto se ha actualizado en el sistema.',
         duration: 4000,
       });
-      
+
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -131,7 +131,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
               <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
               Información Básica
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="marca" className="text-sm font-semibold text-gray-700">
@@ -185,7 +185,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
               <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
               Imagen del Producto
             </h3>
-            
+
             <div className="space-y-4">
               {/* Imagen actual */}
               <div className="space-y-2">

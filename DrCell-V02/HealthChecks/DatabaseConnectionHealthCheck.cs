@@ -1,9 +1,9 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace DrCell_V01.HealthChecks;
+namespace DrCell_V02.HealthChecks;
 
 public class DatabaseConnectionHealthCheck : IHealthCheck
 {

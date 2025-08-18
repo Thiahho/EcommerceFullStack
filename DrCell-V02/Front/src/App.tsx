@@ -8,12 +8,13 @@ import Variantes from '@/pages/admin/Variantes';
 import ProductosGrid from '@/components/admin/ProductosGrid';
 import Usuarios from '@/pages/admin/Usuarios';
 import ConsultaReparacionSection from './components/ConsultaReparacionSection';
-import {Login} from '@/pages/Login';
+import { Login } from '@/pages/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import LayoutAdmin from '@/components/layout/LayoutAdmin';
 import DashboardAdmin from '@/components/admin/DasboardAdmin';
 import PrivateRoute from '@/components/admin/PrivateRoute';
 import ReparacionesConfig from '@/components/admin/ReparacionesConfig';
+import Categorias from '@/components/admin/Categorias';
 import { Toaster } from 'sonner';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/auth-store';
@@ -81,7 +82,7 @@ export default function App() {
   if (isLoading || !isInitialized) {
     return <LoadingScreen />;
   }
-  
+
   return (
     <>
       <Toaster position="top-right" richColors />
@@ -106,6 +107,7 @@ export default function App() {
             <Route path="productos" element={<ProductosAdmin />} />
             <Route path="variantes" element={<Variantes />} />
             <Route path="reparaciones" element={<ReparacionesConfig />} />
+            <Route path="categorias" element={<Categorias />} />
             <Route path="usuarios" element={<Usuarios />} />
           </Route>
           <Route

@@ -1,11 +1,19 @@
+
 import axios from 'axios';
+
+// 🚨 HARDCODED PARA DEBUG - FORZAR HTTP
+const FORCE_HTTP_URL = 'http://localhost:5000';
 
 // Configuración dinámica de la URL base
 const getBaseURL = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.REACT_APP_API_URL || 'https://api.drcell.com';
-  }
-  return 'http://localhost:5015';
+  console.log('🔧 DEBUG - axios.ts getBaseURL()');
+  console.log('🔧 DEBUG - process.env.REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+  console.log('🔧 DEBUG - process.env.NODE_ENV:', process.env.NODE_ENV);
+  console.log('🔧 DEBUG - window.location.protocol:', typeof window !== 'undefined' ? window.location.protocol : 'N/A');
+  
+  // FORZAMOS HTTP para debug
+  console.log('🔧 DEBUG - FORZANDO URL:', FORCE_HTTP_URL);
+  return FORCE_HTTP_URL;
 };
 
 const api = axios.create({
@@ -16,12 +24,19 @@ const api = axios.create({
   withCredentials: true // 🔑 Crítico: Permite envío de cookies httpOnly
 });
 
-// 🔑 Interceptor para manejar autenticación con cookies
-// Ya no necesitamos agregar tokens manualmente - las cookies se envían automáticamente
+// 🔑 Interceptor para manejar autenticación con cookies + localStorage fallback
 api.interceptors.request.use(
   (config) => {
-    // Las cookies httpOnly se envían automáticamente
-    // No necesitamos hacer nada aquí
+    // 🔧 TEMP: En desarrollo, usar localStorage como fallback si no hay cookies
+    if (process.env.NODE_ENV === 'development') {
+      const token = localStorage.getItem('authToken');
+      if (token && !document.cookie.includes('AuthToken')) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔧 TEMP: Usando token de localStorage');
+      }
+    }
+    
+    console.log(`🔗 API Call: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
     return config;
   },
   (error) => {
@@ -31,8 +46,13 @@ api.interceptors.request.use(
 
 // Interceptor para manejar errores de autenticación
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`✅ API Response: ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    return response;
+  },
   async (error) => {
+    console.error(`❌ API Error: ${error.response?.status} ${error.config?.method?.toUpperCase()} ${error.config?.url}`, error.response?.data);
+    
     if (error.response?.status === 401) {
       // Limpiar cualquier token que pueda estar en localStorage (migración)
       localStorage.removeItem('token');

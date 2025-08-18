@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from 'sonner';
-import api from '@/lib/axios';
+import api from '../../config/axios';
 
 // Interfaces unificadas para los diferentes tipos de registros
 interface BaseRecord {
@@ -119,26 +119,26 @@ const ReparacionesConfig = () => {
     const getApiEndpoint = (type: RecordType) => {
         switch (type) {
             case 'baterias':
-                return '/api/Baterias/all';
+                return '/Baterias/all';
             case 'pines':
-                return '/api/Pines/all';
+                return '/Pines/all';
             case 'modulos':
-                return '/api/Modulos/all';
+                return '/Modulos/all';
             default:
-                return '/api/Baterias/all';
+                return '/Baterias/all';
         }
     };
 
     const getUpdateEndpoint = (type: RecordType, id: number) => {
         switch (type) {
             case 'baterias':
-                return `/api/Baterias/${id}`;
+                return `/Baterias/${id}`;
             case 'pines':
-                return `/api/Pines/${id}`;
+                return `/Pines/${id}`;
             case 'modulos':
-                return `/api/Modulos/${id}`;
+                return `/Modulos/${id}`;
             default:
-                return `/api/Baterias/${id}`;
+                return `/Baterias/${id}`;
         }
     };
 
@@ -149,13 +149,13 @@ const ReparacionesConfig = () => {
     const getCreateEndpoint = (type: RecordType) => {
         switch (type) {
             case 'baterias':
-                return '/api/Baterias/create';
+                return '/Baterias/create';
             case 'pines':
-                return '/api/Pines/create';
+                return '/Pines/create';
             case 'modulos':
-                return '/api/Modulos/create';
+                return '/Modulos/create';
             default:
-                return '/api/Baterias/create';
+                return '/Baterias/create';
         }
     };
 

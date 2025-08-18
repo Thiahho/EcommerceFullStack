@@ -1,10 +1,10 @@
-using DrCell_V01.Data.Modelos;
+using DrCell_V02.Data.Modelos;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace DrCell_V01.Data.Dtos
+namespace DrCell_V02.Data.Dtos
 {
     public class ProductosVariantesDto
     {

@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DrCell_V01.Migrations
+namespace DrCell_V02.Migrations
 {
     /// <inheritdoc />
     public partial class InicialIdentity : Migration

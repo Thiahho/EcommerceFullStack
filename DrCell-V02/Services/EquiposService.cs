@@ -1,9 +1,9 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace DrCell_V01.Services
+namespace DrCell_V02.Services
 {
     public class EquiposService : ICelularesService
     {

@@ -33,8 +33,8 @@ interface DropdownBuscadorProps {
   onMarcaChange?: (marca: string) => void;
   onModeloChange?: (modelo: string) => void;
 }
+import api from '@/config/axios';
 
-const API_URL = 'http://localhost:5015';
 
 const DropdownBuscador: React.FC<DropdownBuscadorProps> = ({
   onSeleccionar,
@@ -62,9 +62,9 @@ const DropdownBuscador: React.FC<DropdownBuscadorProps> = ({
         const params = new URLSearchParams();
         params.append('termino', terminoBusqueda.trim());
         
-        fetch(`${API_URL}/celulares/buscar?${params}`)
-          .then(res => res.json())
-          .then(data => {
+        api.get(`/Celulares/buscar?${params}`)
+          .then(res => {
+            const data = res.data;
             const resultados: ReparacionInfo[] = data.data || [];
             setResultadosBusqueda(resultados);
             setMostrarDropdown(true);

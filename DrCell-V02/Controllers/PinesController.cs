@@ -1,14 +1,14 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace DrCell_V01.Controllers
+namespace DrCell_V02.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Pines")]
     [ApiController]
     [EnableRateLimiting("AuthPolicy")]
     public class PinesController : ControllerBase
@@ -24,6 +24,7 @@ namespace DrCell_V01.Controllers
             _logger = logger;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetPines()
         {
@@ -39,6 +40,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPines()
         {
@@ -67,6 +69,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("marca/{marca}")]
         public async Task<IActionResult> GetPinesByMarca(string marca)
         {
@@ -82,6 +85,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("modelos")]
         public async Task<IActionResult> GetPinesByModelos()
         {
@@ -97,6 +101,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("Solo-Pines/{marca}/{modelo}")]
         public async Task<IActionResult> GetPinesByModelo(string marca, string modelo)
         {
@@ -112,6 +117,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPinById(int id)
         {
@@ -131,78 +137,78 @@ namespace DrCell_V01.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdatePin(int id, [FromBody] Pines pin)
-        {
-            try
-            {
-                if (id != pin.id)
-                    return BadRequest(new { success = false, message = "El ID del pin no coincide" });
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "ADMIN")]
+        //public async Task<IActionResult> UpdatePin(int id, [FromBody] Pines pin)
+        //{
+        //    try
+        //    {
+        //        if (id != pin.id)
+        //            return BadRequest(new { success = false, message = "El ID del pin no coincide" });
 
-                var existePin = await _pinesService.GetPinByIdAsync(id);
-                if (existePin == null)
-                {
-                    return NotFound(new { success = false, message = $"No se encontró el pin con ID {id}" });
-                }
+        //        var existePin = await _pinesService.GetPinByIdAsync(id);
+        //        if (existePin == null)
+        //        {
+        //            return NotFound(new { success = false, message = $"No se encontró el pin con ID {id}" });
+        //        }
 
-                await _pinesService.UpdateAsync(pin);
-                _logger.LogInformation("Pin {Id} actualizado correctamente", id);
+        //        await _pinesService.UpdateAsync(pin);
+        //        _logger.LogInformation("Pin {Id} actualizado correctamente", id);
                 
-                return Ok(new { success = true, message = "Pin actualizado correctamente", data = pin });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al actualizar el pin {Id}", id);
-                return StatusCode(500, new { success = false, message = "Error interno del servidor" });
-            }
-        }
+        //        return Ok(new { success = true, message = "Pin actualizado correctamente", data = pin });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al actualizar el pin {Id}", id);
+        //        return StatusCode(500, new { success = false, message = "Error interno del servidor" });
+        //    }
+        //}
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
-        [EnableRateLimiting("CriticalPolicy")]
-        public async Task<IActionResult> DeletePin(int id)
-        {
-            try
-            {
-                var pin = await _pinesService.GetPinByIdAsync(id);
-                if (pin == null)
-                {
-                    return NotFound(new { success = false, message = $"No se encontró el pin con ID {id}" });
-                }
+        //[HttpDelete("{id}")]
+        //[Authorize(Roles = "ADMIN")]
+        //[EnableRateLimiting("CriticalPolicy")]
+        //public async Task<IActionResult> DeletePin(int id)
+        //{
+        //    try
+        //    {
+        //        var pin = await _pinesService.GetPinByIdAsync(id);
+        //        if (pin == null)
+        //        {
+        //            return NotFound(new { success = false, message = $"No se encontró el pin con ID {id}" });
+        //        }
 
-                await _pinesService.DeleteAsync(id);
-                _logger.LogInformation("Pin {Id} eliminado correctamente", id);
+        //        await _pinesService.DeleteAsync(id);
+        //        _logger.LogInformation("Pin {Id} eliminado correctamente", id);
                 
-                return Ok(new { success = true, message = "Pin eliminado correctamente" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al eliminar el pin {Id}", id);
-                return StatusCode(500, new { success = false, message = "Error interno del servidor" });
-            }
-        }
+        //        return Ok(new { success = true, message = "Pin eliminado correctamente" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al eliminar el pin {Id}", id);
+        //        return StatusCode(500, new { success = false, message = "Error interno del servidor" });
+        //    }
+        //}
 
-        [HttpPost("create")]
-        [Authorize(Roles = "ADMIN")]
-        [EnableRateLimiting("CriticalPolicy")]
-        public async Task<IActionResult> CreatePin([FromBody] Pines pin)
-        {
-            try
-            {
-                if(!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+        //[HttpPost("create")]
+        //[Authorize(Roles = "ADMIN")]
+        //[EnableRateLimiting("CriticalPolicy")]
+        //public async Task<IActionResult> CreatePin([FromBody] Pines pin)
+        //{
+        //    try
+        //    {
+        //        if(!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-                var nuevoPin = await _pinesService.AddAsync(pin);
-                return CreatedAtAction(nameof(GetPinById), new { id = nuevoPin.id }, new { success = true, data = nuevoPin });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear el pin");
-                return StatusCode(500, new { success = false, message = "Error interno del servidor" });
-            }
-        }
+        //        var nuevoPin = await _pinesService.AddAsync(pin);
+        //        return CreatedAtAction(nameof(GetPinById), new { id = nuevoPin.id }, new { success = true, data = nuevoPin });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al crear el pin");
+        //        return StatusCode(500, new { success = false, message = "Error interno del servidor" });
+        //    }
+        //}
     }
 }

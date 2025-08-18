@@ -16,6 +16,7 @@ const links = [
   { to: '/admin/productos', label: 'Productos', icon: Package },
   { to: '/admin/variantes', label: 'Variantes', icon: Package },
   { to: '/admin/reparaciones', label: 'Reparaciones', icon: Package },
+  { to: '/admin/categorias', label: 'Categorias', icon: Package },
 ];
 
 interface SidebarAdminProps {
@@ -43,18 +44,18 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({ open, setOpen, isMobile }) 
     <>
       {/* Overlay para móviles */}
       {isMobile && open && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside 
+      <aside
         className={`
           fixed lg:relative z-50 h-full bg-white shadow-2xl flex flex-col transition-all duration-300 ease-in-out
-          ${isMobile 
-            ? `top-0 left-0 transform ${open ? 'translate-x-0' : '-translate-x-full'} w-64` 
+          ${isMobile
+            ? `top-0 left-0 transform ${open ? 'translate-x-0' : '-translate-x-full'} w-64`
             : `w-64 my-6 ml-6 rounded-3xl`
           }
           ${!isMobile && !open ? 'w-20' : ''}
@@ -79,7 +80,7 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({ open, setOpen, isMobile }) 
               </div>
             )}
           </div>
-          
+
           {/* Botón de cerrar para móviles */}
           {isMobile && (
             <button
@@ -90,7 +91,7 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({ open, setOpen, isMobile }) 
               <X className="h-6 w-6 text-gray-600" />
             </button>
           )}
-          
+
           {/* Botón de toggle para desktop */}
           {!isMobile && (
             <button

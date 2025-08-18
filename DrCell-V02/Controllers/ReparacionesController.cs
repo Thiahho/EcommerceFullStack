@@ -1,27 +1,27 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Microsoft.AspNetCore.RateLimiting;
-namespace DrCell_V01.Controllers
+namespace DrCell_V02.Controllers
 {
     /// <summary>
     /// Controlador para gestionar consultas de reparaciones de celulares
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("Reparaciones")]
     [ApiController]
     [EnableRateLimiting("AuthPolicy")]
-    public class ReparacionesController : ControllerBase
+    public class AdminReparacionesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly IvCelularesInfoService _celularesService;
-        private readonly ILogger<ReparacionesController> _logger;
+        private readonly ILogger<AdminReparacionesController> _logger;
 
-        public ReparacionesController(
+        public AdminReparacionesController(
             ApplicationDbContext context, 
             IvCelularesInfoService celularesService,
-            ILogger<ReparacionesController> logger)
+            ILogger<AdminReparacionesController> logger)
         {
             _context = context;
             _celularesService = celularesService;

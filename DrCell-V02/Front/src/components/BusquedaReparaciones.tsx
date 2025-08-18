@@ -21,8 +21,8 @@ interface ReparacionInfo {
   marco?: boolean;
   version?: string;
 }
+import api from '@/config/axios';
 
-const API_URL = 'http://localhost:5015';
 
 const BusquedaReparaciones: React.FC = () => {
   const [termino, setTermino] = useState('');
@@ -34,7 +34,7 @@ const BusquedaReparaciones: React.FC = () => {
 
   // Obtener marcas para el filtro
   useEffect(() => {
-    axios.get(`${API_URL}/celulares/marcas`)
+    api.get(`/Celulares/marcas`)
       .then(res => setMarcas(res.data))
       .catch(() => setMarcas([]));
   }, []);
@@ -47,7 +47,7 @@ const BusquedaReparaciones: React.FC = () => {
       if (marca) params.append('marca', marca);
       if (modelo) params.append('modelo', modelo);
 
-      const response = await axios.get(`${API_URL}/celulares/buscar?${params}`);
+      const response = await api.get(`/Celulares/buscar?${params}`);
       setResultados(response.data.data || []);
     } catch (error) {
       console.error('Error en la búsqueda:', error);

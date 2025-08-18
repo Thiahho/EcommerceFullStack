@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import axios from '@/lib/axios';
+import axios from '../../config/axios';
 import { toast } from 'sonner';
 
 interface ProductFormProps {
@@ -85,7 +85,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProducto(prev => ({ ...prev, img: file }));
-      
+
       // Crear vista previa
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -116,13 +116,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
         img: imgBase64
       };
 
-      await axios.post('/api/Producto', productoPayload);
-      
+      await axios.post('/admin/Productos', productoPayload);
+
       toast.success('¡Producto creado exitosamente!', {
         description: 'El producto se ha guardado en el sistema.',
         duration: 4000,
       });
-      
+
       // Reset form
       setProducto({
         marca: '',
@@ -131,7 +131,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
         img: null
       });
       setImagePreview(null);
-      
+
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -173,7 +173,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
               <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
               Información Básica
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="marca" className="text-sm font-semibold text-gray-700">
@@ -229,7 +229,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
               <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
               Imagen del Producto
             </h3>
-            
+
             <div className="space-y-3">
               <div className="space-y-2">
                 <Label htmlFor="img" className="text-sm font-semibold text-gray-700">

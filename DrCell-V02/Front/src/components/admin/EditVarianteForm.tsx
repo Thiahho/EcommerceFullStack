@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from '@/lib/axios';
+import axios from '../../config/axios';
 import { toast } from 'sonner';
 
 interface EditVarianteFormProps {
@@ -30,12 +30,12 @@ interface Variante {
   stock: number;
 }
 
-const EditVarianteForm: React.FC<EditVarianteFormProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSuccess, 
-  variante, 
-  productoId 
+const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  variante,
+  productoId
 }) => {
   const [formData, setFormData] = useState<Variante>({
     ram: '',
@@ -109,13 +109,13 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
         stock: Number(formData.stock)
       };
 
-      await axios.put(`/api/Producto/variante/${variante.id}`, variantePayload);
-      
+      await axios.put(`/admin/productos/variante/${variante.id}`, variantePayload);
+
       toast.success('¡Variante actualizada exitosamente!', {
         description: 'La variante se ha actualizado en el sistema.',
         duration: 4000,
       });
-      
+
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -162,7 +162,7 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
               <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
               Especificaciones Técnicas
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="ram" className="text-sm font-semibold text-gray-700">
@@ -173,9 +173,8 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
                   value={formData.ram}
                   onChange={(e) => handleChange('ram', e.target.value)}
                   placeholder="Ej: 8GB"
-                  className={`w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
-                    formData.ram !== originalData.ram ? 'ring-2 ring-yellow-200' : ''
-                  }`}
+                  className={`w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${formData.ram !== originalData.ram ? 'ring-2 ring-yellow-200' : ''
+                    }`}
                 />
                 {formData.ram !== originalData.ram && (
                   <p className="text-xs text-yellow-600">
@@ -192,9 +191,8 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
                   value={formData.almacenamiento}
                   onChange={(e) => handleChange('almacenamiento', e.target.value)}
                   placeholder="Ej: 128GB"
-                  className={`w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
-                    formData.almacenamiento !== originalData.almacenamiento ? 'ring-2 ring-yellow-200' : ''
-                  }`}
+                  className={`w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${formData.almacenamiento !== originalData.almacenamiento ? 'ring-2 ring-yellow-200' : ''
+                    }`}
                 />
                 {formData.almacenamiento !== originalData.almacenamiento && (
                   <p className="text-xs text-yellow-600">
@@ -213,9 +211,8 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
                 value={formData.color}
                 onChange={(e) => handleChange('color', e.target.value)}
                 placeholder="Ej: Negro, Blanco, Azul"
-                className={`w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
-                  formData.color !== originalData.color ? 'ring-2 ring-yellow-200' : ''
-                }`}
+                className={`w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${formData.color !== originalData.color ? 'ring-2 ring-yellow-200' : ''
+                  }`}
               />
               {formData.color !== originalData.color && (
                 <p className="text-xs text-yellow-600">
@@ -231,7 +228,7 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
               <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
               Información Comercial
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="precio" className="text-sm font-semibold text-gray-700">
@@ -247,9 +244,8 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
                     value={formData.precio}
                     onChange={(e) => handleChange('precio', parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
-                    className={`w-full bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 pl-8 ${
-                      formData.precio !== originalData.precio ? 'ring-2 ring-yellow-200' : ''
-                    }`}
+                    className={`w-full bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 pl-8 ${formData.precio !== originalData.precio ? 'ring-2 ring-yellow-200' : ''
+                      }`}
                   />
                 </div>
                 {formData.precio !== originalData.precio && (
@@ -272,9 +268,8 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
                   value={formData.stock}
                   onChange={(e) => handleChange('stock', parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className={`w-full bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 ${
-                    formData.stock !== originalData.stock ? 'ring-2 ring-yellow-200' : ''
-                  }`}
+                  className={`w-full bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 ${formData.stock !== originalData.stock ? 'ring-2 ring-yellow-200' : ''
+                    }`}
                 />
                 {formData.stock !== originalData.stock && (
                   <p className="text-xs text-yellow-600">
@@ -294,7 +289,7 @@ const EditVarianteForm: React.FC<EditVarianteFormProps> = ({
               <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
               Resumen de la Variante
             </h3>
-            
+
             <div className="bg-white p-4 rounded-lg border border-purple-200">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>

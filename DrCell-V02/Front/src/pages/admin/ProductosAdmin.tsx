@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Plus, AlertTriangle } from 'lucide-react';
-import axios from '@/lib/axios';
+import axios from '../../config/axios';
 import ProductForm from '@/components/admin/ProductForm';
 import EditProductForm from '@/components/admin/EditProductForm';
 import { toast } from 'sonner';
@@ -35,7 +35,7 @@ const ProductosAdmin = () => {
 
   const fetchProductos = async () => {
     try {
-      const response = await axios.get('/api/Producto');
+      const response = await axios.get('/Productos/GetAll');
       setProductos(response.data);
     } catch (error) {
       console.error('Error al obtener productos:', error);
@@ -62,7 +62,7 @@ const ProductosAdmin = () => {
 
     try {
       setLoading(true);
-      await axios.delete(`api/producto/${productoToDelete.id}`);
+      await axios.delete(`/admin/productos/${productoToDelete.id}`);
       toast.success('Producto eliminado exitosamente');
       await fetchProductos();
     } catch (error) {
@@ -212,7 +212,7 @@ const ProductosAdmin = () => {
                     ⚠️ Acción Irreversible
                   </p>
                   <p className="text-sm text-red-700">
-                    Al confirmar, el producto será eliminado permanentemente del sistema. 
+                    Al confirmar, el producto será eliminado permanentemente del sistema.
                     Esta acción no se puede deshacer.
                   </p>
                 </div>
@@ -221,7 +221,7 @@ const ProductosAdmin = () => {
           </div>
 
           <AlertDialogFooter className="bg-gray-50 -mx-6 -mb-6 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
-            <AlertDialogCancel 
+            <AlertDialogCancel
               disabled={loading}
               className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-100"
             >

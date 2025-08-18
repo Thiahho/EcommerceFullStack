@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace DrCell_V01.HealthChecks;
+namespace DrCell_V02.HealthChecks;
 
 public class DiskSpaceHealthCheck : IHealthCheck
 {

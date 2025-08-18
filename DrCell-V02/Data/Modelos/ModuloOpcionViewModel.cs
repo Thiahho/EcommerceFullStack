@@ -1,4 +1,4 @@
-﻿namespace DrCell_V01.Data.Modelos
+﻿namespace DrCell_V02.Data.Modelos
 {
     public class ModuloOpcionViewModel
     {

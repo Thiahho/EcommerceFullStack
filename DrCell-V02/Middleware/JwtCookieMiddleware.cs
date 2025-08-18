@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace DrCell_V01.Middleware
+namespace DrCell_V02.Middleware
 {
     /// <summary>
     /// Middleware para manejar autenticación JWT con cookies httpOnly

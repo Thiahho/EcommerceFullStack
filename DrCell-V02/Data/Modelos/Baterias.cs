@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DrCell_V01.Data.Modelos
+namespace DrCell_V02.Data.Modelos
 {
     [Table("baterias")]
     public class Baterias

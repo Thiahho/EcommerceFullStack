@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using DrCell_V01.Data.Dtos;
-
-namespace DrCell_V01.Services.Interface
+using DrCell_V02.Data.Dtos;
+using SixLabors.ImageSharp;
+namespace DrCell_V02.Services.Interface
 {
     public interface IProductoService
     {
@@ -9,7 +9,8 @@ namespace DrCell_V01.Services.Interface
         Task<ProductoDto?> GetByIdWithVarianteAsync(int id);
         Task<ProductoDto> AddAsync(ProductoDto productos);
         Task<ProductosVariantesDto> AddVarianteAsync(ProductosVariantesDto productosVariantes);
-        Task UpdateAsync(ProductoDto productos);
+        //Task UpdateAsync(ProductoDto productos);
+        Task ActualizarAsync(ProductoDto productos, CancellationToken ct = default);
         Task DeleteAsync(int id);
         Task<IEnumerable<ProductosVariantesDto>> GetVariantesByIdAsync(int productId);
         Task<ProductosVariantesDto?> GetVarianteSpecAsync(int productId, string ram, string storage, string color);
@@ -23,5 +24,8 @@ namespace DrCell_V01.Services.Interface
         Task DeleteVarianteAsync(int varianteId);
         Task<bool> ExistsVarianteAsync(int productoId, string ram, string almacenamiento, string color);
         Task<bool> ExistsProductoAsync(string marca, string modelo);
+
+        byte[] toWebpp(byte[] input, int size= 60, int quality= 80);
+        bool IsReasonableSize(byte[] input, int maxBytes);
     }
 }

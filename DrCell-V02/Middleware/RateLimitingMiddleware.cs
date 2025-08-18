@@ -2,7 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
 using System.Net;
 
-namespace DrCell_V01.Middleware
+namespace DrCell_V02.Middleware
 {
     public class RateLimitingMiddleware
     {

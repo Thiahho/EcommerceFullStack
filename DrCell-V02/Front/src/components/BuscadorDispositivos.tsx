@@ -21,7 +21,7 @@ interface BuscadorDispositivosProps {
   className?: string;
 }
 
-const API_URL = 'http://localhost:5015';
+import api from '@/config/axios';
 
 const BuscadorDispositivos: React.FC<BuscadorDispositivosProps> = ({
   onSeleccionar,
@@ -41,10 +41,9 @@ const BuscadorDispositivos: React.FC<BuscadorDispositivosProps> = ({
         const params = new URLSearchParams();
         params.append('termino', terminoBusqueda.trim());
         
-        fetch(`${API_URL}/celulares/buscar?${params}`)
-          .then(res => res.json())
-          .then(data => {
-            const resultados: ReparacionInfo[] = data.data || [];
+        api.get(`/Celulares/buscar?${params}`)
+          .then(response => {
+            const resultados: ReparacionInfo[] = response.data.data || [];
             setResultadosBusqueda(resultados);
             setMostrarResultados(true);
           })

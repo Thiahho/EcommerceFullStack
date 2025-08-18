@@ -1,17 +1,20 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services.Interface;
+﻿using AutoMapper;
+using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace DrCell_V01.Services
+namespace DrCell_V02.Services
 {
     public class BateriasService : IBateriasService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BateriasService(ApplicationDbContext applicationDbContext)
+        public BateriasService(ApplicationDbContext applicationDbContext, IMapper mapper)
         {
             _context = applicationDbContext;
+            _mapper = mapper;
         }
 
         public async Task<List<object>> ObtenerBateriasAsync()

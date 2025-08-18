@@ -1,8 +1,8 @@
-﻿using DrCell_V01.Data.Modelos;
-using DrCell_V01.Data.Vistas;
+﻿using DrCell_V02.Data.Modelos;
+using DrCell_V02.Data.Vistas;
 using Microsoft.EntityFrameworkCore;
 
-namespace DrCell_V01.Data
+namespace DrCell_V02.Data
 {
     public class ApplicationDbContext : DbContext
     {
@@ -15,6 +15,7 @@ namespace DrCell_V01.Data
         public DbSet<Pines> Pines { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Productos> Productos { get; set; }
+        public DbSet<Categorias> Categorias { get; set; }
         public DbSet<ProductosVariantes> ProductosVariantes { get; set; }
 
         /// VISTAS
@@ -42,6 +43,9 @@ namespace DrCell_V01.Data
             modelBuilder.Entity<Baterias>()
                 .ToTable("baterias")
                 .HasKey(b => b.id);
+            modelBuilder.Entity<Categorias>()
+                .ToTable("categorias")
+                .HasKey(b => b.Id);
 
             modelBuilder.Entity<Pines>()
                 .ToTable("pines")

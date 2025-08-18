@@ -1,11 +1,17 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Dtos;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Dtos;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-
-namespace DrCell_V01.Services
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+namespace DrCell_V02.Services
 {
     public class ProductosService : IProductoService
     {   
@@ -180,7 +186,7 @@ namespace DrCell_V01.Services
             return _mapper.Map<ProductosVariantesDto>(variante);
         }
 
-        public async Task UpdateAsync(ProductoDto productoDto)
+      /*  public async Task UpdateAsync(ProductoDto productoDto)
         {
             var entidad = await _context.Productos
                 .FirstOrDefaultAsync(p => p.Id == productoDto.Id);
@@ -196,7 +202,7 @@ namespace DrCell_V01.Services
                 _context.Productos.Update(entidad);
                 await _context.SaveChangesAsync();
             }
-        }
+        }*/
 
         public async Task UpdateVarianteAsync(ProductosVariantesDto varianteDto)
         {
@@ -239,5 +245,58 @@ namespace DrCell_V01.Services
             return await _context.Productos
                 .AnyAsync(p => p.Marca == marca && p.Modelo == modelo);
         }
+
+        public byte[] toWebpp(byte[] input, int size = 60, int quality = 80)
+        {
+            using var image = Image.Load(input); // admite jpg/png/webp
+            // Lienzo cuadrado con fondo blanco y contenido centrado
+            var scale = Math.Min((float)size / image.Width, (float)size / image.Height);
+            var w = (int)(image.Width * scale);
+            var h = (int)(image.Height * scale);
+
+            using var canvas = new Image<Rgba32>(size, size, Color.White);
+            image.Mutate(x => x.Resize(w, h));
+            canvas.Mutate(x => x.DrawImage(image, new Point((size - w) / 2, (size - h) / 2), 1f));
+
+            using var ms = new MemoryStream();
+            canvas.Save(ms, new WebpEncoder { Quality = quality, FileFormat = WebpFileFormatType.Lossy });
+            return ms.ToArray();
+        }
+
+        public bool IsReasonableSize(byte[] input, int maxBytes)
+        => input.Length <= maxBytes;
+    
+
+     public async Task ActualizarAsync(ProductoDto dto, CancellationToken ct = default)
+    {
+        var p = await _context.Productos.FirstOrDefaultAsync(x => x.Id == dto.Id, ct)
+                ?? throw new KeyNotFoundException("Producto no encontrado");
+
+        p.Marca = dto.Marca;
+        p.Modelo = dto.Modelo;
+        p.Categoria = dto.Categoria;
+
+        if (!string.IsNullOrWhiteSpace(dto.Img))
+        {
+            var raw = Convert.FromBase64String(dto.Img);
+            if (!IsReasonableSize(raw, 2 * 1024 * 1024))
+                throw new InvalidOperationException("Imagen > 2MB");
+
+            p.Img = toWebpp(raw, 600, 80); // siempre WebP normalizado
+        }
+
+        await _context.SaveChangesAsync(ct);
     }
+
+    public async Task<(byte[] bytes, string contentType)> ObtenerImagenAsync(int id, CancellationToken ct = default)
+    {
+        var bytes = await _context.Productos.Where(x => x.Id == id).Select(x => x.Img!).FirstOrDefaultAsync(ct);
+        if (bytes == null || bytes.Length == 0) throw new KeyNotFoundException();
+        return (bytes, "image/webp");
+    }
+
+
 }
+
+}
+

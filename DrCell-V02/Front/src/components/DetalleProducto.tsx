@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from '@/lib/axios';
+import axios from '../config/axios';
 import { useParams } from 'react-router-dom';
 import { useCartStore } from '@/store/cart-store';
 import Toast from '@/components/ui/toast';
@@ -12,11 +12,11 @@ const ProductDetalle: React.FC = () => {
   const [color, setColor] = useState('');
   const [variante, setVariante] = useState<any>(null);
   const [showNotification, setShowNotification] = useState(false);
-  
+
   const { addToCart } = useCartStore();
 
   useEffect(() => {
-    axios.get(`/api/Producto/${id}`)
+    axios.get(`/Productos/GetById/${id}`)
       .then(res => setProducto(res.data))
       .catch(() => setProducto(null));
   }, [id]);

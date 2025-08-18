@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text;
 
-namespace DrCell_V01.Middleware
+namespace DrCell_V02.Middleware
 {
     public class SwaggerSecurityMiddleware
     {

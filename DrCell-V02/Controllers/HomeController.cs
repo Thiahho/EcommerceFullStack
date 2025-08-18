@@ -1,11 +1,11 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Data.Vistas;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Data.Vistas;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-namespace DrCell_V01.Controllers
+namespace DrCell_V02.Controllers
 {
     public class HomeController : Controller
     {

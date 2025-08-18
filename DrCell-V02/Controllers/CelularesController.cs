@@ -1,38 +1,99 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.RateLimiting;
-namespace DrCell_V01.Controllers
+using Microsoft.AspNetCore.Authorization;
+using DrCell_V02.Controllers.Base;
+
+namespace DrCell_V02.Controllers
 {
-    [Route("[controller]")]
+    [Route("Celulares")]
     [ApiController]
     [EnableRateLimiting("AuthPolicy")]
-    public class CelularesController : ControllerBase
+    public class CelularesController : BaseCelularController
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IvCelularesInfoService _celularesService;
-        public CelularesController(ApplicationDbContext context, IvCelularesInfoService celularesService)
+        public CelularesController(ApplicationDbContext context, IvCelularesInfoService celularesService, ILogger<BaseCelularController> logger)
+            : base(context, celularesService, logger)
         {
-            _context = context;
-            _celularesService = celularesService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetCelulares()
-         => Ok(await _celularesService.ObtenerCelularesInfoAsync());
+        /// <summary>
+        /// Sobrescribe el método base para permitir acceso anónimo
+        /// </summary>
+        [AllowAnonymous]
+        public override async Task<IActionResult> GetCelulares()
+        {
+            return await base.GetCelulares();
+        }
 
-        [HttpGet("marcas")]
-        public async Task<IActionResult> GetMarcas()
-            => Ok(await _celularesService.ObtenerMarcasAsync());
+        /// <summary>
+        /// Sobrescribe el método base para permitir acceso anónimo
+        /// </summary>
+        [AllowAnonymous]
+        public override async Task<IActionResult> GetMarcas()
+        {
+            return await base.GetMarcas();
+        }
 
-        [HttpGet("modelos")]
-        public async Task<IActionResult> GetModelos()
-            => Ok(await _celularesService.ObtenerModelosAsync());
-    
+        /// <summary>
+        /// Sobrescribe el método base para permitir acceso anónimo
+        /// </summary>
+        [AllowAnonymous]
+        public override async Task<IActionResult> GetModelos()
+        {
+            return await base.GetModelos();
+        }
+
+        /// <summary>
+        /// Sobrescribe el método base para permitir acceso anónimo
+        /// </summary>
+        [AllowAnonymous]
+        public override async Task<IActionResult> GetModelosPorMarca(string marca)
+        {
+            return await base.GetModelosPorMarca(marca);
+        }
+
+        /// <summary>
+        /// Endpoint específico para el frontend - modelos por marca
+        /// </summary>
+        [AllowAnonymous]
         [HttpGet("modelos/{marca}")]
-        public async Task<IActionResult> GetModelosPorMarca(string marca) 
-            => Ok(await _celularesService.ObtenerCelularesInfoByMarcaAsync(marca));
+        public async Task<IActionResult> GetModelosPorMarcaLegacy(string marca)
+        {
+            try
+            {
+                var modelos = await _celularesService.ObtenerModelosPorMarcaAsync(marca);
+                return Ok(modelos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener modelos para la marca {marca}");
+                return StatusCode(500, "Error interno del servidor");
+            }
+        }
+
+        /// <summary>
+        /// Sobrescribe el método base para permitir acceso anónimo
+        /// </summary>
+        //[AllowAnonymous]
+        //public override async Task<IActionResult> BuscarCelulares([FromQuery] string termino)
+        //{
+        //    return await base.BuscarCelulares(termino);
+        //}
+
+        ///// <summary>
+        ///// Sobrescribe el método base para permitir acceso anónimo
+        ///// </summary>
+        //[AllowAnonymous]
+        //public override async Task<IActionResult> GetCelularById(int id)
+        //{
+        //    return await base.GetCelularById(id);
+        //}
+    
+        //[HttpGet("modelos/{marca}")]
+        //public async Task<IActionResult> GetModelosPorMarca(string marca) 
+        //    => Ok(await _celularesService.ObtenerCelularesInfoByMarcaAsync(marca));
 
         [HttpGet("celulares/buscar/{marca}/{modelo}")]
         public async Task<IActionResult> GetModulosByModelo(string marca, string modelo)
@@ -78,43 +139,121 @@ namespace DrCell_V01.Controllers
         {
             try
             {
-                var query = _context.vCelularesMBP.AsQueryable();
+                // Intentar usar la vista completa primero
+                try
+                {
+                    var queryVista = _context.vCelularesMBP.AsQueryable();
+
+                    if (!string.IsNullOrEmpty(termino))
+                    {
+                        queryVista = queryVista.Where(v => 
+                            (v.marca != null && EF.Functions.ILike(v.marca, $"%{termino}%")) || 
+                            (v.modelo != null && EF.Functions.ILike(v.modelo, $"%{termino}%"))
+                        );
+                    }
+
+                    if (!string.IsNullOrEmpty(marca))
+                    {
+                        queryVista = queryVista.Where(v => v.marca == marca);
+                    }
+
+                    if (!string.IsNullOrEmpty(modelo))
+                    {
+                        queryVista = queryVista.Where(v => v.modelo == modelo);
+                    }
+
+                    // Usar timeout de 5 segundos para la vista
+                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                    
+                    var resultadoVista = await queryVista
+                        .Take(100)
+                        .Select(v => new
+                        {
+                            v.marca,
+                            v.modelo,
+                            v.arreglomodulo,
+                            v.arreglobat,
+                            v.arreglopin,
+                            v.color,
+                            v.tipo,
+                            v.tipopin,
+                            v.placa,
+                            v.marco,
+                            v.version
+                        })
+                        .ToListAsync(cts.Token);
+
+                    return Ok(new{
+                        success = true,
+                        message = "Búsqueda realizada correctamente (vista completa)",
+                        count = resultadoVista.Count,
+                        filters = new { termino, marca, modelo },
+                        data = resultadoVista
+                    });
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogWarning("Timeout en vista vCelularesMBP, usando fallback con tablas individuales");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error en vista vCelularesMBP, usando fallback con tablas individuales");
+                }
+
+                // Fallback: usar tablas individuales para obtener datos reales
+                var query = _context.Celulares.AsQueryable();
 
                 if (!string.IsNullOrEmpty(termino))
                 {
-                    query = query.Where(v => 
-                        (v.marca != null && EF.Functions.ILike(v.marca, $"%{termino}%")) || 
-                        (v.modelo != null && EF.Functions.ILike(v.modelo, $"%{termino}%"))
+                    query = query.Where(c => 
+                        (c.marca != null && EF.Functions.ILike(c.marca, $"%{termino}%")) || 
+                        (c.modelo != null && EF.Functions.ILike(c.modelo, $"%{termino}%"))
                     );
                 }
 
                 if (!string.IsNullOrEmpty(marca))
                 {
-                    query = query.Where(v => v.marca == marca);
+                    query = query.Where(c => c.marca == marca);
                 }
 
                 if (!string.IsNullOrEmpty(modelo))
                 {
-                    query = query.Where(v => v.modelo == modelo);
+                    query = query.Where(c => c.modelo == modelo);
                 }
 
-                var resultado = await query
-                    .Take(100) // Limitar resultados
-                    .Select(v => new
+                var celulares = await query.Take(100).ToListAsync();
+
+                // Obtener precios reales de las tablas individuales
+                var resultado = new List<object>();
+                foreach (var cel in celulares)
+                {
+                    var modulo = await _context.Modulos
+                        .Where(m => m.marca == cel.marca && m.modelo == cel.modelo)
+                        .FirstOrDefaultAsync();
+                    
+                    var bateria = await _context.Baterias
+                        .Where(b => b.marca == cel.marca && b.modelo == cel.modelo)
+                        .FirstOrDefaultAsync();
+                    
+                    var pin = await _context.Pines
+                        .Where(p => p.marca == cel.marca && p.modelo == cel.modelo)
+                        .FirstOrDefaultAsync();
+
+                    resultado.Add(new
                     {
-                        v.marca,
-                        v.modelo,
-                        v.arreglomodulo,
-                        v.arreglobat,
-                        v.arreglopin,
-                        v.color,
-                        v.tipo,
-                        v.tipopin,
-                        v.placa,
-                        v.marco,
-                        v.version
-                     })
-                    .ToListAsync();
+                        marca = cel.marca,
+                        modelo = cel.modelo,
+                        arreglomodulo = modulo?.arreglo,
+                        arreglobat = bateria?.arreglo ?? 40000m,
+                        arreglopin = pin?.arreglo,
+                        color = modulo?.color,
+                        tipo = modulo?.tipo,
+                        tipopin = pin?.tipo,
+                        placa = pin?.placa,
+                        marco = modulo?.marco,
+                        version = modulo?.version
+                    });
+                }
 
             return Ok(new{
                 success = true,

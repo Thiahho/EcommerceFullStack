@@ -24,8 +24,7 @@ interface ReparacionInfo {
   marca?: string;
   modelo?: string;
 }
-
-const API_URL = 'http://localhost:5015';
+import api from '@/config/axios';
 
 const ConsultaReparacionSection: React.FC = () => {
   const [marcas, setMarcas] = useState<string[]>([]);
@@ -68,7 +67,7 @@ const ConsultaReparacionSection: React.FC = () => {
 
   // Obtener marcas reales
   useEffect(() => {
-    axios.get(`${API_URL}/celulares/marcas`)
+    api.get(`/Celulares/marcas`)
       .then(res => {
         // Eliminar duplicados manteniendo formato original
         const marcasUnicas = Array.from(new Set(
@@ -89,7 +88,7 @@ const ConsultaReparacionSection: React.FC = () => {
         const params = new URLSearchParams();
         params.append('termino', terminoBusqueda.trim());
         
-        axios.get(`${API_URL}/celulares/buscar?${params}`)
+        api.get(`/Celulares/buscar?${params}`)
           .then(res => {
             const data: ReparacionInfo[] = res.data.data || [];
             setResultadosBusqueda(data);
@@ -132,7 +131,7 @@ const ConsultaReparacionSection: React.FC = () => {
     setPrecio('');
     setTodosLosRegistros([]);
     if (marca) {
-      axios.get(`${API_URL}/celulares/modelos/${marca}`)
+      api.get(`/Celulares/modelos/${marca}`)
         .then(res => setModelos(res.data))
         .catch(() => setModelos([]));
     } else {
@@ -159,7 +158,7 @@ const ConsultaReparacionSection: React.FC = () => {
       params.append('marca', marca);
       params.append('modelo', modelo);
       
-      axios.get(`${API_URL}/celulares/buscar?${params}`)
+      api.get(`/Celulares/buscar?${params}`)
         .then(res => {
           const data: ReparacionInfo[] = res.data.data || [];
           setTodosLosRegistros(data);

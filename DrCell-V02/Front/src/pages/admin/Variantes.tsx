@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Edit, Trash2, Plus } from 'lucide-react';
-import axios from '@/lib/axios';
+import axios from '../../config/axios';
 import { toast } from 'sonner';
 import VarianteForm from '@/components/admin/VarianteForm';
 import EditVarianteForm from '@/components/admin/EditVarianteForm';
@@ -50,7 +50,7 @@ const Variantes = () => {
 
   const fetchProductos = useCallback(async () => {
     try {
-      const response = await axios.get('/api/Producto');
+      const response = await axios.get('/Productos/GetAll');
       setProductos(response.data);
     } catch (error) {
       console.error('Error al obtener productos:', error);
@@ -60,7 +60,7 @@ const Variantes = () => {
 
   const fetchVariantes = useCallback(async (productoId: number) => {
     try {
-      const response = await axios.get(`/api/Producto/${productoId}/variantes`);
+      const response = await axios.get(`/Productos/${productoId}/variantes`);
       setVariantes(response.data || []);
     } catch (error) {
       console.error('Error al obtener variantes:', error);
@@ -104,7 +104,7 @@ const Variantes = () => {
 
     try {
       setLoading(true);
-      await axios.delete(`/api/Producto/variante/${varianteToDelete.id}`);
+      await axios.delete(`/admin/productos/variante/${varianteToDelete.id}`);
       toast.success('Variante eliminada exitosamente');
       if (selectedProductoId) {
         await fetchVariantes(selectedProductoId);
@@ -129,7 +129,7 @@ const Variantes = () => {
     <div className="container mx-auto py-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-4">Gestión de Variantes</h1>
-        
+
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="space-y-4">
             <div>
@@ -219,11 +219,10 @@ const Variantes = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          variante.stock > 0 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${variante.stock > 0
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                          }`}>
                           {variante.stock}
                         </span>
                       </td>
@@ -341,7 +340,7 @@ const Variantes = () => {
                 <div>
                   <h5 className="font-semibold text-red-800 mb-1">¡Atención!</h5>
                   <p className="text-sm text-red-700">
-                    Esta acción eliminará permanentemente la variante del sistema. 
+                    Esta acción eliminará permanentemente la variante del sistema.
                     Todos los datos asociados se perderán y no se podrán recuperar.
                   </p>
                 </div>
@@ -350,7 +349,7 @@ const Variantes = () => {
           </div>
 
           <AlertDialogFooter className="bg-gray-50 -mx-6 -mb-6 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
-            <AlertDialogCancel 
+            <AlertDialogCancel
               disabled={loading}
               className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-100"
             >

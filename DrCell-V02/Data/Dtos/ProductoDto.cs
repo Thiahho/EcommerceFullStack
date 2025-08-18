@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DrCell_V01.Data.Dtos
+namespace DrCell_V02.Data.Dtos
 {
     public class ProductoDto
     {

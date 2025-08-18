@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/store/auth-store';
-import axios from '@/lib/axios';
+import axios from '../config/axios';
 import { toast } from 'sonner';
 import { Label } from '@radix-ui/react-label';
 
@@ -28,13 +28,20 @@ export const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
       const response = await axios.post('/Admin/login', formData);
-      const { usuario, message } = response.data;
-      
-      // 🔑 Ya no manejamos tokens - las cookies httpOnly se establecen automáticamente
-      // Solo actualizamos el estado del usuario
+      const { usuario, message, token, debug } = response.data;
+
+      console.log('🔧 DEBUG Login Response:', debug);
+
+      // 🔧 TEMP: Para desarrollo, usar token de la respuesta si no hay cookies
+      if (token && process.env.NODE_ENV === 'development') {
+        localStorage.setItem('authToken', token);
+        console.log('🔧 TEMP: Token almacenado en localStorage para desarrollo');
+      }
+
+      // Actualizar el estado del usuario
       setUser({
         id: usuario.id,
         email: usuario.email,

@@ -20,6 +20,7 @@
 			<PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="8.0.1" />
 			<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 			<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+			<PackageReference Include="DotNetEnv" Version="3.1.1" />
 			<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
 			<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 			<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
@@ -36,6 +37,7 @@
 			<PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
 			<PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
 			<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+			<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
 			<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 			<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.1" />
 			<PackageReference Include="System.Threading.RateLimiting" Version="8.0.0" />

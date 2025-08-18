@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace DrCell_V01.Filters;
+namespace DrCell_V02.Filters;
 
 public class SwaggerSecurityFilter : IDocumentFilter
 {

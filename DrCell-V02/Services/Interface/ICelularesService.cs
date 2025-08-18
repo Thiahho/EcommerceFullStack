@@ -1,6 +1,6 @@
-﻿using DrCell_V01.Data.Modelos;
+﻿using DrCell_V02.Data.Modelos;
 
-namespace DrCell_V01.Services.Interface
+namespace DrCell_V02.Services.Interface
 {
     public interface ICelularesService
     {

@@ -1,6 +1,6 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ using System.Text;
 using BCrypt.Net;
 using Microsoft.Extensions.Logging;
 
-namespace DrCell_V01.Services
+namespace DrCell_V02.Services
 {
     public class UsuarioService : IUsuarioService
     {

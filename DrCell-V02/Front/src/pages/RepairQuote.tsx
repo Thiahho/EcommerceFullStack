@@ -50,7 +50,7 @@ const RepairQuote: React.FC = () => {
   const [quote, setQuote] = useState<RepairQuote | null>(null);
   const [allQuotes, setAllQuotes] = useState<RepairQuote[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Estados para el buscador
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<RepairQuote[]>([]);
@@ -61,7 +61,7 @@ const RepairQuote: React.FC = () => {
     // Fetch brands
     const fetchBrands = async () => {
       try {
-        const response = await axios.get('http://localhost:5015/celulares/marcas');
+        const response = await axios.get('/Celulares/marcas');
         setBrands(response.data);
       } catch (error) {
         console.error('Error fetching brands:', error);
@@ -78,8 +78,8 @@ const RepairQuote: React.FC = () => {
         try {
           const params = new URLSearchParams();
           params.append('termino', searchTerm.trim());
-          
-          const response = await axios.get(`http://localhost:5015/celulares/buscar?${params}`);
+
+          const response = await axios.get(`/Celulares/buscar?${params}`);
           const data: RepairQuote[] = response.data.data || [];
           setSearchResults(data);
         } catch (error) {
@@ -115,7 +115,7 @@ const RepairQuote: React.FC = () => {
     if (selectedBrand) {
       const fetchModels = async () => {
         try {
-          const response = await axios.get(`http://localhost:5015/celulares/modelos/${selectedBrand}`);
+          const response = await axios.get(`/Celulares/modelos/${selectedBrand}`);
           setModels(response.data);
         } catch (error) {
           console.error('Error fetching models:', error);
@@ -135,12 +135,12 @@ const RepairQuote: React.FC = () => {
           const params = new URLSearchParams();
           params.append('marca', selectedBrand);
           params.append('modelo', selectedModel);
-          
-          const response = await axios.get(`http://localhost:5015/celulares/buscar?${params}`);
+
+          const response = await axios.get(`/Celulares/buscar?${params}`);
           const quotes: RepairQuote[] = response.data.data || [];
-          
+
           setAllQuotes(quotes);
-          
+
           // Si hay múltiples registros, tomar el primero como principal
           if (quotes.length > 0) {
             setQuote(quotes[0]);
@@ -222,16 +222,16 @@ const RepairQuote: React.FC = () => {
               />
             )}
           </Box>
-          
+
           {/* Dropdown con resultados de búsqueda */}
           {showDropdown && (searchResults.length > 0 || searchTerm.trim().length >= 2) && (
-            <Paper sx={{ 
-              position: 'absolute', 
-              zIndex: 1000, 
-              width: '100%', 
-              mt: 1, 
-              maxHeight: 300, 
-              overflow: 'auto' 
+            <Paper sx={{
+              position: 'absolute',
+              zIndex: 1000,
+              width: '100%',
+              mt: 1,
+              maxHeight: 300,
+              overflow: 'auto'
             }}>
               {searchResults.length > 0 ? (
                 <List>
@@ -245,10 +245,10 @@ const RepairQuote: React.FC = () => {
                               {item.colormodulo && <Chip label={`Color: ${item.colormodulo}`} size="small" sx={{ mr: 0.5, mb: 0.5 }} />}
                               {item.tipo && <Chip label={`Tipo: ${item.tipo}`} size="small" sx={{ mr: 0.5, mb: 0.5 }} />}
                               {item.version && <Chip label={`Versión: ${item.version}`} size="small" sx={{ mr: 0.5, mb: 0.5 }} />}
-                              <Chip 
-                                label={item.marco ? 'Con marco' : 'Sin marco'} 
-                                size="small" 
-                                sx={{ mr: 0.5, mb: 0.5 }} 
+                              <Chip
+                                label={item.marco ? 'Con marco' : 'Sin marco'}
+                                size="small"
+                                sx={{ mr: 0.5, mb: 0.5 }}
                               />
                               {item.arreglomodulo && <Chip label={`M:$${item.arreglomodulo}`} size="small" color="success" sx={{ mr: 0.5, mb: 0.5 }} />}
                               {item.arreglobat && <Chip label={`B:$${item.arreglobat}`} size="small" color="success" sx={{ mr: 0.5, mb: 0.5 }} />}
@@ -312,10 +312,10 @@ const RepairQuote: React.FC = () => {
               {quote.arreglomodulo && (
                 <Grid item xs={12}>
                   <Typography variant="body1">
-                    Reparación de Módulo: <Chip 
-                      label={getPriceDisplay(quote.arreglomodulo).text} 
-                      color={getPriceDisplay(quote.arreglomodulo).color} 
-                      size="small" 
+                    Reparación de Módulo: <Chip
+                      label={getPriceDisplay(quote.arreglomodulo).text}
+                      color={getPriceDisplay(quote.arreglomodulo).color}
+                      size="small"
                     />
                   </Typography>
                 </Grid>
@@ -323,10 +323,10 @@ const RepairQuote: React.FC = () => {
               {quote.arreglobat && (
                 <Grid item xs={12}>
                   <Typography variant="body1">
-                    Cambio de Batería: <Chip 
-                      label={getPriceDisplay(quote.arreglobat).text} 
-                      color={getPriceDisplay(quote.arreglobat).color} 
-                      size="small" 
+                    Cambio de Batería: <Chip
+                      label={getPriceDisplay(quote.arreglobat).text}
+                      color={getPriceDisplay(quote.arreglobat).color}
+                      size="small"
                     />
                   </Typography>
                 </Grid>
@@ -334,10 +334,10 @@ const RepairQuote: React.FC = () => {
               {quote.arreglopin && (
                 <Grid item xs={12}>
                   <Typography variant="body1">
-                    Reparación de Pin de Carga: <Chip 
-                      label={getPriceDisplay(quote.arreglopin).text} 
-                      color={getPriceDisplay(quote.arreglopin).color} 
-                      size="small" 
+                    Reparación de Pin de Carga: <Chip
+                      label={getPriceDisplay(quote.arreglopin).text}
+                      color={getPriceDisplay(quote.arreglopin).color}
+                      size="small"
                     />
                   </Typography>
                 </Grid>
@@ -368,24 +368,24 @@ const RepairQuote: React.FC = () => {
                     </Box>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                       {quoteItem.arreglomodulo && (
-                        <Chip 
-                          label={`Módulo: ${getPriceDisplay(quoteItem.arreglomodulo).text}`} 
-                          color={getPriceDisplay(quoteItem.arreglomodulo).color} 
-                          size="small" 
+                        <Chip
+                          label={`Módulo: ${getPriceDisplay(quoteItem.arreglomodulo).text}`}
+                          color={getPriceDisplay(quoteItem.arreglomodulo).color}
+                          size="small"
                         />
                       )}
                       {quoteItem.arreglobat && (
-                        <Chip 
-                          label={`Batería: ${getPriceDisplay(quoteItem.arreglobat).text}`} 
-                          color={getPriceDisplay(quoteItem.arreglobat).color} 
-                          size="small" 
+                        <Chip
+                          label={`Batería: ${getPriceDisplay(quoteItem.arreglobat).text}`}
+                          color={getPriceDisplay(quoteItem.arreglobat).color}
+                          size="small"
                         />
                       )}
                       {quoteItem.arreglopin && (
-                        <Chip 
-                          label={`Pin: ${getPriceDisplay(quoteItem.arreglopin).text}`} 
-                          color={getPriceDisplay(quoteItem.arreglopin).color} 
-                          size="small" 
+                        <Chip
+                          label={`Pin: ${getPriceDisplay(quoteItem.arreglopin).text}`}
+                          color={getPriceDisplay(quoteItem.arreglopin).color}
+                          size="small"
                         />
                       )}
                     </Box>

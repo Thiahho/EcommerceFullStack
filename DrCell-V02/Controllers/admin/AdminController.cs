@@ -1,7 +1,7 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services;
+using DrCell_V02.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +12,10 @@ using System.Security.Claims;
 using System.Text;
 using BCrypt.Net;
 using Microsoft.AspNetCore.RateLimiting;
-using DrCell_V01.Middleware;
-namespace DrCell_V01.Controllers
+using DrCell_V02.Middleware;
+namespace DrCell_V02.Controllers.admin
 {
-    [Route("[controller]")]
+    [Route("Admin")]
     [ApiController]
     [Authorize(Roles = "ADMIN")]
     [EnableRateLimiting("AuthPolicy")]
@@ -34,7 +34,8 @@ namespace DrCell_V01.Controllers
         }
 
         [HttpPost("registro")]
-         [RateLimit("registro", 2, 10)]
+        [AllowAnonymous]
+        [RateLimit("registro", 2, 10)]
         public async Task<IActionResult> CrearAdmin([FromBody] Usuario usuario)
         {
             try
@@ -47,9 +48,11 @@ namespace DrCell_V01.Controllers
                 usuario.Rol = "ADMIN";
                 var usuarioCreado = await _usuarioService.CrearUsuarioAsync(usuario);
 
-                return Ok(new { 
+                return Ok(new
+                {
                     message = "Administrador creado correctamente",
-                    usuario = new {
+                    usuario = new
+                    {
                         id = usuarioCreado.Id,
                         email = usuarioCreado.Email,
                         rol = usuarioCreado.Rol
@@ -79,7 +82,7 @@ namespace DrCell_V01.Controllers
                 }
 
                 var usuario = await _usuarioService.ValidarCredencialesAsync(auth.Email, auth.Password);
-                
+
                 if (usuario == null)
                 {
                     return Unauthorized(new { message = "Credenciales inválidas" });
@@ -91,26 +94,34 @@ namespace DrCell_V01.Controllers
                 }
 
                 var token = _usuarioService.GenerarToken(usuario);
-                
-                // Configurar cookie httpOnly
+
+                // Configurar cookie - en desarrollo no usar HttpOnly para evitar problemas cross-origin
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = true,
-                    Secure = true, // Solo en HTTPS
-                    SameSite = SameSiteMode.Strict,
+                    HttpOnly = false, // 🔧 FIX: False en desarrollo para mayor compatibilidad
+                    Secure = false, // 🔧 FIX: False para desarrollo HTTP
+                    SameSite = SameSiteMode.Lax, // 🔧 FIX: Lax para desarrollo
                     Expires = DateTimeOffset.UtcNow.AddHours(24), // Expira en 24 horas
                     Path = "/"
                 };
 
-                // En desarrollo, permitir HTTP
-                if (_configuration["ASPNETCORE_ENVIRONMENT"] == "Development")
+                // En producción, usar configuración segura
+                if (_configuration["ASPNETCORE_ENVIRONMENT"] == "Production")
                 {
-                    cookieOptions.Secure = false;
+                    cookieOptions.HttpOnly = true; // Seguro en producción
+                    cookieOptions.Secure = true;
+                    cookieOptions.SameSite = SameSiteMode.Strict;
                 }
 
-                Response.Cookies.Append("AuthToken", token, cookieOptions);
+                // 🔧 DEBUG: Agregar logs para verificar cookie
+                Console.WriteLine($"🔧 DEBUG: Intentando establecer cookie AuthToken");
+                Console.WriteLine($"🔧 DEBUG: Token generado: {token?.Substring(0, 20)}...");
+                Console.WriteLine($"🔧 DEBUG: Cookie options - Secure: {cookieOptions.Secure}, SameSite: {cookieOptions.SameSite}");
                 
-                return Ok(new 
+                Response.Cookies.Append("AuthToken", token, cookieOptions);
+                Console.WriteLine($"🔧 DEBUG: Cookie establecida exitosamente");
+
+                return Ok(new
                 {
                     message = "Inicio de sesión exitoso",
                     usuario = new
@@ -118,6 +129,14 @@ namespace DrCell_V01.Controllers
                         id = usuario.Id,
                         email = usuario.Email,
                         rol = usuario.Rol
+                    },
+                    token = token, // 🔧 TEMP: Enviar token en respuesta para desarrollo
+                    debug = new // 🔧 DEBUG: Agregar info de debug
+                    {
+                        tokenLength = token?.Length,
+                        cookieSecure = cookieOptions.Secure,
+                        cookieSameSite = cookieOptions.SameSite.ToString(),
+                        environment = _configuration["ASPNETCORE_ENVIRONMENT"]
                     }
                 });
             }
@@ -135,7 +154,7 @@ namespace DrCell_V01.Controllers
             {
                 // Eliminar cookie de autenticación
                 Response.Cookies.Delete("AuthToken");
-                
+
                 return Ok(new { message = "Sesión cerrada exitosamente" });
             }
             catch (Exception ex)
@@ -157,8 +176,8 @@ namespace DrCell_V01.Controllers
                     // Si llegamos aquí y hay token, significa que es válido
                     if (User.Identity?.IsAuthenticated == true)
                     {
-                        return Ok(new 
-                        { 
+                        return Ok(new
+                        {
                             isAuthenticated = true,
                             usuario = new
                             {
@@ -169,7 +188,7 @@ namespace DrCell_V01.Controllers
                         });
                     }
                 }
-                
+
                 return Ok(new { isAuthenticated = false });
             }
             catch (Exception ex)
@@ -180,7 +199,7 @@ namespace DrCell_V01.Controllers
 
         private async Task<bool> AlreadyExist(string email)
         {
-            return await _context.Usuarios.AnyAsync(u=>u.Email.ToLower()== email.ToLower());
+            return await _context.Usuarios.AnyAsync(u => u.Email.ToLower() == email.ToLower());
         }
 
         // ============================= ENDPOINTS PROTEGIDOS =============================
@@ -199,7 +218,7 @@ namespace DrCell_V01.Controllers
             {
                 return BadRequest(new { message = "Error al obtener los celulares", error = ex.Message });
             }
-        }   
+        }
 
         [Authorize(Roles = "ADMIN")]
         [HttpGet("marcas")]
@@ -262,6 +281,6 @@ namespace DrCell_V01.Controllers
                 return BadRequest(new { message = "Error al obtener la información por marca y modelo." });
             }
         }
-        
+
     }
 }

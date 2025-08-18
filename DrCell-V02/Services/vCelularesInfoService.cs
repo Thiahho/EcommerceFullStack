@@ -1,11 +1,11 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 
-namespace DrCell_V01.Services
+namespace DrCell_V02.Services
 {
     public class vCelularesInfoService : IvCelularesInfoService
     {
@@ -154,10 +154,11 @@ namespace DrCell_V01.Services
             {
                 _logger.LogInformation("Obteniendo modelos para marca: {Marca}", marca);
                 
-                var resultado = await _context.vCelularesMBP
+                // Usar tabla Celulares en lugar de la vista problemática
+                var resultado = await _context.Celulares
                     .AsNoTracking()
-                    .Where(v => v.marca == marca)
-                    .Select(v => v.modelo)
+                    .Where(c => c.marca == marca)
+                    .Select(c => c.modelo)
                     .Where(m => !string.IsNullOrEmpty(m))
                     .Distinct()
                     .OrderBy(m => m)

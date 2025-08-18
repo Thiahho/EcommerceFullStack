@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from '@/lib/axios';
+import axios from '../../config/axios';
 import { toast } from 'sonner';
 
 interface VarianteFormProps {
@@ -63,13 +63,13 @@ const VarianteForm: React.FC<VarianteFormProps> = ({ isOpen, onClose, onSuccess,
         stock: Number(variante.stock)
       };
 
-      await axios.post('/api/Producto/variante', variantePayload);
-      
+      await axios.post('/admin/productos/variante', variantePayload);
+
       toast.success('¡Variante creada exitosamente!', {
         description: 'La variante se ha guardado en el sistema.',
         duration: 4000,
       });
-      
+
       // Reset form
       setVariante({
         ram: '',
@@ -78,7 +78,7 @@ const VarianteForm: React.FC<VarianteFormProps> = ({ isOpen, onClose, onSuccess,
         precio: 0,
         stock: 0
       });
-      
+
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -120,7 +120,7 @@ const VarianteForm: React.FC<VarianteFormProps> = ({ isOpen, onClose, onSuccess,
               <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
               Especificaciones Técnicas
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="ram" className="text-sm font-semibold text-gray-700">
@@ -168,7 +168,7 @@ const VarianteForm: React.FC<VarianteFormProps> = ({ isOpen, onClose, onSuccess,
               <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
               Información Comercial
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="precio" className="text-sm font-semibold text-gray-700">
@@ -217,7 +217,7 @@ const VarianteForm: React.FC<VarianteFormProps> = ({ isOpen, onClose, onSuccess,
               <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
               Resumen de la Variante
             </h3>
-            
+
             <div className="bg-white p-4 rounded-lg border border-purple-200">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>

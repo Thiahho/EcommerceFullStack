@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 
-namespace DrCell_V01.Data.Modelos
+namespace DrCell_V02.Data.Modelos
 {
     public class ProductosVariantes
     {

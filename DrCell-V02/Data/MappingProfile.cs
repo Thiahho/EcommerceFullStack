@@ -1,6 +1,6 @@
 using AutoMapper;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Data.Dtos;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Data.Dtos;
 
 public class MappingProfile : Profile
 {
@@ -17,6 +17,6 @@ public class MappingProfile : Profile
         CreateMap<Productos, ProductoDto>()
             .ForMember(dest => dest.Img, opt => opt.MapFrom(src =>
                 src.Img != null ? Convert.ToBase64String(src.Img) : null));
-
+        CreateMap<Categorias, CategoriaDto>().ReverseMap();
     }
 }

@@ -1,13 +1,13 @@
-﻿using DrCell_V01.Data;
-using DrCell_V01.Data.Modelos;
-using DrCell_V01.Services.Interface;
+﻿using DrCell_V02.Data;
+using DrCell_V02.Data.Modelos;
+using DrCell_V02.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.RateLimiting;
-namespace DrCell_V01.Controllers
+namespace DrCell_V02.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Modulos")]
     [ApiController]
     [EnableRateLimiting("AuthPolicy")]
     public class ModulosController : ControllerBase
@@ -23,6 +23,7 @@ namespace DrCell_V01.Controllers
             _logger = logger;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetModulos()
         {
@@ -38,6 +39,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllModulos()
         {
@@ -68,6 +70,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("marca/{marca}")]
         public async Task<IActionResult> GetModulosByMarca(string marca)
         {
@@ -83,6 +86,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("modelo/{modelo}")]
         public async Task<IActionResult> GetModulosByModelo(string modelo)
         {
@@ -98,6 +102,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("Solo-Modulos/{marca}/{modelo}")]
         public async Task<IActionResult> GetModulosByModelo(string marca, string modelo)
         {
@@ -113,6 +118,7 @@ namespace DrCell_V01.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetModuloById(int id)
         {
@@ -132,78 +138,78 @@ namespace DrCell_V01.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdateModulo(int id, [FromBody] Modulos modulo)
-        {
-            try
-            {
-                if (id != modulo.id)
-                    return BadRequest(new { success = false, message = "El ID del módulo no coincide" });
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "ADMIN")]
+        //public async Task<IActionResult> UpdateModulo(int id, [FromBody] Modulos modulo)
+        //{
+        //    try
+        //    {
+        //        if (id != modulo.id)
+        //            return BadRequest(new { success = false, message = "El ID del módulo no coincide" });
 
-                var existeModulo = await _modulosService.GetModuloByIdAsync(id);
-                if (existeModulo == null)
-                {
-                    return NotFound(new { success = false, message = $"No se encontró el módulo con ID {id}" });
-                }
+        //        var existeModulo = await _modulosService.GetModuloByIdAsync(id);
+        //        if (existeModulo == null)
+        //        {
+        //            return NotFound(new { success = false, message = $"No se encontró el módulo con ID {id}" });
+        //        }
 
-                await _modulosService.UpdateAsync(modulo);
-                _logger.LogInformation("Módulo {Id} actualizado correctamente", id);
+        //        await _modulosService.UpdateAsync(modulo);
+        //        _logger.LogInformation("Módulo {Id} actualizado correctamente", id);
                 
-                return Ok(new { success = true, message = "Módulo actualizado correctamente", data = modulo });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al actualizar el módulo {Id}", id);
-                return StatusCode(500, new { success = false, message = "Error interno del servidor" });
-            }
-        }
+        //        return Ok(new { success = true, message = "Módulo actualizado correctamente", data = modulo });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al actualizar el módulo {Id}", id);
+        //        return StatusCode(500, new { success = false, message = "Error interno del servidor" });
+        //    }
+        //}
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
-        [EnableRateLimiting("CriticalPolicy")]
-        public async Task<IActionResult> DeleteModulo(int id)
-        {
-            try
-            {
-                var modulo = await _modulosService.GetModuloByIdAsync(id);
-                if (modulo == null)
-                {
-                    return NotFound(new { success = false, message = $"No se encontró el módulo con ID {id}" });
-                }
+        //[HttpDelete("{id}")]
+        //[Authorize(Roles = "ADMIN")]
+        //[EnableRateLimiting("CriticalPolicy")]
+        //public async Task<IActionResult> DeleteModulo(int id)
+        //{
+        //    try
+        //    {
+        //        var modulo = await _modulosService.GetModuloByIdAsync(id);
+        //        if (modulo == null)
+        //        {
+        //            return NotFound(new { success = false, message = $"No se encontró el módulo con ID {id}" });
+        //        }
 
-                await _modulosService.DeleteAsync(id);
-                _logger.LogInformation("Módulo {Id} eliminado correctamente", id);
+        //        await _modulosService.DeleteAsync(id);
+        //        _logger.LogInformation("Módulo {Id} eliminado correctamente", id);
                 
-                return Ok(new { success = true, message = "Módulo eliminado correctamente" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al eliminar el módulo {Id}", id);
-                return StatusCode(500, new { success = false, message = "Error interno del servidor" });
-            }
-        }
+        //        return Ok(new { success = true, message = "Módulo eliminado correctamente" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al eliminar el módulo {Id}", id);
+        //        return StatusCode(500, new { success = false, message = "Error interno del servidor" });
+        //    }
+        //}
 
-        [HttpPost("create")]
-        [Authorize(Roles = "ADMIN")]
-        [EnableRateLimiting("CriticalPolicy")]
-        public async Task<IActionResult> CreateModulo([FromBody] Modulos modulo)
-        {
-            try
-            {
-                if(!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+        //[HttpPost("create")]
+        //[Authorize(Roles = "ADMIN")]
+        //[EnableRateLimiting("CriticalPolicy")]
+        //public async Task<IActionResult> CreateModulo([FromBody] Modulos modulo)
+        //{
+        //    try
+        //    {
+        //        if(!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-                var nuevoModulo = await _modulosService.AddAsync(modulo);
-                return CreatedAtAction(nameof(GetModuloById), new { id = nuevoModulo.id }, new { success = true, data = nuevoModulo });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear el módulo");
-                return StatusCode(500, new { success = false, message = "Error interno del servidor" });
-            }
-        }
+        //        var nuevoModulo = await _modulosService.AddAsync(modulo);
+        //        return CreatedAtAction(nameof(GetModuloById), new { id = nuevoModulo.id }, new { success = true, data = nuevoModulo });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al crear el módulo");
+        //        return StatusCode(500, new { success = false, message = "Error interno del servidor" });
+        //    }
+        //}
     }
 }
