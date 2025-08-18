@@ -3,6 +3,7 @@ import axios from '@/config/axios';
 import { Button } from '@/components/ui/button';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCategorias } from '@/hooks/useCategorias';
 
 type Categoria = {
   id: number;
@@ -10,28 +11,18 @@ type Categoria = {
 };
 
 const Categorias: React.FC = () => {
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [nombreNueva, setNombreNueva] = useState('');
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [nombreEdit, setNombreEdit] = useState('');
 
-  const fetchCategorias = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get('/Categorias');
-      setCategorias(res.data || []);
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al cargar categorías');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Usar el hook personalizado para categorías
+  const { categorias, loading: categoriasLoading, refetch } = useCategorias();
 
-  useEffect(() => {
-    fetchCategorias();
-  }, []);
+  // Función para recargar categorías después de operaciones CRUD
+  const recargarCategorias = () => {
+    refetch();
+  };
 
   const crearCategoria = async () => {
     if (!nombreNueva.trim()) {
@@ -43,7 +34,7 @@ const Categorias: React.FC = () => {
       await axios.post('/admin/categorias', { nombre: nombreNueva.trim() });
       setNombreNueva('');
       toast.success('Categoría creada');
-      await fetchCategorias();
+      recargarCategorias();
     } catch (err: any) {
       console.error(err);
       const msg = err?.response?.data || 'Error al crear categoría';
@@ -74,7 +65,7 @@ const Categorias: React.FC = () => {
       await axios.put(`/admin/categorias/${editandoId}`, { id: editandoId, nombre: nombreEdit.trim() });
       toast.success('Categoría actualizada');
       cancelarEdicion();
-      await fetchCategorias();
+      recargarCategorias();
     } catch (err) {
       console.error(err);
       toast.error('Error al actualizar categoría');
@@ -89,7 +80,7 @@ const Categorias: React.FC = () => {
       setLoading(true);
       await axios.delete(`/admin/categorias/${cat.id}`);
       toast.success('Categoría eliminada');
-      await fetchCategorias();
+      recargarCategorias();
     } catch (err) {
       console.error(err);
       toast.error('Error al eliminar categoría');
@@ -176,7 +167,7 @@ const Categorias: React.FC = () => {
             {categorias.length === 0 && (
               <tr>
                 <td colSpan={3} className="px-6 py-10 text-center text-gray-500">
-                  {loading ? 'Cargando...' : 'Sin categorías'}
+                  {categoriasLoading ? 'Cargando...' : 'Sin categorías'}
                 </td>
               </tr>
             )}

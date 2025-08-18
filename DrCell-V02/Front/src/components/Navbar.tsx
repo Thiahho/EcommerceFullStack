@@ -33,14 +33,14 @@ const Navbar: React.FC = () => {
 
   // Función para obtener las clases de un enlace
   const getLinkClasses = (path: string, isMobile = false) => {
-    const baseClasses = isMobile 
+    const baseClasses = isMobile
       ? "block px-3 py-2 rounded-md transition-colors duration-200"
       : "transition-colors duration-200";
-    
+
     if (isActiveLink(path)) {
       return `${baseClasses} text-[#17436b] ${isMobile ? 'bg-blue-50 font-semibold' : 'border-b-2 border-[#17436b] font-semibold'}`;
     }
-    
+
     return `${baseClasses} text-gray-700 hover:text-[#17436b] ${isMobile ? 'hover:bg-gray-50' : ''}`;
   };
 
@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
         <span className="sm:hidden">Lun-Vie 09:00-19:00</span>
         <span className="font-bold ml-1 sm:ml-2">Cotizacion sin cargo.</span>
       </div>
-      
+
       <nav className="border-b border-gray-200 bg-white relative h-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex h-16 items-center justify-between">
@@ -83,20 +83,20 @@ const Navbar: React.FC = () => {
 
             {/* Menú principal - Desktop */}
             <div className="hidden md:flex md:items-center md:space-x-6 lg:space-x-8">
-              <Link 
-                to="/tienda" 
+              <Link
+                to="/tienda"
                 className={getLinkClasses('/tienda')}
               >
                 Tienda
               </Link>
-              <Link 
-                to="/nosotros" 
+              <Link
+                to="/nosotros"
                 className={getLinkClasses('/nosotros')}
               >
                 Sobre nosotros
               </Link>
-              <Link 
-                to="/cotizacion" 
+              <Link
+                to="/cotizacion"
                 className={getLinkClasses('/cotizacion')}
               >
                 Presupuestar
@@ -112,26 +112,26 @@ const Navbar: React.FC = () => {
                       className="bg-[#17436b] text-white hover:bg-[#0d2b4a] text-sm px-3 py-2"
                       onClick={() => navigate('/admin')}
                     >
-                                          <Clipboard className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
-                    <span className="hidden lg:inline">Admin</span>
+                      <Clipboard className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
+                      <span className="hidden lg:inline">Admin</span>
+                    </Button>
+                  )}
+
+                  <Button
+                    variant="outline"
+                    className="border-red-500 text-red-500 hover:bg-red-50 text-sm px-3 py-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
+                    <span className="hidden lg:inline">Cerrar Sesión</span>
                   </Button>
-                )}
-                
+                </>
+              ) : (
                 <Button
-                  variant="outline"
-                  className="border-red-500 text-red-500 hover:bg-red-50 text-sm px-3 py-2"
-                  onClick={handleLogout}
+                  className="bg-[#17436b] text-white hover:bg-[#0d2b4a] text-sm px-3 py-2"
+                  onClick={() => navigate('/login')}
                 >
-                  <LogOut className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
-                  <span className="hidden lg:inline">Cerrar Sesión</span>
-                </Button>
-              </>
-            ) : (
-              <Button
-                className="bg-[#17436b] text-white hover:bg-[#0d2b4a] text-sm px-3 py-2"
-                onClick={() => navigate('/login')}
-              >
-                <User className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
+                  <User className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
                   <span className="hidden lg:inline">Iniciar Sesión</span>
                 </Button>
               )}
@@ -167,9 +167,9 @@ const Navbar: React.FC = () => {
                 Tienda
               </Link>
               <Link
-                to="/nosotros"
+                to="/AboutUs"
                 onClick={handleNavLinkClick}
-                className={getLinkClasses('/nosotros', true)}
+                className={getLinkClasses('/aboutus', true)}
               >
                 Sobre nosotros
               </Link>
@@ -180,10 +180,10 @@ const Navbar: React.FC = () => {
               >
                 Presupuestar
               </Link>
-              
+
               {/* Separador */}
               <div className="border-t border-gray-200 my-2"></div>
-              
+
               {/* Acciones de usuario móvil */}
               {user ? (
                 <>
@@ -199,7 +199,7 @@ const Navbar: React.FC = () => {
                       Admin
                     </button>
                   )}
-                  
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors duration-200 flex items-center"

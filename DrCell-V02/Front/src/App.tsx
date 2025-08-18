@@ -38,45 +38,19 @@ const LoadingScreen = () => (
 );
 
 export default function App() {
-  const logout = useAuthStore((state) => state.logout);
   const { isLoading, isInitialized } = useAuthInit();
 
-  useEffect(() => {
-    let isReloading = false;
+  // SOLUCIÓN SIMPLIFICADA: Eliminar la lógica problemática de beforeunload
+  // La persistencia de sesión se maneja completamente a través de:
+  // 1. Cookies httpOnly en el backend (más seguro)
+  // 2. sessionStorage para el estado del usuario (persiste en recargas)
+  // 3. checkAuthStatus en useAuthInit para verificar cookies al cargar
 
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      // Si es una recarga (F5), no hacer nada
-      if (isReloading) {
-        return;
-      }
-
-      // Si no es una recarga, cerrar sesión
-      logout();
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Detectar si se presiona F5 o Ctrl+R
-      if (event.key === 'F5' || (event.ctrlKey && event.key === 'r')) {
-        isReloading = true;
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        isReloading = true;
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [logout]);
+  // Nota: Removemos el logout automático al cerrar pestaña por las siguientes razones:
+  // - beforeunload es impredecible y causa problemas con recargas
+  // - Las cookies tienen expiración automática (24 horas)
+  // - Es mejor UX mantener la sesión entre recargas
+  // - El usuario puede cerrar sesión manualmente si lo desea
 
   // Mostrar pantalla de carga mientras se inicializa la autenticación
   if (isLoading || !isInitialized) {

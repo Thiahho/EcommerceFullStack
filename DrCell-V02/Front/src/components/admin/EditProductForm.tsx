@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import axios from '../../config/axios';
 import { toWebpBase64 } from '@/lib/utils';
+import { useCategorias } from '@/hooks/useCategorias';
 
 interface EditProductFormProps {
   isOpen: boolean;
@@ -30,6 +31,9 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
   });
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Usar el hook personalizado para categorías
+  const { categorias, loading: categoriasLoading, error: categoriasError } = useCategorias();
 
   useEffect(() => {
     setEditedProducto({
@@ -166,16 +170,30 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
               <Select
                 value={editedProducto.categoria}
                 onValueChange={(value) => handleProductoChange('categoria', value)}
+                disabled={categoriasLoading}
               >
                 <SelectTrigger className="w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Selecciona una categoría" />
+                  <SelectValue placeholder={categoriasLoading ? "Cargando categorías..." : "Selecciona una categoría"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="celular">📱 Celular</SelectItem>
-                  <SelectItem value="tablet">📱 Tablet</SelectItem>
-                  <SelectItem value="laptop">💻 Laptop</SelectItem>
+                  {categoriasError ? (
+                    <SelectItem value="" disabled>
+                      Error al cargar categorías
+                    </SelectItem>
+                  ) : (
+                    categorias.map((categoria) => (
+                      <SelectItem key={categoria.id} value={categoria.nombre}>
+                        {categoria.nombre}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
+              {categoriasError && (
+                <p className="text-xs text-red-600 mt-1">
+                  {categoriasError}
+                </p>
+              )}
             </div>
           </div>
 
@@ -289,7 +307,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={loading || !editedProducto.marca || !editedProducto.modelo || !editedProducto.categoria}
+            disabled={loading || categoriasLoading || !editedProducto.marca || !editedProducto.modelo || !editedProducto.categoria}
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400"
           >
             {loading ? (

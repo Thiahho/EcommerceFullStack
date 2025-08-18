@@ -3,6 +3,7 @@ import { Menu, X, Filter } from 'lucide-react';
 import axios from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 import SidebarFilters from './SidebarFilters';
+import { useCategorias } from '../hooks/useCategorias';
 
 const Shop: React.FC = () => {
   const [productos, setProductos] = useState<any[]>([]);
@@ -16,25 +17,35 @@ const Shop: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Usar el hook personalizado para categorías
+  const { categoriasNombres, loading: categoriasLoading, error: categoriasError } = useCategorias();
+
   useEffect(() => {
-    setLoading(true);
-    axios.get('/Productos/GetAll')
-      .then(res => {
-        setProductos(res.data);
+    const fetchProductos = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('/Productos/GetAll');
+        setProductos(response.data);
+
         // Calcular rango de precios inicial
-        const precios = res.data.flatMap((p: any) => p.variantes?.map((v: any) => v.precio) || []);
+        const precios = response.data.flatMap((p: any) => p.variantes?.map((v: any) => v.precio) || []);
         const min = precios.length ? Math.min(...precios) : 0;
         const max = precios.length ? Math.max(...precios) : 0;
         setRangoPrecio([min, max]);
         setFiltros(f => ({ ...f, precio: [min, max] }));
-      })
-      .catch(() => setProductos([]))
-      .finally(() => setLoading(false));
+      } catch (error) {
+        console.error('Error al cargar productos:', error);
+        setProductos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductos();
   }, []);
 
-  // Obtener marcas y categorías únicas
+  // Obtener marcas únicas de los productos
   const marcas = useMemo(() => Array.from(new Set(productos.map(p => p.marca))).sort(), [productos]);
-  const categorias = useMemo(() => Array.from(new Set(productos.map(p => p.categoria))).sort(), [productos]);
 
   // Filtrar productos
   const productosFiltrados = useMemo(() => {
@@ -74,7 +85,7 @@ const Shop: React.FC = () => {
     setIsSidebarOpen(false);
   };
 
-  if (loading) {
+  if (loading || categoriasLoading) {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-center min-h-[50vh]">
@@ -105,7 +116,7 @@ const Shop: React.FC = () => {
         <div className="hidden lg:block lg:w-80 flex-shrink-0">
           <SidebarFilters
             marcas={marcas}
-            categorias={categorias}
+            categorias={categoriasNombres}
             precioMin={rangoPrecio[0]}
             precioMax={rangoPrecio[1]}
             filtros={filtros}
@@ -137,7 +148,7 @@ const Shop: React.FC = () => {
               <div className="p-4 overflow-y-auto h-full">
                 <SidebarFilters
                   marcas={marcas}
-                  categorias={categorias}
+                  categorias={categoriasNombres}
                   precioMin={rangoPrecio[0]}
                   precioMax={rangoPrecio[1]}
                   filtros={filtros}

@@ -27,16 +27,24 @@ const api = axios.create({
 // 🔑 Interceptor para manejar autenticación con cookies + localStorage fallback
 api.interceptors.request.use(
   (config) => {
+    console.log(`🔗 API Call: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+    console.log('🍪 Cookies en la request:', document.cookie);
+    console.log('🔧 withCredentials:', config.withCredentials);
+    
     // 🔧 TEMP: En desarrollo, usar localStorage como fallback si no hay cookies
     if (process.env.NODE_ENV === 'development') {
       const token = localStorage.getItem('authToken');
-      if (token && !document.cookie.includes('AuthToken')) {
+      const hasCookie = document.cookie.includes('AuthToken');
+      
+      console.log('🔧 localStorage token existe:', !!token);
+      console.log('🔧 Cookie AuthToken existe:', hasCookie);
+      
+      if (token && !hasCookie) {
         config.headers.Authorization = `Bearer ${token}`;
         console.log('🔧 TEMP: Usando token de localStorage');
       }
     }
     
-    console.log(`🔗 API Call: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
     return config;
   },
   (error) => {

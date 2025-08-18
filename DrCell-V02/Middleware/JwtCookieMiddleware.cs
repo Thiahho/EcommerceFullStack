@@ -26,27 +26,64 @@ namespace DrCell_V02.Middleware
         {
             try
             {
-                // Verificar si hay token en cookies
-                if (context.Request.Cookies.TryGetValue("AuthToken", out var token))
+                string? token = null;
+                string source = "";
+
+                // 1. Verificar si ya hay Authorization header
+                var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
                 {
+                    token = authHeader.Substring("Bearer ".Length).Trim();
+                    source = "Authorization Header";
+                    Console.WriteLine($"🔍 DEBUG: Token encontrado en Authorization Header");
+                }
+                // 2. Si no hay header, verificar cookies
+                else if (context.Request.Cookies.TryGetValue("AuthToken", out var cookieToken))
+                {
+                    token = cookieToken;
+                    source = "Cookie";
+                    Console.WriteLine($"🔍 DEBUG: Token encontrado en Cookie");
+                }
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    Console.WriteLine($"🔍 DEBUG: Validando token de {source}...");
+                    
                     // Validar el token JWT
                     if (ValidateJwtToken(token))
                     {
-                        // Agregar el token al header Authorization para que el middleware JWT predeterminado lo procese
-                        context.Request.Headers.Add("Authorization", $"Bearer {token}");
-                        _logger.LogDebug("Token JWT extraído de cookie y agregado al header Authorization");
+                        // Solo agregar header si no existe ya
+                        if (string.IsNullOrEmpty(authHeader))
+                        {
+                            context.Request.Headers.Add("Authorization", $"Bearer {token}");
+                            Console.WriteLine($"✅ DEBUG: Token válido de {source} agregado al header Authorization");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"✅ DEBUG: Token válido de {source} confirmado");
+                        }
                     }
                     else
                     {
-                        _logger.LogWarning("Token JWT en cookie es inválido o expirado");
-                        // Limpiar cookie inválida
-                        context.Response.Cookies.Delete("AuthToken");
+                        Console.WriteLine($"❌ DEBUG: Token inválido de {source}");
+                        _logger.LogWarning($"Token JWT en {source} es inválido o expirado");
+                        
+                        // Limpiar cookie inválida si el token vino de cookie
+                        if (source == "Cookie")
+                        {
+                            context.Response.Cookies.Delete("AuthToken");
+                        }
                     }
+                }
+                else
+                {
+                    Console.WriteLine($"🔍 DEBUG: No se encontró token en cookies ni en Authorization header");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al procesar token JWT de cookie");
+                Console.WriteLine($"❌ DEBUG: Error en JwtCookieMiddleware: {ex.Message}");
+                _logger.LogError(ex, "Error al procesar token JWT");
             }
 
             await _next(context);

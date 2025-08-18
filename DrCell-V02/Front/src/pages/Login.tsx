@@ -41,6 +41,18 @@ export const Login = () => {
         console.log('🔧 TEMP: Token almacenado en localStorage para desarrollo');
       }
 
+      // 🔍 DEBUG: Verificar cookies después del login
+      setTimeout(() => {
+        const cookiesAfterLogin = document.cookie;
+        console.log('🍪 Cookies después del login:', cookiesAfterLogin);
+        const hasAuthCookie = cookiesAfterLogin.includes('AuthToken');
+        console.log('🔍 Cookie AuthToken establecida:', hasAuthCookie);
+
+        if (!hasAuthCookie) {
+          console.log('⚠️ ADVERTENCIA: Cookie no establecida, usando localStorage como respaldo');
+        }
+      }, 100);
+
       // Actualizar el estado del usuario
       setUser({
         id: usuario.id,

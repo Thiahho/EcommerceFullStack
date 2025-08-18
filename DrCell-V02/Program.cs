@@ -367,12 +367,22 @@ try
     // 5. Configuración de Cookies seguras
     builder.Services.Configure<CookiePolicyOptions>(options =>
     {
-        options.CheckConsentNeeded = context => true;
-        options.MinimumSameSitePolicy = SameSiteMode.Strict;
-        options.HttpOnly = HttpOnlyPolicy.Always;
-        options.Secure = builder.Environment.IsDevelopment()
-            ? CookieSecurePolicy.SameAsRequest
-            : CookieSecurePolicy.Always;
+        // 🔧 FIX: Configuración más permisiva para desarrollo
+        if (builder.Environment.IsDevelopment())
+        {
+            options.CheckConsentNeeded = context => false; // No requerir consentimiento en desarrollo
+            options.MinimumSameSitePolicy = SameSiteMode.Lax; // Lax para compatibilidad con desarrollo
+            options.HttpOnly = HttpOnlyPolicy.None; // Permitir acceso desde JavaScript en desarrollo
+            options.Secure = CookieSecurePolicy.SameAsRequest; // Permitir HTTP en desarrollo
+        }
+        else
+        {
+            // Configuración segura para producción
+            options.CheckConsentNeeded = context => true;
+            options.MinimumSameSitePolicy = SameSiteMode.Strict;
+            options.HttpOnly = HttpOnlyPolicy.Always;
+            options.Secure = CookieSecurePolicy.Always;
+        }
     });
 
     // 6. Configuración de sesión
@@ -380,10 +390,21 @@ try
     builder.Services.AddSession(options =>
     {
         options.IdleTimeout = TimeSpan.FromMinutes(30);
-        options.Cookie.HttpOnly = true;
         options.Cookie.IsEssential = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        
+        // 🔧 FIX: Configuración diferente para desarrollo vs producción
+        if (builder.Environment.IsDevelopment())
+        {
+            options.Cookie.HttpOnly = false; // Permitir acceso desde JS en desarrollo
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // HTTP permitido
+            options.Cookie.SameSite = SameSiteMode.Lax; // Más permisivo
+        }
+        else
+        {
+            options.Cookie.HttpOnly = true; // Seguro en producción
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Solo HTTPS
+            options.Cookie.SameSite = SameSiteMode.Strict; // Estricto en producción
+        }
     });
 
     builder.Services.AddMemoryCache();

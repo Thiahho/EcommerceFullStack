@@ -95,22 +95,31 @@ namespace DrCell_V02.Controllers.admin
 
                 var token = _usuarioService.GenerarToken(usuario);
 
-                // Configurar cookie - en desarrollo no usar HttpOnly para evitar problemas cross-origin
+                // 🔧 FIX: Configuración de cookie mejorada para desarrollo
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = false, // 🔧 FIX: False en desarrollo para mayor compatibilidad
-                    Secure = false, // 🔧 FIX: False para desarrollo HTTP
-                    SameSite = SameSiteMode.Lax, // 🔧 FIX: Lax para desarrollo
                     Expires = DateTimeOffset.UtcNow.AddHours(24), // Expira en 24 horas
                     Path = "/"
                 };
 
-                // En producción, usar configuración segura
-                if (_configuration["ASPNETCORE_ENVIRONMENT"] == "Production")
+                // 🔧 DEBUG: Verificar configuración de ambiente
+                var environment = _configuration["ASPNETCORE_ENVIRONMENT"];
+                Console.WriteLine($"🔧 DEBUG: Ambiente detectado: '{environment}'");
+                
+                // Configuración específica por ambiente
+                if (environment == "Development")
+                {
+                    cookieOptions.HttpOnly = false; // Permitir acceso desde JS en desarrollo
+                    cookieOptions.Secure = false; // HTTP permitido en desarrollo
+                    cookieOptions.SameSite = SameSiteMode.Lax; // Lax para compatibilidad cross-origin
+                    Console.WriteLine($"🔧 DEBUG: Usando configuración de DESARROLLO");
+                }
+                else
                 {
                     cookieOptions.HttpOnly = true; // Seguro en producción
-                    cookieOptions.Secure = true;
-                    cookieOptions.SameSite = SameSiteMode.Strict;
+                    cookieOptions.Secure = true; // Solo HTTPS en producción
+                    cookieOptions.SameSite = SameSiteMode.Strict; // Estricto en producción
+                    Console.WriteLine($"🔧 DEBUG: Usando configuración de PRODUCCIÓN");
                 }
 
                 // 🔧 DEBUG: Agregar logs para verificar cookie
@@ -118,8 +127,15 @@ namespace DrCell_V02.Controllers.admin
                 Console.WriteLine($"🔧 DEBUG: Token generado: {token?.Substring(0, 20)}...");
                 Console.WriteLine($"🔧 DEBUG: Cookie options - Secure: {cookieOptions.Secure}, SameSite: {cookieOptions.SameSite}");
                 
-                Response.Cookies.Append("AuthToken", token, cookieOptions);
-                Console.WriteLine($"🔧 DEBUG: Cookie establecida exitosamente");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    Response.Cookies.Append("AuthToken", token, cookieOptions);
+                    Console.WriteLine($"🔧 DEBUG: Cookie establecida exitosamente");
+                }
+                else
+                {
+                    Console.WriteLine($"🔧 ERROR: Token es null o vacío, no se puede establecer cookie");
+                }
 
                 return Ok(new
                 {
@@ -136,7 +152,9 @@ namespace DrCell_V02.Controllers.admin
                         tokenLength = token?.Length,
                         cookieSecure = cookieOptions.Secure,
                         cookieSameSite = cookieOptions.SameSite.ToString(),
-                        environment = _configuration["ASPNETCORE_ENVIRONMENT"]
+                        cookieHttpOnly = cookieOptions.HttpOnly,
+                        environment = _configuration["ASPNETCORE_ENVIRONMENT"],
+                        cookieExpires = cookieOptions.Expires
                     }
                 });
             }
@@ -169,30 +187,38 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                // Verificar si hay token en cookies
-                if (Request.Cookies.TryGetValue("AuthToken", out var token))
+                Console.WriteLine($"🔍 DEBUG: Verificando sesión...");
+                Console.WriteLine($"🔍 DEBUG: User.Identity.IsAuthenticated = {User.Identity?.IsAuthenticated}");
+                Console.WriteLine($"🔍 DEBUG: Cookies: {string.Join(", ", Request.Cookies.Select(c => $"{c.Key}={c.Value?.Substring(0, Math.Min(20, c.Value.Length))}..."))}");
+                Console.WriteLine($"🔍 DEBUG: Authorization Header: {Request.Headers.Authorization}");
+
+                // Verificar si el usuario está autenticado (ya sea por cookie o por header Authorization)
+                if (User.Identity?.IsAuthenticated == true)
                 {
-                    // El middleware JwtCookieMiddleware ya habrá validado el token
-                    // Si llegamos aquí y hay token, significa que es válido
-                    if (User.Identity?.IsAuthenticated == true)
+                    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+                    Console.WriteLine($"✅ DEBUG: Usuario autenticado - ID: {userId}, Email: {email}, Role: {role}");
+
+                    return Ok(new
                     {
-                        return Ok(new
+                        isAuthenticated = true,
+                        usuario = new
                         {
-                            isAuthenticated = true,
-                            usuario = new
-                            {
-                                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-                                email = User.FindFirst(ClaimTypes.Email)?.Value,
-                                rol = User.FindFirst(ClaimTypes.Role)?.Value
-                            }
-                        });
-                    }
+                            id = userId,
+                            email = email,
+                            rol = role
+                        }
+                    });
                 }
 
+                Console.WriteLine($"❌ DEBUG: Usuario no autenticado");
                 return Ok(new { isAuthenticated = false });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"❌ DEBUG: Error en verify: {ex.Message}");
                 return StatusCode(500, new { message = "Error al verificar sesión", error = ex.Message });
             }
         }
