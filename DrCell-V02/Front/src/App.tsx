@@ -24,6 +24,7 @@ import ProductDetalle from '@/components/DetalleProducto';
 import Cart from '@/components/Cart';
 import AboutUs from './components/AboutUs';
 import TerminosYCondiciones from './components/TerminosYCondiciones';
+import Checkout from '@/pages/Checkout';
 
 const UserDashboard = () => <div>Panel de Usuario</div>;
 
@@ -94,6 +95,7 @@ export default function App() {
           />
           <Route path="/tienda" element={<Tienda />} />
           <Route path="/tienda/:id" element={<ProductDetalle />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="*" element={<Home />} />
         </Routes>
         <Cart />

@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../config/axios';
-import { useParams } from 'react-router-dom';
-import { useCartStore } from '@/store/cart-store';
+import { useParams, useNavigate } from 'react-router-dom';
 import Toast from '@/components/ui/toast';
+import { useCartStore } from '@/store/cart-store';
 
 const ProductDetalle: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [producto, setProducto] = useState<any>(null);
   const [ram, setRam] = useState('');
   const [almacenamiento, setAlmacenamiento] = useState('');
   const [color, setColor] = useState('');
   const [variante, setVariante] = useState<any>(null);
   const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
 
   const { addToCart } = useCartStore();
 
@@ -20,6 +22,8 @@ const ProductDetalle: React.FC = () => {
       .then(res => setProducto(res.data))
       .catch(() => setProducto(null));
   }, [id]);
+
+
 
   useEffect(() => {
     if (producto && ram && almacenamiento && color) {
@@ -35,6 +39,7 @@ const ProductDetalle: React.FC = () => {
 
     addToCart({
       productoId: producto.id,
+      varianteId: variante.id,
       marca: producto.marca,
       modelo: producto.modelo,
       ram: variante.ram,
@@ -45,8 +50,34 @@ const ProductDetalle: React.FC = () => {
       img: producto.img
     });
 
-    // Mostrar notificación
+    setNotificationMessage('¡Producto agregado al carrito exitosamente!');
     setShowNotification(true);
+  };
+
+  const handleProceedToCheckout = () => {
+    if (!variante || !producto) return;
+
+    // Agregar el producto al carrito
+    addToCart({
+      productoId: producto.id,
+      varianteId: variante.id,
+      marca: producto.marca,
+      modelo: producto.modelo,
+      ram: variante.ram,
+      almacenamiento: variante.almacenamiento,
+      color: variante.color,
+      precio: variante.precio,
+      stock: variante.stock,
+      img: producto.img
+    });
+
+    setNotificationMessage('¡Producto agregado al carrito! Redirigiendo al checkout...');
+    setShowNotification(true);
+
+    // Redireccionar al checkout después de un pequeño delay para mostrar la notificación
+    setTimeout(() => {
+      navigate('/checkout');
+    }, 1500);
   };
 
   if (!producto) return <div className="p-8">Cargando...</div>;
@@ -64,8 +95,8 @@ const ProductDetalle: React.FC = () => {
     <div className="w-full flex flex-col items-center justify-center py-4">
       {/* Notificación mejorada */}
       <Toast
-        message="¡Producto agregado al carrito exitosamente!"
-        type="success"
+        message={notificationMessage}
+        type={notificationMessage.includes('Error') ? 'error' : 'success'}
         isVisible={showNotification}
         onClose={() => setShowNotification(false)}
         duration={3000}
@@ -129,13 +160,32 @@ const ProductDetalle: React.FC = () => {
               <div className="text-gray-700">Stock: {variante.stock}</div>
             </div>
           )}
-          <button
-            className="w-full bg-[#111] text-white py-3 px-6 rounded hover:bg-[#333] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-bold text-lg mt-2"
-            disabled={!variante}
-            onClick={handleAddToCart}
-          >
-            Agregar al carrito
-          </button>
+          {variante && (
+            <div className="w-full space-y-3">
+              {/* Botón de Agregar al Carrito */}
+              <button
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-bold text-lg"
+                disabled={!variante || variante.stock <= 0}
+                onClick={handleAddToCart}
+              >
+                🛒 Agregar al Carrito
+              </button>
+
+              {/* Separador */}
+              <div className="flex items-center justify-center text-gray-500 text-sm">
+                <span className="bg-white px-2">O</span>
+              </div>
+
+              {/* Botón para ir al Checkout */}
+              <button
+                className="w-full bg-green-600 text-white py-3 px-6 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-bold text-lg"
+                disabled={!variante || variante.stock <= 0}
+                onClick={handleProceedToCheckout}
+              >
+                💳 Pagar con Tarjeta
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

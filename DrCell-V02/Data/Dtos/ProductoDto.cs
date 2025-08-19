@@ -32,6 +32,9 @@ namespace DrCell_V02.Data.Dtos
             return Variantes?.Min(v => v.Precio);
         }
 
+        // Propiedad calculada para compatibilidad
+        public decimal Precio => GetBasePrice() ?? 0;
+
         public IEnumerable<string> GetAvailableRAM()
         {
             return Variantes?.Select(v => v.Ram)

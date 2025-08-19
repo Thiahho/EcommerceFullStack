@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 export interface CartItem {
   id: number;
   productoId: number;
+  varianteId: number; // ID real de la variante en la base de datos
   marca: string;
   modelo: string;
   ram: string;
@@ -36,9 +37,7 @@ export const useCartStore = create<CartState>()(
         const existingItem = state.items.find(
           item => 
             item.productoId === newItem.productoId &&
-            item.ram === newItem.ram &&
-            item.almacenamiento === newItem.almacenamiento &&
-            item.color === newItem.color
+            item.varianteId === newItem.varianteId
         );
 
         if (existingItem) {
