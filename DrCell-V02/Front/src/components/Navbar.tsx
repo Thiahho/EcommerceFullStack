@@ -14,6 +14,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth-store';
+import { useCartStore } from '@/store/cart-store';
 
 interface User {
   email: string;
@@ -24,6 +25,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const { getTotalItems } = useCartStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Función para verificar si un enlace está activo
@@ -105,6 +107,22 @@ const Navbar: React.FC = () => {
 
             {/* Acciones a la derecha - Desktop */}
             <div className="hidden md:flex md:items-center md:space-x-3 lg:space-x-4">
+              {/* Botón del Carrito → Checkout */}
+              <button
+                onClick={() => navigate('/checkout')}
+                disabled={getTotalItems() === 0}
+                className="relative p-2 text-gray-700 hover:text-[#17436b] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Ir al checkout"
+                title={getTotalItems() > 0 ? `${getTotalItems()} productos - Ir al checkout` : 'Carrito vacío'}
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
+
               {user ? (
                 <>
                   {user.role === 'admin' && (
@@ -180,6 +198,24 @@ const Navbar: React.FC = () => {
               >
                 Presupuestar
               </Link>
+
+              {/* Botón de Carrito → Checkout Móvil */}
+              <button
+                onClick={() => {
+                  navigate('/checkout');
+                  setIsMobileMenuOpen(false);
+                }}
+                disabled={getTotalItems() === 0}
+                className="w-full flex items-center justify-center space-x-2 px-3 py-3 text-white bg-[#17436b] hover:bg-[#0d2b4a] rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span>Ir al Checkout</span>
+                {getTotalItems() > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
 
               {/* Separador */}
               <div className="border-t border-gray-200 my-2"></div>

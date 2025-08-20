@@ -3,7 +3,12 @@ import { useCartStore, CartItem } from '@/store/cart-store';
 import { useNavigate } from 'react-router-dom';
 import { WHATSAPP_CONFIG } from '@/config/whatsapp';
 
-const Cart: React.FC = () => {
+interface CartProps {
+  isOpen?: boolean;
+  onToggle?: (open: boolean) => void;
+}
+
+const Cart: React.FC<CartProps> = ({ isOpen: externalIsOpen, onToggle }) => {
   const {
     items,
     removeFromCart,
@@ -14,7 +19,11 @@ const Cart: React.FC = () => {
   } = useCartStore();
 
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+
+  // Usar el estado externo si está disponible, sino el interno
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = onToggle || setInternalIsOpen;
 
   const handleWhatsAppOrder = () => {
     if (items.length === 0) return;
@@ -203,18 +212,23 @@ Gracias por tu compra! 📱✨`;
 
             {/* Botones de acción */}
             <div className="space-y-2">
-              {/* Botón de Pagar Total */}
+              {/* Botón para Ir al Checkout */}
               <button
                 onClick={handleProceedToCheckout}
-                className={`w-full bg-green-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors ${items.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
+                className={`w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors ${items.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
                 disabled={items.length === 0}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-                <span className="hidden sm:inline">💰 Pagar Total</span>
-                <span className="sm:hidden">Pagar</span>
+                <span className="hidden sm:inline">🛒 Ir a Checkout</span>
+                <span className="sm:hidden">Checkout</span>
               </button>
+
+              {/* Separador */}
+              <div className="text-center text-xs text-gray-500">
+                Revisa tu pedido antes de pagar
+              </div>
 
               {/* Info de MercadoPago Pro */}
               <div className="text-xs text-gray-500 text-center">

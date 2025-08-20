@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
-import { useCartStore } from '@/store/cart-store';
+import React, { useState, useEffect } from 'react';
+import { useCartStore, CartItem } from '@/store/cart-store';
 import { useNavigate } from 'react-router-dom';
 import CheckoutPro from '@/components/mp/CheckoutPro';
 import Toast from '@/components/ui/toast';
 
 const Checkout: React.FC = () => {
     const navigate = useNavigate();
-    const { items, getTotalPrice, clearCart } = useCartStore();
+    const { items, getTotalPrice, clearCart, updateQuantity, removeFromCart } = useCartStore();
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
     const [notificationType, setNotificationType] = useState<'success' | 'error'>('success');
 
     const totalPrice = getTotalPrice();
+
+    // Efecto para redirigir si el carrito se vacía completamente
+    useEffect(() => {
+        if (items.length === 0) {
+            const timer = setTimeout(() => {
+                navigate('/tienda');
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [items.length, navigate]);
 
     const handlePaymentSuccess = () => {
         console.log('🎉 Pago exitoso!');
@@ -35,6 +45,35 @@ const Checkout: React.FC = () => {
 
     const handleCancel = () => {
         navigate(-1); // Volver a la página anterior
+    };
+
+    const handleQuantityChange = (itemId: number, newQuantity: number) => {
+        if (newQuantity <= 0) {
+            handleRemoveItem(itemId);
+            return;
+        }
+
+        // Buscar el item para validar stock
+        const item = items.find(i => i.id === itemId);
+        if (item && newQuantity > item.stock) {
+            setNotificationMessage(`Solo hay ${item.stock} unidades disponibles de ${item.marca} ${item.modelo}`);
+            setNotificationType('error');
+            setShowNotification(true);
+            return;
+        }
+
+        updateQuantity(itemId, newQuantity);
+        setNotificationMessage('Cantidad actualizada');
+        setNotificationType('success');
+        setShowNotification(true);
+    };
+
+    const handleRemoveItem = (itemId: number) => {
+        const item = items.find(i => i.id === itemId);
+        removeFromCart(itemId);
+        setNotificationMessage(`${item?.marca} ${item?.modelo} eliminado del carrito`);
+        setNotificationType('success');
+        setShowNotification(true);
     };
 
     // Si no hay productos en el carrito, mostrar mensaje
@@ -95,27 +134,70 @@ const Checkout: React.FC = () => {
 
                             <div className="space-y-4 mb-6">
                                 {items.map((item) => (
-                                    <div key={item.id} className="flex items-center space-x-3 pb-3 border-b border-gray-200">
-                                        <img
-                                            src={`data:image/webp;base64,${item.img}`}
-                                            alt={`${item.marca} ${item.modelo}`}
-                                            className="w-16 h-16 object-contain rounded"
-                                        />
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold text-gray-800">
-                                                {item.marca} {item.modelo}
-                                            </h3>
-                                            <p className="text-sm text-gray-600">
-                                                {item.color} - {item.ram}/{item.almacenamiento}
-                                            </p>
-                                            <div className="flex justify-between items-center mt-1">
-                                                <span className="text-sm text-gray-600">
-                                                    Cantidad: {item.cantidad}
-                                                </span>
-                                                <span className="font-semibold text-green-600">
-                                                    ${(item.precio * item.cantidad).toLocaleString()}
-                                                </span>
+                                    <div key={item.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                                        <div className="flex items-center space-x-3">
+                                            <img
+                                                src={`data:image/webp;base64,${item.img}`}
+                                                alt={`${item.marca} ${item.modelo}`}
+                                                className="w-16 h-16 object-contain rounded"
+                                            />
+                                            <div className="flex-1">
+                                                <h3 className="font-semibold text-gray-800">
+                                                    {item.marca} {item.modelo}
+                                                </h3>
+                                                <p className="text-sm text-gray-600">
+                                                    {item.color} - {item.ram}/{item.almacenamiento}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    Stock disponible: {item.stock}
+                                                </p>
                                             </div>
+                                            <div className="text-right">
+                                                <p className="font-semibold text-lg text-green-600">
+                                                    ${(item.precio * item.cantidad).toLocaleString()}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    ${item.precio.toLocaleString()} c/u
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Controles de cantidad y eliminación */}
+                                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                                            <div className="flex items-center space-x-3">
+                                                <span className="text-sm font-medium text-gray-700">Cantidad:</span>
+                                                <div className="flex items-center space-x-2">
+                                                    <button
+                                                        onClick={() => handleQuantityChange(item.id, item.cantidad - 1)}
+                                                        className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 transition-colors"
+                                                        disabled={item.cantidad <= 1}
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                                        </svg>
+                                                    </button>
+                                                    <span className="w-12 text-center font-semibold">{item.cantidad}</span>
+                                                    <button
+                                                        onClick={() => handleQuantityChange(item.id, item.cantidad + 1)}
+                                                        className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 transition-colors"
+                                                        disabled={item.cantidad >= item.stock}
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                onClick={() => handleRemoveItem(item.id)}
+                                                className="flex items-center space-x-2 text-red-600 hover:text-red-700 transition-colors"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                <span className="text-sm font-medium">Eliminar</span>
+                                            </button>
                                         </div>
                                     </div>
                                 ))}

@@ -25,6 +25,7 @@ import Cart from '@/components/Cart';
 import AboutUs from './components/AboutUs';
 import TerminosYCondiciones from './components/TerminosYCondiciones';
 import Checkout from '@/pages/Checkout';
+import FloatingCheckout from '@/components/FloatingCheckout';
 
 const UserDashboard = () => <div>Panel de Usuario</div>;
 
@@ -98,7 +99,7 @@ export default function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="*" element={<Home />} />
         </Routes>
-        <Cart />
+        <FloatingCheckout />
         <div className="w-full flex justify-center items-center my-8">
           <div className="w-full max-w-6xl bg-white rounded-3xl shadow-lg px-4 py-6">
             <img
