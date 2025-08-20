@@ -56,15 +56,17 @@ Gracias por tu compra! 📱✨`;
     setIsOpen(false);
   };
 
-  const handlePaymentInitiated = (response: any) => {
-    console.log('Pago iniciado:', response);
-    // Opcionalmente limpiar el carrito tras iniciar el pago
-    // clearCart();
+  const handlePaymentSuccess = () => {
+    console.log('🎉 Pago exitoso!');
+    setShowCheckout(false);
+    setIsOpen(false);
+    // El carrito se limpia automáticamente en CartCheckout
+    alert('¡Pago realizado con éxito! Gracias por tu compra.');
   };
 
   const handlePaymentError = (error: string) => {
-    console.error('Error en el pago:', error);
-    alert(`Error: ${error}`);
+    console.error('❌ Error en el pago:', error);
+    alert(`Error en el pago: ${error}`);
   };
 
   const handleCancelCheckout = () => {
@@ -260,14 +262,30 @@ Gracias por tu compra! 📱✨`;
       {/* Modal de Checkout */}
       {showCheckout && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <CartCheckout
-              cartItems={items}
-              totalPrice={getTotalPrice()}
-              onPaymentInitiated={handlePaymentInitiated}
-              onError={handlePaymentError}
-              onCancel={handleCancelCheckout}
-            />
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  💳 Checkout - MercadoPago Pro
+                </h2>
+                <button
+                  onClick={handleCancelCheckout}
+                  className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Cerrar checkout"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <CartCheckout
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentError}
+                onCancel={handleCancelCheckout}
+                showCartSummary={true}
+              />
+            </div>
           </div>
         </div>
       )}

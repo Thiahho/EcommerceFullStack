@@ -30,20 +30,21 @@ namespace DrCell_V02.Controllers
             _logger = logger;
         }
 
-        private string GetAccessToken()
+        /*private string GetAccessToken()
         {
             var token = _configuration.GetValue<string>("MercadoPago:AccessToken");
             return token ?? string.Empty;
 
-        }
-        private string  GetPublicKey()
+        }*/
+        /*private string  GetPublicKey()
         {
             var x = _configuration.GetValue<string>("MercadoPago:PublicKey");
             return x ?? string.Empty;
 
         }
+        */
 
-        [HttpGet("Success")]
+       /* [HttpGet("Success")]
         public IActionResult Success([FromQuery] PaymentResponse paymentResponse)
         {
             try
@@ -83,8 +84,9 @@ namespace DrCell_V02.Controllers
                 });
             }
         }
-
-        [HttpGet("Failure")]
+        */
+        
+        /*[HttpGet("Failure")]
         public IActionResult Failure([FromQuery] PaymentResponse paymentResponse)
         {
             try
@@ -102,8 +104,8 @@ namespace DrCell_V02.Controllers
                 });
             }
         }
-
-        [HttpGet("Pending")]
+        */
+        /*[HttpGet("Pending")]
         public IActionResult Pending([FromQuery] PaymentResponse paymentResponse)
         {
             try
@@ -121,8 +123,9 @@ namespace DrCell_V02.Controllers
                 });
             }
         }
-
-        [HttpPost("procesar-pago")]
+        */
+        // MIGRADO A PagosController
+        /*[HttpPost("procesar-pago")]
         public async Task<IActionResult> ProcesarPago(EnviarPagoDto enviarPagoDto)
         {
             try
@@ -280,9 +283,10 @@ namespace DrCell_V02.Controllers
                 Console.WriteLine($"Error al procesar pago: {ex.Message}");
                 return StatusCode(500, new { message = "Error interno del servidor", error = ex.Message });
             }
-        }
+        }*/
 
-        [HttpPost("procesar-pago-carrito")]
+        // MIGRADO A PagosController  
+        /*[HttpPost("procesar-pago-carrito")]
         public async Task<IActionResult> ProcesarPagoCarrito()
         {
             try
@@ -507,9 +511,10 @@ namespace DrCell_V02.Controllers
                 Console.WriteLine($"Error al procesar pago del carrito: {ex.Message}");
                 return StatusCode(500, new { message = "Error interno del servidor", error = ex.Message });
             }
-        }
+        }*/
 
-        [HttpPost("webhooks/mercadopago")]
+        // MIGRADO A PagosController
+        /*[HttpPost("webhooks/mercadopago")]
         public async Task<IActionResult> MercadoPagoWebhook([FromBody] dynamic notification)
         {
             try
@@ -587,7 +592,7 @@ namespace DrCell_V02.Controllers
             {
                 Console.WriteLine($"❌ Error consultando pago {paymentId}: {ex.Message}");
             }
-        }
+        }*/
 
         public IActionResult Index()
         {
@@ -668,7 +673,8 @@ namespace DrCell_V02.Controllers
             return Json(modelos);
         }
 
-        [HttpGet("mercadopago/public-key")]
+        // MIGRADO A PagosController
+        /*[HttpGet("mercadopago/public-key")]
         public IActionResult GetMercadoPagoPublicKey()
         {
             try
@@ -686,84 +692,19 @@ namespace DrCell_V02.Controllers
                 Console.WriteLine($"Error al obtener clave pública: {ex.Message}");
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
-        }
+        }*/
 
-        [HttpPost("crear-preferencia")]
+        // MIGRADO A PagosController
+        /*[HttpPost("crear-preferencia")]
         public async Task<IActionResult> CrearPreferencia([FromBody] CrearPreferenciaDto preferenciaData)
         {
-            try
-            {
-                // Debug logging
-                Console.WriteLine("🔧 Endpoint crear-preferencia llamado");
-                Console.WriteLine($"🔧 Datos recibidos: {JsonSerializer.Serialize(preferenciaData)}");
-                Console.WriteLine($"🔧 Items count: {preferenciaData?.Items?.Count ?? 0}");
-                
-                // Validar modelo
-                if (!ModelState.IsValid)
-                {
-                    Console.WriteLine("❌ ModelState inválido:");
-                    foreach (var error in ModelState)
-                    {
-                        Console.WriteLine($"   - {error.Key}: {string.Join(", ", error.Value.Errors.Select(e => e.ErrorMessage))}");
-                    }
-                    return BadRequest(new { success = false, message = "Datos inválidos", errors = ModelState });
-                }
-                var client = new PreferenceClient();
-                
-                var items = preferenciaData.Items.Select(item => new PreferenceItemRequest
-                {
-                    Id = item.ProductoId.ToString(),
-                    Title = $"{item.Marca} {item.Modelo}",
-                    Description = $"RAM: {item.Ram}, Almacenamiento: {item.Almacenamiento}, Color: {item.Color}",
-                    CategoryId = "phones",
-                    Quantity = item.Cantidad,
-                    CurrencyId = "ARS",
-                    UnitPrice = item.Precio
-                }).ToList();
+            // Este método ha sido migrado a PagosController para mejor organización
+            // Usar: /Pagos/crear-preferencia
+            return BadRequest(new { message = "Este endpoint ha sido migrado a /Pagos/crear-preferencia" });
+        }*/
 
-                var request = new PreferenceRequest
-                {
-                    Items = items,
-                    BackUrls = new PreferenceBackUrlsRequest
-                    {
-                        Success = $"{Request.Scheme}://{Request.Host}/payment-success",
-                        Failure = $"{Request.Scheme}://{Request.Host}/payment-failure",
-                        Pending = $"{Request.Scheme}://{Request.Host}/payment-pending"
-                    },
-                    AutoReturn = "approved",
-                    PaymentMethods = new PreferencePaymentMethodsRequest
-                    {
-                        DefaultPaymentMethodId = null,
-                        ExcludedPaymentTypes = new List<PreferencePaymentTypeRequest>(),
-                        ExcludedPaymentMethods = new List<PreferencePaymentMethodRequest>(),
-                        DefaultInstallments = 1
-                    },
-                    NotificationUrl = $"{Request.Scheme}://{Request.Host}/webhooks/mercadopago-checkout",
-                    StatementDescriptor = "DRCELL",
-                    ExternalReference = Guid.NewGuid().ToString(),
-                    Expires = false,
-                    ExpirationDateFrom = null,
-                    ExpirationDateTo = null
-                };
-
-                var preference = await client.CreateAsync(request);
-                
-                return Ok(new
-                {
-                    success = true,
-                    preferenceId = preference.Id,
-                    initPoint = preference.InitPoint,
-                    sandboxInitPoint = preference.SandboxInitPoint
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear preferencia de MercadoPago");
-                return BadRequest(new { success = false, message = "Error al crear la preferencia de pago" });
-            }
-        }
-
-        [HttpGet("payment-success")]
+        // MIGRADO A PagosController
+        /*[HttpGet("payment-success")]
         public IActionResult PaymentSuccess()
         {
             return View("PaymentSuccess");
@@ -784,24 +725,12 @@ namespace DrCell_V02.Controllers
         [HttpPost("webhooks/mercadopago-checkout")]
         public async Task<IActionResult> WebhookMercadopagoCheckout([FromBody] object notification)
         {
-            try
-            {
-                _logger.LogInformation("Webhook recibido de MercadoPago: {notification}", notification);
-                
-                // Aquí puedes procesar la notificación de pago
-                // Por ejemplo, actualizar el estado del pedido en la base de datos
-                await Task.CompletedTask; // Placeholder para operación async
-                
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error procesando webhook de MercadoPago");
-                return StatusCode(500);
-            }
-        }
+            // MIGRADO A PagosController
+            return BadRequest(new { message = "Este endpoint ha sido migrado a /Pagos/webhooks/mercadopago" });
+        }*/
 
-        [HttpPost("procesar-pago-tarjeta")]
+        // MIGRADO A PagosController (pendiente implementar)
+        /*[HttpPost("procesar-pago-tarjeta")]
         public async Task<IActionResult> ProcesarPagoTarjeta([FromBody] PagoTarjetaDto pagoTarjetaDto)
         {
             try
@@ -1042,6 +971,6 @@ namespace DrCell_V02.Controllers
                 "cc_rejected_max_attempts" => "Máximo de intentos alcanzado",
                 _ => "Pago rechazado por el procesador"
             };
-        }
+        }*/
     }
 }

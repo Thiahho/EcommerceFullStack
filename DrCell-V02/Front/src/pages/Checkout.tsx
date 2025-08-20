@@ -13,15 +13,15 @@ const Checkout: React.FC = () => {
 
     const totalPrice = getTotalPrice();
 
-    const handlePaymentSuccess = (response: any) => {
-        console.log('✅ Pago exitoso:', response);
+    const handlePaymentSuccess = () => {
+        console.log('🎉 Pago exitoso!');
         setNotificationMessage('¡Pago procesado exitosamente! Tu pedido ha sido confirmado.');
         setNotificationType('success');
         setShowNotification(true);
 
-        // Limpiar carrito después del pago exitoso
+        // El carrito se limpia automáticamente en CartCheckout
+        // Redirigir a la página principal después de mostrar el mensaje
         setTimeout(() => {
-            clearCart();
             navigate('/');
         }, 3000);
     };
@@ -125,10 +125,7 @@ const Checkout: React.FC = () => {
                                 <div className="flex justify-between items-center text-lg font-bold">
                                     <span>Total:</span>
                                     <span className="text-green-600">
-                                        ${totalPrice.toLocaleString('es-CO', {
-                                            style: 'currency',
-                                            currency: 'COP'
-                                        })}
+                                        ${totalPrice.toLocaleString()}
                                     </span>
                                 </div>
                             </div>
@@ -143,11 +140,10 @@ const Checkout: React.FC = () => {
                             </h2>
 
                             <CartCheckout
-                                cartItems={items}
-                                totalPrice={totalPrice}
-                                onPaymentInitiated={handlePaymentSuccess}
+                                onSuccess={handlePaymentSuccess}
                                 onError={handlePaymentError}
                                 onCancel={handleCancel}
+                                showCartSummary={false}
                             />
                         </div>
                     </div>

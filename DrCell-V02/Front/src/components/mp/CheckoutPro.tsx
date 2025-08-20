@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { checkoutProService, CheckoutProItem } from '@/services/checkoutProService';
 import { useCartStore } from '@/store/cart-store';
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+
 
 interface CheckoutProProps {
     items: CheckoutProItem[];
@@ -9,73 +11,70 @@ interface CheckoutProProps {
 }
 
 const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) => {
+    const [preferenceId, setPreferenceId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [publicKey, setPublicKey] = useState('');
     const [sdkLoaded, setSdkLoaded] = useState(false);
     const { clearCart } = useCartStore();
-
-    // Obtener la clave pública
+    
+    // Inicializar MercadoPago SDK
     useEffect(() => {
-        const fetchPublicKey = async () => {
+        initMercadoPago('APP_USR-2fd73940-1ce1-4521-956e-b5fcf2c7db9c');
+        setSdkLoaded(true);
+    }, []);
+
+    // Crear preferencia cuando se cargan los items
+    useEffect(() => {
+        const createPreference = async () => {
+            if (items.length === 0) {
+                console.log('⚠️ No hay items para crear preferencia');
+                setPreferenceId(null);
+                return;
+            }
+            
             try {
-                const key = await checkoutProService.getPublicKey();
-                setPublicKey(key);
-                console.log('✅ Public key obtenida:', key);
+                setLoading(true);
+                setPreferenceId(null); // Reset preference ID
+                console.log('🔧 Creando preferencia con items:', items);
+                
+                const preference = await checkoutProService.createPreference(items);
+                setPreferenceId(preference.preferenceId);
+                
+                console.log('✅ Preferencia creada:', preference.preferenceId);
             } catch (error: any) {
-                console.error('❌ Error al obtener public key:', error);
-                onError?.('Error al cargar el sistema de pagos');
+                console.error('❌ Error al crear preferencia:', error);
+                setPreferenceId(null);
+                onError?.(error.message || 'Error al crear la preferencia de pago');
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchPublicKey();
-    }, [onError]);
-
-    // Inicializar SDK cuando se obtiene la clave pública
-    useEffect(() => {
-        const initSDK = async () => {
-            if (!publicKey) return;
-
-            try {
-                console.log('🔧 Inicializando Checkout Pro SDK...');
-                await checkoutProService.initialize(publicKey);
-                setSdkLoaded(true);
-                console.log('✅ Checkout Pro SDK inicializado');
-            } catch (error: any) {
-                console.error('❌ Error al inicializar SDK:', error);
-                setSdkLoaded(false);
-                onError?.('Error al cargar el sistema de pagos: ' + error.message);
-            }
-        };
-
-        initSDK();
-    }, [publicKey, onError]);
-
-    const handleCheckout = async () => {
-        if (!sdkLoaded || items.length === 0) return;
-
-        setLoading(true);
-
-        try {
-            console.log('🔧 Iniciando proceso de checkout con items:', items);
-
-            // Procesar checkout
-            await checkoutProService.processCheckout(items);
-
-            // Limpiar carrito después de iniciar el checkout
-            clearCart();
-
-            // Llamar callback de éxito
-            onSuccess?.();
-
-        } catch (error: any) {
-            console.error('❌ Error en checkout:', error);
-            onError?.(error.message || 'Error al procesar el pago');
-        } finally {
+        // Solo crear preferencia si hay items
+        if (items && items.length > 0) {
+            createPreference();
+        } else {
+            setPreferenceId(null);
             setLoading(false);
         }
+    }, [items, onError]);
+
+    // Manejar éxito del pago
+    const handlePaymentSuccess = () => {
+        clearCart();
+        onSuccess?.();
     };
 
     const totalAmount = items.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+
+    // Si no hay items
+    if (!items || items.length === 0) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-gray-500">No hay productos seleccionados para el pago</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4">
@@ -84,7 +83,7 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) 
                 <h3 className="font-semibold text-lg mb-3">Resumen de compra</h3>
 
                 {items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+                    <div key={`${item.productoId}-${item.varianteId}-${index}`} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
                         <div>
                             <p className="font-medium">{item.marca} {item.modelo}</p>
                             <p className="text-sm text-gray-600">
@@ -115,27 +114,33 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) 
             <div className="text-xs text-blue-500 p-2 bg-blue-50 rounded">
                 SDK Status: {sdkLoaded ? '✅ Cargado' : '❌ No cargado'} |
                 Loading: {loading ? '⏳' : '✅'} |
-                PublicKey: {publicKey ? '✅' : '❌'} |
+                Preference ID: {preferenceId ? '✅ Creada' : '❌ Pendiente'} |
                 Items: {items.length}
             </div>
 
-            {/* Botón de pago */}
-            <button
-                onClick={handleCheckout}
-                disabled={loading || !sdkLoaded || items.length === 0}
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-bold text-lg flex items-center justify-center"
-            >
-                {loading ? (
-                    <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        Procesando...
-                    </>
-                ) : (
-                    <>
-                        💳 Pagar con MercadoPago
-                    </>
-                )}
-            </button>
+            {/* Loading state */}
+            {loading && (
+                <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span className="text-gray-600">Preparando formulario de pago...</span>
+                </div>
+            )}
+
+            {/* MercadoPago Wallet */}
+            {preferenceId && !loading && (
+                <div className="w-full max-w-md mx-auto">
+                    <Wallet 
+                        initialization={{ 
+                            preferenceId: preferenceId 
+                        }}
+                        onReady={() => console.log('🎉 Wallet listo')}
+                        onError={(error) => {
+                            console.error('❌ Error en Wallet:', error);
+                            onError?.('Error al cargar el formulario de pago');
+                        }}
+                    />
+                </div>
+            )}
 
             {/* Información adicional */}
             <div className="text-center text-sm text-gray-500">
