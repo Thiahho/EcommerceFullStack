@@ -146,10 +146,7 @@ namespace DrCell_V02.Controllers
                 Items = items,
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    //Success = $"{Request.Scheme}://{Request.Host}/Pagos/Success",
-                    //Failure = $"{Request.Scheme}://{Request.Host}/Pagos/Failure", 
-                    //Pending = $"{Request.Scheme}://{Request.Host}/Pagos/Pending"
-                    Success = $"localhost://5000/Pagos/Failure", 
+                    Success = $"localhost://5000/Pagos/Success", 
                     Failure = $"localhost://5000/Pagos/Failure", 
                     Pending = $"localhost://5000/Pagos/Pending"
                 },
