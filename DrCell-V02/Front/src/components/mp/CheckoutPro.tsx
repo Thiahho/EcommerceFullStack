@@ -5,41 +5,58 @@ import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
 
 interface CheckoutProProps {
-    items: CheckoutProItem[];
     onSuccess?: () => void;
     onError?: (error: string) => void;
 }
 
-const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) => {
+const CheckoutPro: React.FC<CheckoutProProps> = ({ onSuccess, onError }) => {
+    const { items: cartItems } = useCartStore();
     const [preferenceId, setPreferenceId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [publicKey, setPublicKey] = useState('');
     const [sdkLoaded, setSdkLoaded] = useState(false);
     const { clearCart } = useCartStore();
-    
+
     // Inicializar MercadoPago SDK
     useEffect(() => {
-        initMercadoPago('APP_USR-2fd73940-1ce1-4521-956e-b5fcf2c7db9c');
+        initMercadoPago('APP_USR-577a322a-6a01-4928-92bd-dbed5e7ed551');
         setSdkLoaded(true);
     }, []);
+
+    // Convertir items del carrito a formato CheckoutPro
+    const convertCartToCheckoutItems = (): CheckoutProItem[] => {
+        return cartItems.map(item => ({
+            productoId: item.productoId,
+            varianteId: item.varianteId,
+            marca: item.marca,
+            modelo: item.modelo,
+            ram: item.ram,
+            almacenamiento: item.almacenamiento,
+            color: item.color,
+            cantidad: item.cantidad,
+            precio: item.precio
+        }));
+    };
 
     // Crear preferencia cuando se cargan los items
     useEffect(() => {
         const createPreference = async () => {
-            if (items.length === 0) {
-                console.log('⚠️ No hay items para crear preferencia');
+            if (cartItems.length === 0) {
+                console.log('⚠️ No hay items en el carrito para crear preferencia');
                 setPreferenceId(null);
                 return;
             }
-            
+
+            const checkoutItems = convertCartToCheckoutItems();
+
             try {
                 setLoading(true);
                 setPreferenceId(null); // Reset preference ID
-                console.log('🔧 Creando preferencia con items:', items);
-                
-                const preference = await checkoutProService.createPreference(items);
+                console.log('🔧 Creando preferencia con items:', checkoutItems);
+
+                const preference = await checkoutProService.createPreference(checkoutItems);
                 setPreferenceId(preference.preferenceId);
-                
+
                 console.log('✅ Preferencia creada:', preference.preferenceId);
             } catch (error: any) {
                 console.error('❌ Error al crear preferencia:', error);
@@ -51,13 +68,13 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) 
         };
 
         // Solo crear preferencia si hay items
-        if (items && items.length > 0) {
+        if (cartItems && cartItems.length > 0) {
             createPreference();
         } else {
             setPreferenceId(null);
             setLoading(false);
         }
-    }, [items, onError]);
+    }, [cartItems, onError]);
 
     // Manejar éxito del pago
     const handlePaymentSuccess = () => {
@@ -65,10 +82,10 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) 
         onSuccess?.();
     };
 
-    const totalAmount = items.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    const totalAmount = cartItems.reduce((sum: number, item: any) => sum + (item.precio * item.cantidad), 0);
 
     // Si no hay items
-    if (!items || items.length === 0) {
+    if (!cartItems || cartItems.length === 0) {
         return (
             <div className="text-center py-8">
                 <p className="text-gray-500">No hay productos seleccionados para el pago</p>
@@ -82,7 +99,7 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) 
             <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-3">Resumen de compra</h3>
 
-                {items.map((item, index) => (
+                {cartItems.map((item: any, index: number) => (
                     <div key={`${item.productoId}-${item.varianteId}-${index}`} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
                         <div>
                             <p className="font-medium">{item.marca} {item.modelo}</p>
@@ -115,7 +132,7 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) 
                 SDK Status: {sdkLoaded ? '✅ Cargado' : '❌ No cargado'} |
                 Loading: {loading ? '⏳' : '✅'} |
                 Preference ID: {preferenceId ? '✅ Creada' : '❌ Pendiente'} |
-                Items: {items.length}
+                Items: {cartItems.length}
             </div>
 
             {/* Loading state */}
@@ -129,9 +146,9 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ items, onSuccess, onError }) 
             {/* MercadoPago Wallet */}
             {preferenceId && !loading && (
                 <div className="w-full max-w-md mx-auto">
-                    <Wallet 
-                        initialization={{ 
-                            preferenceId: preferenceId 
+                    <Wallet
+                        initialization={{
+                            preferenceId: preferenceId
                         }}
                         onReady={() => console.log('🎉 Wallet listo')}
                         onError={(error) => {

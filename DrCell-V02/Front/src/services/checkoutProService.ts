@@ -76,7 +76,7 @@ class CheckoutProService {
     } catch (error) {
       console.error('❌ Error al obtener public key:', error);
       // Fallback a la clave hardcodeada
-      return 'APP_USR-2fd73940-1ce1-4521-956e-b5fcf2c7db9c';
+      return 'APP_USR-577a322a-6a01-4928-92bd-dbed5e7ed551';
     }
   }
 }

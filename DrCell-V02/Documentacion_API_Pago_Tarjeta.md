@@ -274,3 +274,4 @@ window.Mercadopago.createToken({
   console.error('Error al tokenizar:', error);
 });
 ```
+

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCartStore } from '@/store/cart-store';
 import { useNavigate } from 'react-router-dom';
-import CartCheckout from '@/components/mp/CartCheckout';
+import CheckoutPro from '@/components/mp/CheckoutPro';
 import Toast from '@/components/ui/toast';
 
 const Checkout: React.FC = () => {
@@ -135,16 +135,39 @@ const Checkout: React.FC = () => {
                     {/* Formulario de Pago */}
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-lg shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4">
-                                Información de Pago
+                            <h2 className="text-xl font-bold text-gray-800 mb-6">
+                                💳 Pagar con MercadoPago
                             </h2>
 
-                            <CartCheckout
-                                onSuccess={handlePaymentSuccess}
-                                onError={handlePaymentError}
-                                onCancel={handleCancel}
-                                showCartSummary={false}
-                            />
+                            <div className="space-y-4">
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-blue-600">
+                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-blue-800">Pago 100% Seguro</p>
+                                            <p className="text-sm text-blue-600">Procesado por MercadoPago</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <CheckoutPro
+                                    onSuccess={handlePaymentSuccess}
+                                    onError={handlePaymentError}
+                                />
+
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={handleCancel}
+                                        className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                                    >
+                                        ← Volver al Carrito
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -28,13 +28,13 @@ namespace DrCell_V02.Controllers
             _logger = logger;
         }
 
-        private string GetAccessToken()
+        public string GetAccessToken()
         {
             var token = _configuration.GetValue<string>("MercadoPago:AccessToken");
             return token ?? string.Empty;
         }
 
-        private string GetPublicKey()
+        public string GetPublicKey()
         {
             var publicKey = _configuration.GetValue<string>("MercadoPago:PublicKey");
             return publicKey ?? string.Empty;
@@ -44,7 +44,7 @@ namespace DrCell_V02.Controllers
         public IActionResult Test()
         {
             return Ok(new { 
-                message = "🎉 ¡PagosController funcionando correctamente!", 
+                message = "PagosController funcionando correctamente!", 
                 timestamp = DateTime.Now,
                 endpoints = new[] {
                     "GET /Pagos/test",
@@ -74,112 +74,139 @@ namespace DrCell_V02.Controllers
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
-
-        [HttpPost("crear-preferencia")]
-        public async Task<IActionResult> CrearPreferencia([FromBody] CrearPreferenciaDto preferenciaData)
+        [HttpGet("mercadopago/access-token")]
+        public IActionResult GetMercadoPagoAccessToken()
         {
             try
             {
-                _logger.LogInformation("🔧 Endpoint crear-preferencia llamado");
-                _logger.LogInformation("🔧 Datos recibidos: {data}", JsonSerializer.Serialize(preferenciaData));
-                _logger.LogInformation("🔧 Items count: {count}", preferenciaData?.Items?.Count ?? 0);
-                
-                // Validar modelo
-                if (!ModelState.IsValid)
+                var token = GetAccessToken();
+                if (string.IsNullOrEmpty(token))
                 {
-                    _logger.LogWarning("❌ ModelState inválido:");
-                    foreach (var error in ModelState)
-                    {
-                        _logger.LogWarning("   - {key}: {errors}", error.Key, string.Join(", ", error.Value.Errors.Select(e => e.ErrorMessage)));
-                    }
-                    return BadRequest(new { success = false, message = "Datos inválidos", errors = ModelState });
+                    return StatusCode(500, new { message = "Clave pública no configurada" });
                 }
 
-                if (preferenciaData?.Items == null || !preferenciaData.Items.Any())
-                {
-                    return BadRequest(new { success = false, message = "No se proporcionaron items para el pago" });
-                }
-
-                // Configurar MercadoPago
-                var accessToken = GetAccessToken();
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    _logger.LogError("❌ AccessToken no configurado");
-                    return StatusCode(500, new { success = false, message = "Error de configuración: AccessToken no configurado" });
-                }
-
-                MercadoPagoConfig.AccessToken = accessToken;
-                _logger.LogInformation("✅ MercadoPago configurado correctamente");
-                
-                var client = new PreferenceClient();
-                
-                var items = preferenciaData.Items.Select(item => new PreferenceItemRequest
-                {
-                    Id = item.ProductoId.ToString(),
-                    Title = $"{item.Marca} {item.Modelo}",
-                    Description = $"RAM: {item.Ram}, Almacenamiento: {item.Almacenamiento}, Color: {item.Color}",
-                    CategoryId = "phones",
-                    Quantity = item.Cantidad,
-                    CurrencyId = "ARS",
-                    UnitPrice = item.Precio
-                }).ToList();
-
-                var request = new PreferenceRequest
-                {
-                    Items = items,
-                    BackUrls = new PreferenceBackUrlsRequest
-                    {
-                        Success = $"{Request.Scheme}://{Request.Host}/Pagos/payment-success",
-                        Failure = $"{Request.Scheme}://{Request.Host}/Pagos/payment-failure",
-                        Pending = $"{Request.Scheme}://{Request.Host}/Pagos/payment-pending"
-                    },
-                    AutoReturn = "approved",
-                    PaymentMethods = new PreferencePaymentMethodsRequest
-                    {
-                        DefaultPaymentMethodId = null,
-                        ExcludedPaymentTypes = new List<PreferencePaymentTypeRequest>(),
-                        ExcludedPaymentMethods = new List<PreferencePaymentMethodRequest>(),
-                        DefaultInstallments = 1
-                    },
-                    NotificationUrl = $"{Request.Scheme}://{Request.Host}/Pagos/webhooks/mercadopago",
-                    StatementDescriptor = "DRCELL",
-                    ExternalReference = Guid.NewGuid().ToString(),
-                    Expires = true,
-                    ExpirationDateFrom = DateTime.Now,
-                    ExpirationDateTo = DateTime.Now.AddMinutes(30)
-                };
-
-                _logger.LogInformation("🔄 Creando preferencia en MercadoPago...");
-                var preference = await client.CreateAsync(request);
-                
-                _logger.LogInformation("✅ Preferencia creada exitosamente: {id}", preference.Id);
-                
-                return Ok(new
-                {
-                    success = true,
-                    preferenceId = preference.Id,
-                    initPoint = preference.InitPoint,
-                    sandboxInitPoint = preference.SandboxInitPoint
-                });
+                return Ok(new { token = token });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear preferencia de MercadoPago");
-                return BadRequest(new { 
-                    success = false, 
-                    message = "Error al crear la preferencia de pago",
-                    error = ex.Message,
-                    details = ex.InnerException?.Message
-                });
+                _logger.LogError(ex, "Error al obtener clave pública");
+                return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
+
+    [HttpPost("crear-preferencia")]
+    public async Task<IActionResult> CrearPreferencia([FromBody] CrearPreferenciaDto preferenciaData)
+    {
+        try
+        {
+            _logger.LogInformation("=== INICIO CREAR PREFERENCIA ===");
+            _logger.LogInformation("Datos recibidos: {data}", JsonSerializer.Serialize(preferenciaData));
+            
+            // Validar modelo
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ModelState inválido");
+                return BadRequest(new { success = false, message = "Datos inválidos", errors = ModelState });
+            }
+
+            if (preferenciaData?.Items == null || !preferenciaData.Items.Any())
+            {
+                return BadRequest(new { success = false, message = "No se proporcionaron items para el pago" });
+            }
+
+            // Configurar MercadoPago
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                _logger.LogError("AccessToken no configurado");
+                return StatusCode(500, new { success = false, message = "Error de configuración: AccessToken no configurado" });
+            }
+
+            _logger.LogInformation("AccessToken OK: {token}", accessToken.Substring(0, 20) + "...");
+            MercadoPagoConfig.AccessToken = accessToken;
+            
+            var client = new PreferenceClient();
+            
+            var items = preferenciaData.Items.Select(item => new PreferenceItemRequest
+            {
+                Id = item.ProductoId.ToString(),
+                Title = $"{item.Marca} {item.Modelo}",
+                Description = $"RAM: {item.Ram}, Almacenamiento: {item.Almacenamiento}, Color: {item.Color}",
+                CategoryId = "phones",
+                Quantity = item.Cantidad,
+                CurrencyId = "ARS",
+                UnitPrice = item.Precio
+            }).ToList();
+
+            _logger.LogInformation("Items creados: {count}", items.Count);
+
+            // Crear request CON BackUrls
+            var request = new PreferenceRequest
+            {
+                Items = items,
+                BackUrls = new PreferenceBackUrlsRequest
+                {
+                    //Success = $"{Request.Scheme}://{Request.Host}/Pagos/Success",
+                    //Failure = $"{Request.Scheme}://{Request.Host}/Pagos/Failure", 
+                    //Pending = $"{Request.Scheme}://{Request.Host}/Pagos/Pending"
+                    Success = $"localhost://5000/Pagos/Failure", 
+                    Failure = $"localhost://5000/Pagos/Failure", 
+                    Pending = $"localhost://5000/Pagos/Pending"
+                },
+                AutoReturn = "approved",
+                PaymentMethods = new PreferencePaymentMethodsRequest
+                {
+                    DefaultPaymentMethodId = null,
+                    ExcludedPaymentTypes = new List<PreferencePaymentTypeRequest>(),
+                    ExcludedPaymentMethods = new List<PreferencePaymentMethodRequest>(),
+                    DefaultInstallments = 1
+                },
+                StatementDescriptor = "DRCELL",
+                ExternalReference = Guid.NewGuid().ToString(),
+                Expires = true,
+                ExpirationDateFrom = DateTime.Now,
+                ExpirationDateTo = DateTime.Now.AddMinutes(30)
+            };
+
+            _logger.LogInformation("Request creado - External Reference: {ref}", request.ExternalReference);
+            
+            _logger.LogInformation("Llamando a MercadoPago API...");
+            var preference = await client.CreateAsync(request);
+            
+            _logger.LogInformation("SUCCESS! Preferencia creada: {id}", preference.Id);
+            _logger.LogInformation("InitPoint: {init}", preference.InitPoint);
+            _logger.LogInformation("SandboxInitPoint: {sandbox}", preference.SandboxInitPoint);
+            
+            return Ok(new
+            {
+                success = true,
+                preferenceId = preference.Id,
+                initPoint = preference.InitPoint,
+                sandboxInitPoint = preference.SandboxInitPoint
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("ERROR COMPLETO:");
+            _logger.LogError("Mensaje: {message}", ex.Message);
+            _logger.LogError("Inner: {inner}", ex.InnerException?.Message);
+            _logger.LogError("Stack: {stack}", ex.StackTrace);
+            
+            return BadRequest(new { 
+                success = false, 
+                message = "Error al crear la preferencia de pago",
+                error = ex.Message,
+                details = ex.InnerException?.Message
+            });
+        }
+    }
 
         [HttpGet("Success")]
         public IActionResult Success([FromQuery] PaymentResponse paymentResponse)
         {
             try
             {
-                _logger.LogInformation("✅ Pago exitoso recibido: {paymentResponse}", JsonSerializer.Serialize(paymentResponse));
+                _logger.LogInformation("Pago exitoso recibido: {paymentResponse}", JsonSerializer.Serialize(paymentResponse));
                 
                 // Obtener información del pedido desde la sesión
                 var pedidoInfoJson = HttpContext.Session.GetString("PedidoInfo");
@@ -195,7 +222,7 @@ namespace DrCell_V02.Controllers
                     // Limpiar sesión
                     HttpContext.Session.Remove("PedidoInfo");
                     
-                    _logger.LogInformation("🎉 Pago procesado exitosamente para pedido: {pedidoInfo}", pedidoInfo);
+                    _logger.LogInformation("Pago procesado exitosamente para pedido: {pedidoInfo}", pedidoInfo);
                     
                     return Ok(new { 
                         status = "success", 
@@ -213,7 +240,7 @@ namespace DrCell_V02.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error al procesar resultado del pago exitoso");
+                _logger.LogError(ex, "Error al procesar resultado del pago exitoso");
                 return Ok(new { 
                     status = "error", 
                     message = "Error al procesar el resultado del pago",
@@ -227,7 +254,7 @@ namespace DrCell_V02.Controllers
         {
             try
             {
-                _logger.LogWarning("❌ Pago fallido recibido: {paymentResponse}", JsonSerializer.Serialize(paymentResponse));
+                _logger.LogWarning("Pago fallido recibido: {paymentResponse}", JsonSerializer.Serialize(paymentResponse));
                 
                 return Ok(new { 
                     status = "failure", 
@@ -238,7 +265,7 @@ namespace DrCell_V02.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error al procesar fallo del pago");
+                _logger.LogError(ex, "Error al procesar fallo del pago");
                 return Ok(new { 
                     status = "error", 
                     message = "Error al procesar el fallo del pago",
@@ -253,7 +280,7 @@ namespace DrCell_V02.Controllers
         {
             try
             {
-                _logger.LogInformation("⏳ Pago pendiente recibido: {paymentResponse}", JsonSerializer.Serialize(paymentResponse));
+                _logger.LogInformation("Pago pendiente recibido: {paymentResponse}", JsonSerializer.Serialize(paymentResponse));
                 
                 return Ok(new { 
                     status = "pending", 
@@ -263,7 +290,7 @@ namespace DrCell_V02.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error al procesar pago pendiente");
+                _logger.LogError(ex, "Error al procesar pago pendiente");
                 return Ok(new { 
                     status = "error", 
                     message = "Error al procesar el pago pendiente",
@@ -271,26 +298,6 @@ namespace DrCell_V02.Controllers
                     data = paymentResponse 
                 });
             }
-        }
-
-
-
-        [HttpGet("payment-success")]
-        public IActionResult PaymentSuccess()
-        {
-            return Ok(new { message = "Pago procesado exitosamente" });
-        }
-
-        [HttpGet("payment-failure")]  
-        public IActionResult PaymentFailure()
-        {
-            return Ok(new { message = "El pago no pudo ser procesado" });
-        }
-
-        [HttpGet("payment-pending")]
-        public IActionResult PaymentPending()
-        {
-            return Ok(new { message = "El pago está pendiente de confirmación" });
         }
 
         [HttpPost("procesar-pago")]

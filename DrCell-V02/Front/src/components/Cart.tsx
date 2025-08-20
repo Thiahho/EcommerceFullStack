@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCartStore, CartItem } from '@/store/cart-store';
+import { useNavigate } from 'react-router-dom';
 import { WHATSAPP_CONFIG } from '@/config/whatsapp';
-import CartCheckout from './mp/CartCheckout';
 
 const Cart: React.FC = () => {
   const {
@@ -13,8 +13,8 @@ const Cart: React.FC = () => {
     getTotalPrice
   } = useCartStore();
 
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
 
   const handleWhatsAppOrder = () => {
     if (items.length === 0) return;
@@ -51,26 +51,10 @@ Gracias por tu compra! 📱✨`;
     updateQuantity(item.id, newQuantity);
   };
 
-  const handleCheckout = () => {
-    setShowCheckout(true);
+  const handleProceedToCheckout = () => {
+    if (items.length === 0) return;
     setIsOpen(false);
-  };
-
-  const handlePaymentSuccess = () => {
-    console.log('🎉 Pago exitoso!');
-    setShowCheckout(false);
-    setIsOpen(false);
-    // El carrito se limpia automáticamente en CartCheckout
-    alert('¡Pago realizado con éxito! Gracias por tu compra.');
-  };
-
-  const handlePaymentError = (error: string) => {
-    console.error('❌ Error en el pago:', error);
-    alert(`Error en el pago: ${error}`);
-  };
-
-  const handleCancelCheckout = () => {
-    setShowCheckout(false);
+    navigate('/checkout');
   };
 
   if (items.length === 0) {
@@ -219,16 +203,16 @@ Gracias por tu compra! 📱✨`;
 
             {/* Botones de acción */}
             <div className="space-y-2">
-              {/* Botón de Comprar con MercadoPago Pro */}
+              {/* Botón de Pagar Total */}
               <button
-                onClick={handleCheckout}
-                className={`w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors ${items.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+                onClick={handleProceedToCheckout}
+                className={`w-full bg-green-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors ${items.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
                 disabled={items.length === 0}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
-                <span className="hidden sm:inline">Pagar con MercadoPago Pro</span>
+                <span className="hidden sm:inline">💰 Pagar Total</span>
                 <span className="sm:hidden">Pagar</span>
               </button>
 
@@ -259,36 +243,7 @@ Gracias por tu compra! 📱✨`;
         </div>
       )}
 
-      {/* Modal de Checkout */}
-      {showCheckout && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
-                  💳 Checkout - MercadoPago Pro
-                </h2>
-                <button
-                  onClick={handleCancelCheckout}
-                  className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                  aria-label="Cerrar checkout"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <CartCheckout
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-                onCancel={handleCancelCheckout}
-                showCartSummary={true}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
