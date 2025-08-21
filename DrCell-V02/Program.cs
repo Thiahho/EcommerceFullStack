@@ -106,8 +106,8 @@ try
         "http://www.localhost:5000",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://localhost:5000",
+        "http://127.0.0.1:5000"
     });
 
     corsOrigins = additionalOrigins.Distinct().ToArray();
@@ -214,12 +214,12 @@ try
                 policy.WithOrigins(
                           "http://localhost:3000",
                           "http://127.0.0.1:3000",
-                          "http://localhost:5173",
-                          "http://127.0.0.1:5173",
+                          "http://localhost:5000",
+                          "http://127.0.0.1:5000",
                           "https://localhost:3000",
                           "https://127.0.0.1:3000",
-                          "https://localhost:5173",
-                          "https://127.0.0.1:5173"
+                          "https://localhost:5000",
+                          "https://127.0.0.1:5000"
                       )
                       .AllowAnyMethod()
                       .AllowAnyHeader()
@@ -480,7 +480,9 @@ try
     builder.Services.AddScoped<IvCelularesInfoService, vCelularesInfoService>();
     builder.Services.AddScoped<IProductoService, ProductosService>();
     builder.Services.AddScoped<ICategoriaService, CategoriasService>();
-
+    builder.Services.AddScoped<IStockService, StockService>();
+    builder.Services.AddHostedService<StockCleanupJob>();
+    
     var app = builder.Build();
 
     // 11. Configuración de Swagger por entorno

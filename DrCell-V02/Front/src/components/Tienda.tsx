@@ -200,9 +200,13 @@ const Shop: React.FC = () => {
                   {/* Imagen del producto */}
                   <div className="aspect-square overflow-hidden">
                     <img
-                      src={`data:image/jpeg;base64,${p.img}`}
+                      src={p.img && p.img !== 'System.Byte[]' ? `data:image/webp;base64,${p.img}` : '/placeholder-image.jpg'}
                       alt={`${p.marca} ${p.modelo}`}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        console.log('Error loading image for product:', p.id, 'img value:', p.img);
+                        e.currentTarget.src = '/placeholder-image.jpg';
+                      }}
                     />
                   </div>
 

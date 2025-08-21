@@ -77,8 +77,22 @@ namespace DrCell_V02.Services
 
         public async Task<IEnumerable<ProductoDto>> GetAllProductsAsync()
         {
-            var productos = await _context.Productos.Include(p => p.Variantes).AsNoTracking().ToListAsync();
-            return _mapper.Map<List<ProductoDto>>(productos);
+           var productos = await _context.Productos
+                .Include(p => p.Categoria)        // ✅ AGREGAR: Incluir categoría
+                .Include(p => p.Variantes.Where(v => v.Activa)) // ✅ AGREGAR: Solo variantes activas
+                .Where(p => p.Activo)             // ✅ AGREGAR: Solo productos activos
+                .AsNoTracking()
+                .ToListAsync();
+        
+            var productosDto = _mapper.Map<List<ProductoDto>>(productos);
+            
+            // ✅ AGREGAR: Calcular rangos de precios después del mapeo
+            foreach (var producto in productosDto)
+            {
+                producto.CalcularRangoPrecios();
+            }
+            
+            return productosDto;
         }
 
         public async Task<IEnumerable<ProductoDto>> GetAllVariantesAsync()
@@ -101,7 +115,7 @@ namespace DrCell_V02.Services
                 Id = producto.Id,
                 Marca = producto.Marca,
                 Modelo = producto.Modelo,
-                Categoria = producto.Categoria,
+                Categoria = producto.Categoria?.Nombre,
                 Img = producto.Img != null ? Convert.ToBase64String(producto.Img) : null,
                 Variantes = producto.Variantes.Select(v => new ProductosVariantesDto
                 {
@@ -274,7 +288,7 @@ namespace DrCell_V02.Services
 
         p.Marca = dto.Marca;
         p.Modelo = dto.Modelo;
-        p.Categoria = dto.Categoria;
+        p.CategoriaId = dto.CategoriaId;
 
         if (!string.IsNullOrWhiteSpace(dto.Img))
         {

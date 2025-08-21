@@ -11,66 +11,102 @@ namespace DrCell_V02.Services
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _dbContext;
+        private readonly ILogger<CategoriasService> _logger;
 
-        public CategoriasService(IMapper mapper, ApplicationDbContext applicationDbContext)
+        public CategoriasService(IMapper mapper, ApplicationDbContext applicationDbContext, ILogger<CategoriasService> logger)
         {
-            _dbContext = applicationDbContext;
             _mapper = mapper;
+            _dbContext = applicationDbContext;
+            _logger = logger;
         }
 
         public async Task<CategoriaDto> AddCategoriaAsync(CategoriaDto categoriaDto)
         {
-            var categoria = _mapper.Map<Categorias>(categoriaDto);
-            await _dbContext.Categorias.AddAsync(categoria);
-            await _dbContext.SaveChangesAsync();
-            return _mapper.Map<CategoriaDto>(categoria);
+           try
+            {
+                var categoria = _mapper.Map<Categorias>(categoriaDto);
+                _dbContext.Categorias.Add(categoria);
+                await _dbContext.SaveChangesAsync();
+                
+                return _mapper.Map<CategoriaDto>(categoria);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al agregar categoría");
+                throw;
+            }
         }
 
         public async Task DeleteCategoriaAsync(int id)
         {
-            var categoria = await _dbContext.Categorias.FindAsync(id);
-            if (categoria != null)
+           try
             {
-                _dbContext.Categorias.Remove(categoria);
+                var categoria = await _dbContext.Categorias.FindAsync(id);
+                if (categoria == null)
+                    throw new KeyNotFoundException("Categoría no encontrada");
+
+                // Soft delete
+                categoria.Activa = false;
                 await _dbContext.SaveChangesAsync();
             }
-            else
+            catch (Exception ex)
             {
-                throw new KeyNotFoundException($"Categoria with id {id} not found.");
+                _logger.LogError(ex, "Error al eliminar categoría");
+                throw;
             }
         }
 
         public async Task<IEnumerable<CategoriaDto>> GetAllCategoriasAsync()
         {
-            var cate = await _dbContext.Categorias.AsNoTracking().ToListAsync();
-            return _mapper.Map<List<CategoriaDto>>(cate);
+           try
+            {
+                var categorias = await _dbContext.Categorias
+                    .Where(c => c.Activa)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return _mapper.Map<IEnumerable<CategoriaDto>>(categorias);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todas las categorías");
+                throw;
+            }
         }
 
         public async Task<CategoriaDto> GetCategoriaByIdAsync(int id)
         {
-            var cate = await _dbContext.Categorias.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (cate == null) return null;
-
-            return new CategoriaDto
+           try
             {
-                Id = cate.Id,
-                Nombre = cate.Nombre
-            };
+                var categoria = await _dbContext.Categorias
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == id);
 
+                return categoria != null ? _mapper.Map<CategoriaDto>(categoria) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener categoría por ID: {Id}", id);
+                throw;
+            }
         }
 
 
         public async Task UpdateCategoriaAsync(CategoriaDto categoriaDto)
         {
-            var categorias = await _dbContext.Categorias.FirstOrDefaultAsync(c => c.Id == categoriaDto.Id);
-
-            if (categorias != null)
+             try
             {
-                categorias.Nombre = categoriaDto.Nombre;
-                _dbContext.Categorias.Update(categorias);
-                await _dbContext.SaveChangesAsync();
+                var categoria = await _dbContext.Categorias.FindAsync(categoriaDto.Id);
+                if (categoria == null)
+                    throw new KeyNotFoundException("Categoría no encontrada");
 
+                _mapper.Map(categoriaDto, categoria);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar categoría");
+                throw;
             }
 
         }

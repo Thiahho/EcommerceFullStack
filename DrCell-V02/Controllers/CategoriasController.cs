@@ -14,9 +14,17 @@ namespace DrCell_V02.Controllers
     //[EnableRateLimiting("AuthPolicy")]
     public class CategoriasController : BaseCategoriaController
     {
-        public CategoriasController(ApplicationDbContext context, IConfiguration config, IProductoService productoService, ICategoriaService categoriaService, ILogger<BaseCategoriaController> logger)
+        public CategoriasController(
+            ApplicationDbContext context, 
+            IConfiguration config, 
+            IProductoService productoService, 
+            ICategoriaService categoriaService, 
+            ILogger<BaseCategoriaController> logger)
             : base(context, config, productoService, categoriaService, logger)
         {
+            // Verificar que las dependencias se resolvieron correctamente
+            _logger.LogInformation("CategoriasController inicializado con dependencias: Context={Context}, ProductoService={ProductoService}, CategoriaService={CategoriaService}", 
+                context != null, productoService != null, categoriaService != null);
         }
 
         [HttpPost]
@@ -24,6 +32,8 @@ namespace DrCell_V02.Controllers
         {
             try
             {
+                _logger.LogInformation("Creando nueva categoría: {Nombre}", categoria.Nombre);
+                
                 var nuevaCategoria = await _categoriaService.AddCategoriaAsync(categoria);
                 return CreatedAtAction(nameof(GetCategoriaById), new { id = nuevaCategoria.Id }, nuevaCategoria);
 
@@ -31,7 +41,7 @@ namespace DrCell_V02.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al crear la categoria");
-                return StatusCode(500, "Error interno del servidor");
+                return StatusCode(500, new { error = "Error interno del servidor", details = ex.Message });
             }
         }
 
@@ -51,20 +61,23 @@ namespace DrCell_V02.Controllers
                     return NotFound("Categoria no encontrada");
                 }
 
-                categoriaExistente.Nombre = categoria.Nombre;
-                await _categoriaService.UpdateCategoriaAsync(categoriaExistente);
-                return Ok(categoriaExistente);
+                // Actualizar usando el servicio
+                await _categoriaService.UpdateCategoriaAsync(categoria);
+                
+                // Obtener la categoría actualizada
+                var categoriaActualizada = await _categoriaService.GetCategoriaByIdAsync(id);
+                return Ok(categoriaActualizada);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al actualizar la categoria");
-                return StatusCode(500, "Error interno del servidor");
+                return StatusCode(500, new { error = "Error interno del servidor", details = ex.Message });
             }
         }
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "ADMIN")]
-       // [EnableRateLimiting("CriticalPolicy")]
+        // [EnableRateLimiting("CriticalPolicy")]
         public async Task<IActionResult> EliminarCategoria(int id)
         {
             try
@@ -81,9 +94,8 @@ namespace DrCell_V02.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al eliminar la categoria");
-                return StatusCode(500, "Error interno del servidor");
+                return StatusCode(500, new { error = "Error interno del servidor", details = ex.Message });
             }
-
         }
 
         /// <summary>
@@ -92,6 +104,7 @@ namespace DrCell_V02.Controllers
         [AllowAnonymous]
         public override async Task<IActionResult> GetCategorias()
         {
+            _logger.LogInformation("GetCategorias llamado desde CategoriasController");
             return await base.GetCategorias();
         }
 
@@ -101,8 +114,8 @@ namespace DrCell_V02.Controllers
         [AllowAnonymous]
         public override async Task<IActionResult> GetCategoriaById(int id)
         {
+            _logger.LogInformation("GetCategoriaById llamado desde CategoriasController para ID: {Id}", id);
             return await base.GetCategoriaById(id);
         }
-
     }
 }

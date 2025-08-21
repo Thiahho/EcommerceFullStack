@@ -11,5 +11,6 @@ namespace DrCell_V02.Data.Dtos
         [Required]
         [StringLength(100, MinimumLength = 2)]
         public required string Nombre { get; set; }
+        public bool Activa { get; set; } = true;
     }
 }

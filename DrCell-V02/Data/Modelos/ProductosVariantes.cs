@@ -6,10 +6,13 @@ using System.Text.Json.Serialization;
 
 namespace DrCell_V02.Data.Modelos
 {
+    [Table("productos_variantes")]
     public class ProductosVariantes
     {
         [Key]
+        [Column("id")]
         public int Id { get; set; }
+        [Column("producto_id")]
         public int ProductoId { get; set; }
         [Column("stock")]
         [Required]
@@ -26,9 +29,22 @@ namespace DrCell_V02.Data.Modelos
         [Column("precio")]
         [Required]
         public decimal Precio { get; set; }
-        [JsonIgnore]
-        public Productos? Producto { get; set; }
 
+        [Column("stock_reservado")]
+        [Required]
+        public int StockReservado { get; set; }
+
+        [Column("activa")]
+        public Boolean Activa { get; set; } = true;
+
+        [NotMapped]
+        public int StockDisponible => Stock - StockReservado;
+
+        // ✅ PROPIEDADES DE NAVEGACIÓN - TODAS deben existir
+        public Productos Producto { get; set; } = null!;
+        public ICollection<StockReserva> Reservas { get; set; } = new List<StockReserva>();
+        public ICollection<VentaItem> VentaItems { get; set; } = new List<VentaItem>();  // ✅ ESTA FALTABA
+  
 
 
     }

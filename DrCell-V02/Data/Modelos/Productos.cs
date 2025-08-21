@@ -6,7 +6,7 @@ namespace DrCell_V02.Data.Modelos
 {
     public class Productos
     {
-        [Key]
+        [Key][Column("Id")]
         public int Id { get; set; }
         [Column("marca")]
         [Required]
@@ -14,9 +14,11 @@ namespace DrCell_V02.Data.Modelos
         [Column("modelo")]
         [Required]
         public required string Modelo { get; set; }
-        [Column("categoria")]
-        [Required]
-        public required string Categoria { get; set; }
+        public Categorias Categoria { get; set; } = null!;
+        [Column("categoria_id")]
+        public int CategoriaId { get; set; }
+        [Column("activo")]
+        public Boolean Activo { get; set; } = true;
         [Column("img")]
         [Required]
         public required byte[] Img { get; set; }

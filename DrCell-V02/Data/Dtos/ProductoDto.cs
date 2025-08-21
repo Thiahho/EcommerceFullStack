@@ -6,34 +6,107 @@ namespace DrCell_V02.Data.Dtos
 {
     public class ProductoDto
     {
-        public int Id { get; set; }
-
-        [Required(ErrorMessage = "La marca es requerida")]
+       public int Id { get; set; }
         public string Marca { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "El modelo es requerido")]
         public string Modelo { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "La categoría es requerida")]
-        public string Categoria { get; set; } = string.Empty;
-
-        // La imagen no es requerida para actualizaciones parciales
+        public int CategoriaId { get; set; }
+        public string? Categoria { get; set; }
         public string? Img { get; set; }
+        public string? Descripcion { get; set; }
+        public bool Activo { get; set; } = true;
+        
+        // Precio calculado desde las variantes
+        
+        // Rango de precios si hay múltiples variantes
+        public decimal? PrecioMinimo { get; set; }
+        public decimal? PrecioMaximo { get; set; }
+        
+        // Lista de variantes disponibles
+        public List<ProductosVariantesDto> Variantes { get; set; } = new List<ProductosVariantesDto>();
 
-        public List<ProductosVariantesDto> Variantes { get; set; } = new();
-
+        // Información adicional
+        public int TotalVariantes { get; set; }
+        public bool TieneStock { get; set; }
+        // public int TotalVariantes => Variantes?.Count ?? 0;
+        // public bool TieneStock => Variantes?.Any(v => v.StockDisponible > 0) ?? false;
+        public decimal Precio 
+        { 
+            get 
+            {
+                if (Variantes == null || !Variantes.Any())
+                    return 0m;
+                    
+                var variantesValidas = Variantes
+                    .Where(v => v.Activa && v.Precio > 0)
+                    .ToList();
+                    
+                if (!variantesValidas.Any())
+                    return 0m;
+                    
+                return variantesValidas.Min(v => v.Precio);
+            }
+        }
+         public void CalcularRangoPrecios()
+        {
+            if (Variantes?.Any() == true)
+            {
+                var variantesActivas = Variantes.Where(v => v.Activa && v.Precio > 0);
+                if (variantesActivas.Any())
+                {
+                    PrecioMinimo = variantesActivas.Min(v => v.Precio);
+                    PrecioMaximo = variantesActivas.Max(v => v.Precio);
+                }
+            }
+        }
         public int GetTotalStock()
         {
             return Variantes?.Sum(v => v.Stock) ?? 0;
         }
 
-        public decimal? GetBasePrice()
+         private decimal GetBasePrice()
         {
-            return Variantes?.Min(v => v.Precio);
+            // ✅ CORREGIDO: Manejar el caso donde no hay variantes
+            if (Variantes == null || !Variantes.Any())
+            {
+                return 0; // O el valor que prefieras por defecto
+            }
+            
+            // Obtener el precio mínimo de las variantes activas con stock
+            var variantesDisponibles = Variantes.Where(v => v.Activa && v.StockDisponible > 0);
+            
+            if (!variantesDisponibles.Any())
+            {
+                // Si no hay variantes con stock, obtener el precio mínimo de todas las variantes activas
+                var variantesActivas = Variantes.Where(v => v.Activa);
+                return variantesActivas.Any() ? variantesActivas.Min(v => v.Precio) : 0;
+            }
+            
+            return variantesDisponibles.Min(v => v.Precio);
         }
 
+        // public void CalcularRangoPrecios()
+        // {
+        //     if (Variantes == null || !Variantes.Any())
+        //     {
+        //         PrecioMinimo = null;
+        //         PrecioMaximo = null;
+        //         return;
+        //     }
+            
+        //     var variantesActivas = Variantes.Where(v => v.Activa).ToList();
+            
+        //     if (variantesActivas.Any())
+        //     {
+        //         PrecioMinimo = variantesActivas.Min(v => v.Precio);
+        //         PrecioMaximo = variantesActivas.Max(v => v.Precio);
+        //     }
+        //     else
+        //     {
+        //         PrecioMinimo = null;
+        //         PrecioMaximo = null;
+        //     }
+        // }
         // Propiedad calculada para compatibilidad
-        public decimal Precio => GetBasePrice() ?? 0;
 
         public IEnumerable<string> GetAvailableRAM()
         {

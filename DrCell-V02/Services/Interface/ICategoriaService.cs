@@ -9,8 +9,6 @@ namespace DrCell_V02.Services.Interface
         Task<CategoriaDto> AddCategoriaAsync(CategoriaDto categoriaDto);
         Task UpdateCategoriaAsync(CategoriaDto categoriaDto);
         Task DeleteCategoriaAsync(int id);
-
-        //Task<CategoriaDto?> GetCategoriasAsync(int id);  
         Task<IEnumerable<CategoriaDto>> GetAllCategoriasAsync();
 
     }

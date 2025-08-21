@@ -8,5 +8,8 @@ namespace DrCell_V02.Data.Modelos
     {
         public int Id { get; set; }
         public required string Nombre { get; set; }
+        public bool Activa { get; set; } = true;
+
+        public ICollection<Productos> Productos { get; set; } = new List<Productos>();
     }
 }
