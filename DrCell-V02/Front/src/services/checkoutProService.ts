@@ -9,7 +9,7 @@ export interface CheckoutProItem {
   ram: string;
   almacenamiento: string;
   color: string;
-  cantidad: number;
+  stock: number;
   precio: number;
 }
 
@@ -43,8 +43,8 @@ class CheckoutProService {
       for (const item of items) {
         if (
           !item.varianteId ||
-          !item.cantidad ||
-          item.cantidad <= 0 ||
+          !item.stock ||
+          item.stock <= 0 ||
           !item.precio ||
           item.precio <= 0
         ) {
@@ -61,7 +61,7 @@ class CheckoutProService {
           Ram: item.ram,
           Almacenamiento: item.almacenamiento,
           Color: item.color,
-          Cantidad: item.cantidad,
+          Cantidad: item.stock,
           Precio: item.precio,
         })),
       };
@@ -83,7 +83,7 @@ class CheckoutProService {
 
       return response.data;
     } catch (error: any) {
-      console.error("❌ Error al crear preferencia:", error);
+      console.error("❌ Error al crear preferencia del service:", error);
       console.error("❌ Detalles del error:", error.response?.data);
 
       // Mejorar el manejo de errores específicos
@@ -138,6 +138,22 @@ class CheckoutProService {
   }
 
   /**
+   * Confirma manualmente un pago exitoso
+   */
+  async confirmarPagoManual(preferenceId: string): Promise<boolean> {
+    try {
+      const response = await api.post(`/Pagos/debug/confirmar-pago-manual`, { 
+        PreferenceId: preferenceId 
+      });
+      console.log("✅ Pago confirmado manualmente:", response.data);
+      return response.data.success;
+    } catch (error) {
+      console.error("❌ Error al confirmar pago manualmente:", error);
+      return false;
+    }
+  }
+
+  /**
    * Verifica el stock disponible antes de crear la preferencia
    */
   async verificarStock(
@@ -146,7 +162,7 @@ class CheckoutProService {
     try {
       const verificaciones = items.map((item) => ({
         varianteId: item.varianteId,
-        cantidad: item.cantidad,
+        Stock: item.stock,
       }));
 
       const response = await api.post<{

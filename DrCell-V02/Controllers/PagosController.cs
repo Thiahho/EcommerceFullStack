@@ -222,19 +222,46 @@ namespace DrCell_V02.Controllers
                 
                 // Configurar back URLs tanto en desarrollo como en producción
                 var baseUrl = isDevelopment ? "http://localhost:5000" : $"{Request.Scheme}://{Request.Host}";
+                
+                _logger.LogInformation("🔧 isDevelopment: {isDevelopment}, baseUrl: {baseUrl}", isDevelopment, baseUrl);
+                
+                // Verificar que el baseUrl no esté vacío
+                if (string.IsNullOrEmpty(baseUrl))
+                {
+                    baseUrl = "http://localhost:5000"; // Fallback
+                    _logger.LogWarning("⚠️ BaseUrl estaba vacío, usando fallback: {baseUrl}", baseUrl);
+                }
+                
                 var backUrls = new PreferenceBackUrlsRequest
                 {
                     Success = $"{baseUrl}/Pagos/Success",
-                    Failure = $"{baseUrl}/Pagos/Failure",
+                    Failure = $"{baseUrl}/Pagos/Failure", 
                     Pending = $"{baseUrl}/Pagos/Pending"
                 };
-                string autoReturn = "approved";
-                // Crear request CON BackUrls
+                
+                // Validar que las URLs estén correctamente formateadas
+                if (!Uri.IsWellFormedUriString(backUrls.Success, UriKind.Absolute))
+                {
+                    _logger.LogError("❌ URL Success mal formateada: {url}", backUrls.Success);
+                }
+                if (!Uri.IsWellFormedUriString(backUrls.Failure, UriKind.Absolute))
+                {
+                    _logger.LogError("❌ URL Failure mal formateada: {url}", backUrls.Failure);
+                }
+                if (!Uri.IsWellFormedUriString(backUrls.Pending, UriKind.Absolute))
+                {
+                    _logger.LogError("❌ URL Pending mal formateada: {url}", backUrls.Pending);
+                }
+                
+                _logger.LogInformation("🔗 BackUrls configuradas - Success: {success}, Failure: {failure}, Pending: {pending}", 
+                    backUrls.Success, backUrls.Failure, backUrls.Pending);
+                
+                // Crear request CON BackUrls (sin AutoReturn para evitar conflictos)
                 var request = new PreferenceRequest
                 {
                     Items = items,
                     BackUrls = backUrls,
-                    AutoReturn = autoReturn,
+                    // AutoReturn = "all", // Comentado - MercadoPago tiene problemas con AutoReturn y BackUrls juntos
                     PaymentMethods = new PreferencePaymentMethodsRequest
                     {
                         DefaultPaymentMethodId = null,
@@ -252,6 +279,8 @@ namespace DrCell_V02.Controllers
                 _logger.LogInformation("Request creado - External Reference: {ref}", request.ExternalReference);
 
                 _logger.LogInformation("Llamando a MercadoPago API...");
+                _logger.LogInformation("Request completo: {request}", JsonSerializer.Serialize(request, new JsonSerializerOptions { WriteIndented = true }));
+                
                 var preference = await client.CreateAsync(request);
 
                 // Actualizar reservas con el PreferenceId
@@ -279,16 +308,24 @@ namespace DrCell_V02.Controllers
             catch (Exception ex)
             {
                 _logger.LogError("ERROR COMPLETO:");
+                _logger.LogError("Tipo de excepción: {type}", ex.GetType().Name);
                 _logger.LogError("Mensaje: {message}", ex.Message);
                 _logger.LogError("Inner: {inner}", ex.InnerException?.Message);
                 _logger.LogError("Stack: {stack}", ex.StackTrace);
+                
+                // Si es un error de MercadoPago, logear más detalles
+                if (ex.GetType().Name.Contains("MercadoPago"))
+                {
+                    _logger.LogError("Error específico de MercadoPago: {ex}", ex.ToString());
+                }
 
                 return BadRequest(new
                 {
                     success = false,
                     message = "Error al crear la preferencia de pago",
                     error = ex.Message,
-                    details = ex.InnerException?.Message
+                    details = ex.InnerException?.Message,
+                    type = ex.GetType().Name
                 });
             }
         }
@@ -549,7 +586,7 @@ namespace DrCell_V02.Controllers
 
                     Expires = true,
                     ExpirationDateFrom = DateTime.Now,
-                    ExpirationDateTo = DateTime.Now.AddMinutes(30),
+                    ExpirationDateTo = DateTime.Now.AddMinutes(10),
 
                     Metadata = new Dictionary<string, object>
                     {
@@ -1042,6 +1079,43 @@ public class ConfirmarPagoManualDto
 {
     public string PreferenceId { get; set; } = string.Empty;
     public string? PaymentId { get; set; }
+}
+
+[HttpGet("debug/listar-reservas-pendientes")]
+public async Task<IActionResult> ListarReservasPendientes()
+{
+    try
+    {
+        var reservasPendientes = await _context.StockReserva
+            .Include(r => r.Variante)
+            .ThenInclude(v => v.Producto)
+            .Where(r => r.Estado == "PENDIENTE")
+            .OrderByDescending(r => r.FechaCreacion)
+            .Take(10)
+            .Select(r => new {
+                r.Id,
+                r.PreferenceId,
+                r.SessionId,
+                r.VarianteId,
+                r.Cantidad,
+                r.Estado,
+                r.FechaCreacion,
+                r.FechaExpiracion,
+                Producto = $"{r.Variante.Producto.Marca} {r.Variante.Producto.Modelo}",
+                Variante = $"{r.Variante.Color} - {r.Variante.Ram}/{r.Variante.Almacenamiento}"
+            })
+            .ToListAsync();
+
+        return Ok(new {
+            success = true,
+            reservasPendientes = reservasPendientes,
+            total = reservasPendientes.Count
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
+    }
 }
     }
     

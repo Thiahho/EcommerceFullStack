@@ -219,7 +219,7 @@ namespace DrCell_V02.Services
                     SessionId = sessionId,
                     PreferenceId = preferenceId,
                     FechaCreacion = DateTime.UtcNow,
-                    FechaExpiracion = DateTime.UtcNow.AddMinutes(1),
+                    FechaExpiracion = DateTime.UtcNow.AddMinutes(10),
                     Estado = "PENDIENTE",
                     Observaciones = "Reserva automática para pago"
                 };
