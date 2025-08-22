@@ -219,22 +219,16 @@ namespace DrCell_V02.Controllers
 
                 var isDevelopment = _configuration.GetValue<bool>("Development") ||
                            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-                PreferenceBackUrlsRequest? backUrls = null;
-                string? autoReturn = null;
-
-                if (!isDevelopment)
+                
+                // Configurar back URLs tanto en desarrollo como en producción
+                var baseUrl = isDevelopment ? "http://localhost:5000" : $"{Request.Scheme}://{Request.Host}";
+                var backUrls = new PreferenceBackUrlsRequest
                 {
-                    // Solo configurar back URLs en producción
-                    var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                    //var baseUrl = $"http://localhost://5000";
-                    backUrls = new PreferenceBackUrlsRequest
-                    {
-                        Success = $"{baseUrl}/Pagos/Success",
-                        Failure = $"{baseUrl}/Pagos/Failure",
-                        Pending = $"{baseUrl}/Pagos/Pending"
-                    };
-                    autoReturn = "approved";
-                }
+                    Success = $"{baseUrl}/Pagos/Success",
+                    Failure = $"{baseUrl}/Pagos/Failure",
+                    Pending = $"{baseUrl}/Pagos/Pending"
+                };
+                string autoReturn = "approved";
                 // Crear request CON BackUrls
                 var request = new PreferenceRequest
                 {
@@ -304,34 +298,48 @@ namespace DrCell_V02.Controllers
         {
             try
             {
-                _logger.LogInformation("Pago exitoso recibido - PaymentId: {paymentId}, Status: {status}, PreferenceId: {preferenceId}",
-                    payment_id, status, preference_id);
+                _logger.LogInformation("🎉 =========================== PAGO EXITOSO RECIBIDO ===========================");
+                _logger.LogInformation("PaymentId: {paymentId}", payment_id);
+                _logger.LogInformation("Status: {status}", status);
+                _logger.LogInformation("ExternalReference: {externalReference}", external_reference);
+                _logger.LogInformation("PreferenceId: {preferenceId}", preference_id);
+                _logger.LogInformation("==================================================================================");
 
                 if (!string.IsNullOrEmpty(preference_id))
                 {
+                    _logger.LogInformation("✅ Iniciando confirmación de reservas para PreferenceId: {preferenceId}", preference_id);
+                    
                     // Confirmar las reservas de stock (descontar del stock real)
                     var reservasConfirmadas = await _stockService.ConfirmarReservaAsync(preference_id);
 
                     if (reservasConfirmadas)
                     {
+                        _logger.LogInformation("✅ Reservas confirmadas exitosamente - creando registro de venta...");
+                        
                         // Crear registro de venta
                         await CrearRegistroVentaAsync(preference_id, payment_id);
 
-                        _logger.LogInformation("Reservas confirmadas y venta registrada para PreferenceId: {preferenceId}", preference_id);
+                        _logger.LogInformation("✅ PROCESO COMPLETADO: Reservas confirmadas y venta registrada para PreferenceId: {preferenceId}", preference_id);
                     }
                     else
                     {
-                        _logger.LogWarning("No se encontraron reservas para confirmar - PreferenceId: {preferenceId}", preference_id);
+                        _logger.LogWarning("⚠️ No se encontraron reservas para confirmar - PreferenceId: {preferenceId}", preference_id);
                     }
+                }
+                else
+                {
+                    _logger.LogWarning("⚠️ No se recibió PreferenceId - no se puede procesar el stock");
                 }
 
                 // Redirigir a la tienda con parámetros de éxito
                 var redirectUrl = $"/tienda?pago=exitoso&payment_id={payment_id}";
+                _logger.LogInformation("🔀 Redirigiendo a: {url}", redirectUrl);
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al procesar resultado del pago exitoso");
+                _logger.LogError(ex, "❌ ERROR CRÍTICO al procesar resultado del pago exitoso");
+                _logger.LogError("❌ Stack trace: {stackTrace}", ex.StackTrace);
                 // En caso de error, también redirigir a la tienda pero con parámetro de error
                 return Redirect("/tienda?pago=error");
             }
