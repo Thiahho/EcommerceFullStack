@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Menu, X, Filter } from 'lucide-react';
+import { Menu, X, Filter, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
 import axios from '../config/axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import SidebarFilters from './SidebarFilters';
 import { useCategorias } from '../hooks/useCategorias';
+import { toast } from 'sonner';
 
 const Shop: React.FC = () => {
   const [productos, setProductos] = useState<any[]>([]);
@@ -16,9 +17,52 @@ const Shop: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Usar el hook personalizado para categorías
   const { categoriasNombres, loading: categoriasLoading, error: categoriasError } = useCategorias();
+
+  // Verificar parámetros de pago al cargar el componente
+  useEffect(() => {
+    const estadoPago = searchParams.get('pago');
+    const paymentId = searchParams.get('payment_id');
+
+    if (estadoPago) {
+      switch (estadoPago) {
+        case 'exitoso':
+          toast.success('¡Pago procesado exitosamente!', {
+            description: paymentId ? `ID de pago: ${paymentId}` : 'Tu compra ha sido confirmada.',
+            icon: <CheckCircle className="h-4 w-4" />,
+            duration: 5000,
+          });
+          break;
+        case 'fallido':
+          toast.error('Pago rechazado', {
+            description: 'El pago no pudo ser procesado. Puedes intentar nuevamente.',
+            icon: <XCircle className="h-4 w-4" />,
+            duration: 5000,
+          });
+          break;
+        case 'pendiente':
+          toast.info('Pago pendiente', {
+            description: 'Tu pago está pendiente de confirmación. Te notificaremos cuando se procese.',
+            icon: <Clock className="h-4 w-4" />,
+            duration: 5000,
+          });
+          break;
+        case 'error':
+          toast.error('Error en el procesamiento', {
+            description: 'Ocurrió un error al procesar el pago. Contacta con soporte si persiste.',
+            icon: <AlertTriangle className="h-4 w-4" />,
+            duration: 5000,
+          });
+          break;
+      }
+
+      // Limpiar los parámetros de la URL después de mostrar la notificación
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     const fetchProductos = async () => {

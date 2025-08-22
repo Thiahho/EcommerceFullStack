@@ -32,6 +32,9 @@ namespace DrCell_V02.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                _logger.LogInformation("=== INICIANDO CONFIRMACIÓN DE RESERVAS ===");
+                _logger.LogInformation("PreferenceId: {preferenceId}", preferenceId);
+
                 var reservas = await _context.StockReserva
                     .Include(r => r.Variante)
                     .Where(r => r.PreferenceId == preferenceId && r.Estado == "PENDIENTE")
@@ -43,25 +46,39 @@ namespace DrCell_V02.Services
                     return false;
                 }
 
+                _logger.LogInformation("Encontradas {count} reservas pendientes", reservas.Count);
+
                 foreach (var reserva in reservas)
                 {
+                    var stockAntes = reserva.Variante.Stock;
+                    var stockReservadoAntes = reserva.Variante.StockReservado;
+
+                    _logger.LogInformation("ANTES - VarianteId: {varianteId}, Stock: {stock}, StockReservado: {stockReservado}, Cantidad a confirmar: {cantidad}", 
+                        reserva.VarianteId, stockAntes, stockReservadoAntes, reserva.Cantidad);
+
                     // ✅ CONFIRMAR = Descontar del stock real
                     reserva.Variante.Stock -= reserva.Cantidad;
                     reserva.Variante.StockReservado -= reserva.Cantidad;
                     reserva.Estado = "CONFIRMADO";
                     reserva.Observaciones = "Pago confirmado - Stock descontado";
+
+                    _logger.LogInformation("DESPUÉS - VarianteId: {varianteId}, Stock: {stock}, StockReservado: {stockReservado}", 
+                        reserva.VarianteId, reserva.Variante.Stock, reserva.Variante.StockReservado);
                 }
 
+                _logger.LogInformation("Guardando cambios en la base de datos...");
                 await _context.SaveChangesAsync();
+                
+                _logger.LogInformation("Confirmando transacción...");
                 await transaction.CommitAsync();
                 
-                _logger.LogInformation("Confirmadas {count} reservas para PreferenceId: {preferenceId}", reservas.Count, preferenceId);
+                _logger.LogInformation("✅ CONFIRMACIÓN EXITOSA - {count} reservas confirmadas para PreferenceId: {preferenceId}", reservas.Count, preferenceId);
                 return true;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                _logger.LogError(ex, "Error al confirmar reservas para PreferenceId: {preferenceId}", preferenceId);
+                _logger.LogError(ex, "❌ ERROR al confirmar reservas para PreferenceId: {preferenceId}", preferenceId);
                 throw;
             }
         }
@@ -81,8 +98,13 @@ namespace DrCell_V02.Services
                     return false;
                 }
 
-                // ❌ LIBERAR = Restaurar stock reservado
-                reserva.Variante.StockReservado -= reserva.Cantidad;
+                // ❌ LIBERAR = Restaurar stock reservado (con validación)
+                var nuevoStockReservado = Math.Max(0, reserva.Variante.StockReservado - reserva.Cantidad);
+                
+                _logger.LogInformation("Liberando reserva - VarianteId: {varianteId}, StockReservadoAntes: {antes}, Cantidad: {cantidad}, StockReservadoDespués: {despues}", 
+                    reserva.VarianteId, reserva.Variante.StockReservado, reserva.Cantidad, nuevoStockReservado);
+                
+                reserva.Variante.StockReservado = nuevoStockReservado;
                 reserva.Estado = "LIBERADO";
                 reserva.FechaExpiracion = DateTime.UtcNow;
                 reserva.Observaciones = string.IsNullOrEmpty(motivo) ? "Reserva liberada" : motivo;
@@ -115,8 +137,13 @@ namespace DrCell_V02.Services
 
                 foreach (var reserva in reservasExpiradas)
                 {
-                    // ⏰ EXPIRAR = Restaurar stock reservado
-                    reserva.Variante.StockReservado -= reserva.Cantidad;
+                    // ⏰ EXPIRAR = Restaurar stock reservado (con validación)
+                    var nuevoStockReservado = Math.Max(0, reserva.Variante.StockReservado - reserva.Cantidad);
+                    
+                    _logger.LogInformation("Expirando reserva - VarianteId: {varianteId}, StockReservadoAntes: {antes}, Cantidad: {cantidad}, StockReservadoDespués: {despues}", 
+                        reserva.VarianteId, reserva.Variante.StockReservado, reserva.Cantidad, nuevoStockReservado);
+                    
+                    reserva.Variante.StockReservado = nuevoStockReservado;
                     reserva.Estado = "EXPIRADO";
                     reserva.Observaciones = "Reserva expirada automáticamente";
                 }
@@ -192,7 +219,7 @@ namespace DrCell_V02.Services
                     SessionId = sessionId,
                     PreferenceId = preferenceId,
                     FechaCreacion = DateTime.UtcNow,
-                    FechaExpiracion = DateTime.UtcNow.AddMinutes(30),
+                    FechaExpiracion = DateTime.UtcNow.AddMinutes(1),
                     Estado = "PENDIENTE",
                     Observaciones = "Reserva automática para pago"
                 };
@@ -227,26 +254,39 @@ namespace DrCell_V02.Services
         {
             try
             {
+                _logger.LogInformation("=== VERIFICANDO STOCK DISPONIBLE ===");
+                _logger.LogInformation("VarianteId: {varianteId}, Cantidad solicitada: {cantidad}", varianteId, cantidad);
+                
                 var variante = await _context.ProductosVariantes
                     .FirstOrDefaultAsync(v => v.Id == varianteId);
                 
                 if (variante == null) 
                 {
-                    _logger.LogWarning("Variante no encontrada: {varianteId}", varianteId);
+                    _logger.LogWarning("❌ Variante no encontrada: {varianteId}", varianteId);
                     return false;
                 }
             
+                var stockTotal = variante.Stock;
+                var stockReservado = variante.StockReservado;
                 var stockDisponible = variante.StockDisponible;
                 var disponible = stockDisponible >= cantidad;
                 
-                _logger.LogInformation("Verificación de stock - VarianteId: {varianteId}, Disponible: {disponible}, Solicitado: {cantidad}, Resultado: {resultado}", 
-                    varianteId, stockDisponible, cantidad, disponible);
+                _logger.LogInformation("Stock Total: {stockTotal}", stockTotal);
+                _logger.LogInformation("Stock Reservado: {stockReservado}", stockReservado);
+                _logger.LogInformation("Stock Disponible (calculado): {stockDisponible}", stockDisponible);
+                _logger.LogInformation("Cantidad solicitada: {cantidad}", cantidad);
+                _logger.LogInformation("¿Suficiente stock? {disponible}", disponible ? "✅ SÍ" : "❌ NO");
+                
+                if (!disponible)
+                {
+                    _logger.LogWarning("❌ STOCK INSUFICIENTE - Necesario: {cantidad}, Disponible: {stockDisponible}", cantidad, stockDisponible);
+                }
                 
                 return disponible;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al verificar stock disponible - VarianteId: {varianteId}", varianteId);
+                _logger.LogError(ex, "❌ ERROR al verificar stock disponible - VarianteId: {varianteId}", varianteId);
                 return false;
             }
         }

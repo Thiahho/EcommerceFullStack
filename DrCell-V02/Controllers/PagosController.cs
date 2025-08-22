@@ -125,27 +125,52 @@ namespace DrCell_V02.Controllers
                 // Verificar y reservar stock para cada item
                 try
                 {
-                    // Comentar temporalmente la verificación de stock
+                    _logger.LogInformation("=== VERIFICANDO STOCK PARA {count} ITEMS ===", preferenciaData.Items.Count);
                     
                     foreach (var item in preferenciaData.Items)
                     {
-                        // Verificar stock disponible
-                        if (!await _stockService.VerificarStockDisponibleAsync(item.VarianteId, item.Cantidad))
+                        _logger.LogInformation("Verificando item - VarianteId: {varianteId}, Cantidad: {cantidad}", item.VarianteId, item.Cantidad);
+                        
+                        // Obtener información detallada de la variante antes de verificar
+                        var varianteInfo = await _context.ProductosVariantes
+                            .FirstOrDefaultAsync(v => v.Id == item.VarianteId);
+                            
+                        if (varianteInfo == null)
                         {
+                            _logger.LogError("Variante no encontrada: {varianteId}", item.VarianteId);
+                            return BadRequest(new { success = false, message = $"Variante {item.VarianteId} no encontrada" });
+                        }
+                        
+                        _logger.LogInformation("Variante encontrada - Stock: {stock}, StockReservado: {stockReservado}, StockDisponible: {stockDisponible}", 
+                            varianteInfo.Stock, varianteInfo.StockReservado, varianteInfo.StockDisponible);
+                        
+                        // Verificar stock disponible
+                        var stockDisponible = await _stockService.VerificarStockDisponibleAsync(item.VarianteId, item.Cantidad);
+                        _logger.LogInformation("Resultado verificación: {resultado}", stockDisponible);
+                        
+                        if (!stockDisponible)
+                        {
+                            _logger.LogWarning("Stock insuficiente para VarianteId: {varianteId}, Solicitado: {cantidad}, Disponible: {disponible}", 
+                                item.VarianteId, item.Cantidad, varianteInfo.StockDisponible);
+                            
                             // Si no hay stock suficiente, liberar todas las reservas ya creadas
                             foreach (var reservaExistente in reservasCreadas)
                             {
                                 await _stockService.LiberarReservaAsync(reservaExistente.Id, "Stock insuficiente");
                             }
-                            return BadRequest(new { success = false, message = "Stock insuficiente para uno o más productos" });
+                            return BadRequest(new { success = false, message = $"Stock insuficiente para variante {item.VarianteId}. Disponible: {varianteInfo.StockDisponible}, Solicitado: {item.Cantidad}" });
                         }
 
+                        _logger.LogInformation("Stock OK, procediendo a reservar...");
+                        
                         // Reservar stock
                         var nuevaReserva = await _stockService.ReservarStockAsync(item.VarianteId, item.Cantidad, sessionId);
                         reservasCreadas.Add(nuevaReserva);
+                        
+                        _logger.LogInformation("Reserva creada exitosamente - ReservaId: {reservaId}", nuevaReserva.Id);
                     }
                     
-                     _logger.LogInformation("Omitiendo verificación de stock para testing");
+                    _logger.LogInformation("✅ Todas las verificaciones de stock exitosas");
                 }
                 catch (Exception ex)
                 {
@@ -293,14 +318,6 @@ namespace DrCell_V02.Controllers
                         await CrearRegistroVentaAsync(preference_id, payment_id);
 
                         _logger.LogInformation("Reservas confirmadas y venta registrada para PreferenceId: {preferenceId}", preference_id);
-
-                        return Ok(new
-                        {
-                            status = "success",
-                            message = "Pago procesado exitosamente",
-                            paymentId = payment_id,
-                            preferenceId = preference_id
-                        });
                     }
                     else
                     {
@@ -308,22 +325,15 @@ namespace DrCell_V02.Controllers
                     }
                 }
 
-                return Ok(new
-                {
-                    status = "success",
-                    message = "Pago procesado exitosamente",
-                    paymentId = payment_id
-                });
+                // Redirigir a la tienda con parámetros de éxito
+                var redirectUrl = $"/tienda?pago=exitoso&payment_id={payment_id}";
+                return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al procesar resultado del pago exitoso");
-                return Ok(new
-                {
-                    status = "error",
-                    message = "Error al procesar el resultado del pago",
-                    error = ex.Message
-                });
+                // En caso de error, también redirigir a la tienda pero con parámetro de error
+                return Redirect("/tienda?pago=error");
             }
         }
 
@@ -350,24 +360,15 @@ namespace DrCell_V02.Controllers
                     _logger.LogInformation("Reservas liberadas por pago fallido - PreferenceId: {preferenceId}", preference_id);
                 }
 
-                return Ok(new
-                {
-                    status = "failure",
-                    message = "El pago no pudo ser procesado",
-                    error = "Pago rechazado por MercadoPago",
-                    paymentId = payment_id,
-                    preferenceId = preference_id
-                });
+                // Redirigir a la tienda con parámetros de fallo
+                var redirectUrl = $"/tienda?pago=fallido&payment_id={payment_id}";
+                return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al procesar fallo del pago");
-                return Ok(new
-                {
-                    status = "error",
-                    message = "Error al procesar el fallo del pago",
-                    error = ex.Message
-                });
+                // En caso de error, redirigir a la tienda con parámetro de error
+                return Redirect("/tienda?pago=error");
             }
         }
 
@@ -382,23 +383,15 @@ namespace DrCell_V02.Controllers
                 // Para pagos pendientes, mantenemos las reservas activas
                 // El StockCleanupJob se encargará de liberarlas si expiran
 
-                return Ok(new
-                {
-                    status = "pending",
-                    message = "El pago está pendiente de confirmación",
-                    paymentId = payment_id,
-                    preferenceId = preference_id
-                });
+                // Redirigir a la tienda con parámetros de pendiente
+                var redirectUrl = $"/tienda?pago=pendiente&payment_id={payment_id}";
+                return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al procesar pago pendiente");
-                return Ok(new
-                {
-                    status = "error",
-                    message = "Error al procesar el pago pendiente",
-                    error = ex.Message
-                });
+                // En caso de error, redirigir a la tienda con parámetro de error
+                return Redirect("/tienda?pago=error");
             }
         }
 
@@ -876,6 +869,171 @@ public async Task<IActionResult> TestStock()
             stackTrace = ex.StackTrace?.Substring(0, Math.Min(500, ex.StackTrace.Length))
         });
     }
+}
+
+[HttpGet("debug/verificar-stock/{varianteId}")]
+public async Task<IActionResult> VerificarStockVariante(int varianteId)
+{
+    try
+    {
+        var variante = await _context.ProductosVariantes
+            .FirstOrDefaultAsync(v => v.Id == varianteId);
+
+        if (variante == null)
+        {
+            return NotFound(new { message = "Variante no encontrada" });
+        }
+
+        var reservasActivas = await _context.StockReserva
+            .Where(r => r.VarianteId == varianteId && r.Estado == "PENDIENTE")
+            .ToListAsync();
+
+        var reservasConfirmadas = await _context.StockReserva
+            .Where(r => r.VarianteId == varianteId && r.Estado == "CONFIRMADO")
+            .ToListAsync();
+
+        return Ok(new
+        {
+            varianteId = variante.Id,
+            stockTotal = variante.Stock,
+            stockReservado = variante.StockReservado,
+            stockDisponible = variante.StockDisponible,
+            reservasActivas = reservasActivas.Count,
+            reservasConfirmadas = reservasConfirmadas.Count,
+            detalleReservasActivas = reservasActivas.Select(r => new {
+                r.Id,
+                r.Cantidad,
+                r.Estado,
+                r.PreferenceId,
+                r.FechaCreacion
+            }),
+            detalleReservasConfirmadas = reservasConfirmadas.Select(r => new {
+                r.Id,
+                r.Cantidad,
+                r.Estado,
+                r.PreferenceId,
+                r.FechaCreacion
+            })
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
+    }
+}
+
+[HttpPost("debug/verificar-carrito")]
+public async Task<IActionResult> VerificarCarrito([FromBody] CrearPreferenciaDto preferenciaData)
+{
+    try
+    {
+        _logger.LogInformation("=== DEBUG CARRITO ===");
+        _logger.LogInformation("Items recibidos: {count}", preferenciaData?.Items?.Count ?? 0);
+        
+        if (preferenciaData?.Items == null || !preferenciaData.Items.Any())
+        {
+            return Ok(new { error = "No hay items en el carrito" });
+        }
+
+        var resultados = new List<object>();
+
+        foreach (var item in preferenciaData.Items)
+        {
+            _logger.LogInformation("Verificando item - VarianteId: {varianteId}, Cantidad: {cantidad}", item.VarianteId, item.Cantidad);
+            
+            var variante = await _context.ProductosVariantes
+                .FirstOrDefaultAsync(v => v.Id == item.VarianteId);
+
+            if (variante == null)
+            {
+                resultados.Add(new
+                {
+                    varianteId = item.VarianteId,
+                    error = "Variante no encontrada",
+                    item = item
+                });
+                continue;
+            }
+
+            var stockDisponible = await _stockService.VerificarStockDisponibleAsync(item.VarianteId, item.Cantidad);
+
+            resultados.Add(new
+            {
+                varianteId = item.VarianteId,
+                producto = $"{item.Marca} {item.Modelo}",
+                variante = $"{item.Color} - {item.Ram}/{item.Almacenamiento}",
+                cantidadSolicitada = item.Cantidad,
+                stockTotal = variante.Stock,
+                stockReservado = variante.StockReservado,
+                stockDisponible = variante.StockDisponible,
+                verificacionOK = stockDisponible,
+                itemCompleto = item
+            });
+        }
+
+        return Ok(new
+        {
+            totalItems = preferenciaData.Items.Count,
+            resultados = resultados,
+            todosDisponibles = resultados.All(r => r.GetType().GetProperty("verificacionOK")?.GetValue(r) as bool? == true)
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error al verificar carrito");
+        return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
+    }
+}
+
+[HttpPost("debug/confirmar-pago-manual")]
+public async Task<IActionResult> ConfirmarPagoManual([FromBody] ConfirmarPagoManualDto datos)
+{
+    try
+    {
+        _logger.LogInformation("=== CONFIRMACIÓN MANUAL DE PAGO ===");
+        _logger.LogInformation("PreferenceId: {preferenceId}", datos.PreferenceId);
+
+        if (string.IsNullOrEmpty(datos.PreferenceId))
+        {
+            return BadRequest(new { success = false, message = "PreferenceId requerido" });
+        }
+
+        // Confirmar las reservas de stock
+        var reservasConfirmadas = await _stockService.ConfirmarReservaAsync(datos.PreferenceId);
+
+        if (reservasConfirmadas)
+        {
+            // Crear registro de venta
+            await CrearRegistroVentaAsync(datos.PreferenceId, datos.PaymentId ?? "MANUAL-" + DateTime.Now.Ticks);
+
+            _logger.LogInformation("✅ Pago confirmado manualmente - PreferenceId: {preferenceId}", datos.PreferenceId);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Pago confirmado exitosamente",
+                preferenceId = datos.PreferenceId,
+                stockDescontado = true,
+                ventaRegistrada = true
+            });
+        }
+        else
+        {
+            _logger.LogWarning("❌ No se encontraron reservas para confirmar - PreferenceId: {preferenceId}", datos.PreferenceId);
+            return NotFound(new { success = false, message = "No se encontraron reservas pendientes para este preference ID" });
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "❌ Error al confirmar pago manualmente");
+        return StatusCode(500, new { success = false, message = "Error al confirmar pago", error = ex.Message });
+    }
+}
+
+public class ConfirmarPagoManualDto
+{
+    public string PreferenceId { get; set; } = string.Empty;
+    public string? PaymentId { get; set; }
 }
     }
     
