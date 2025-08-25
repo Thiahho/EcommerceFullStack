@@ -220,8 +220,13 @@ namespace DrCell_V02.Controllers
                 var isDevelopment = _configuration.GetValue<bool>("Development") ||
                            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
                 
-                // Configurar back URLs tanto en desarrollo como en producción
-                var baseUrl = isDevelopment ? "http://localhost:5000" : $"{Request.Scheme}://{Request.Host}";
+                // Configurar back URLs desde variables de entorno
+                var ngrokUrl = _configuration.GetValue<string>("NGROK_BASE_URL");
+                var productionUrl = _configuration.GetValue<string>("PRODUCTION_BASE_URL");
+                
+                var baseUrl = isDevelopment 
+                    ? ngrokUrl ?? "http://localhost:5000" 
+                    : productionUrl ?? $"{Request.Scheme}://{Request.Host}";
                 
                 _logger.LogInformation("🔧 isDevelopment: {isDevelopment}, baseUrl: {baseUrl}", isDevelopment, baseUrl);
                 
@@ -568,9 +573,9 @@ namespace DrCell_V02.Controllers
 
                     BackUrls = new PreferenceBackUrlsRequest
                     {
-                        Success = $"{Request.Scheme}://{Request.Host}/Pagos/Success",
-                        Failure = $"{Request.Scheme}://{Request.Host}/Pagos/Failure",
-                        Pending = $"{Request.Scheme}://{Request.Host}/Pagos/Pending"
+                        Success = GetCallbackUrl("Success"),
+                        Failure = GetCallbackUrl("Failure"),
+                        Pending = GetCallbackUrl("Pending")
                     },
                     AutoReturn = "approved",
 
@@ -640,7 +645,7 @@ namespace DrCell_V02.Controllers
             }
         }
 
-        [HttpPost("webhooks/mercadopago")]
+        /*[HttpPost("webhooks/mercadopago")]
         public async Task<IActionResult> WebhookMercadoPago([FromBody] object notification)
         {
             try
@@ -713,7 +718,48 @@ namespace DrCell_V02.Controllers
                 return StatusCode(500);
             }
         }
+        */
 
+       /* [HttpPost("Webook")]
+        public async Task<IActionResult> Webhook([FromQuery(Name="type")] string type)
+        {
+            try
+            {
+                using var reader = new StreamReader(Request.Body);
+                var body= await reader.ReadToEndAsync();
+                
+                _logger.LogInformation("Weebhook MP: type={type} body={body}", type, body);
+
+                if (!string.Equals(type, "payment", StringComparison.OrdinalIgnoreCase))
+                return Ok(); // ignorar otros tipos
+
+                var paymentId = Request.Query["data.id"].ToString();
+                if (string.IsNullOrWhiteSpace(paymentId)) return Ok();
+
+                // 1) Traer pago real desde MP
+                var pago = await _mp.GetPaymentAsync(paymentId); // debe traer status y preference_id
+
+                if (!string.Equals(pago.Status, "approved", StringComparison.OrdinalIgnoreCase))
+                    return Ok(); // solo confirmamos en approved
+
+                var preferenceId = pago.PreferenceId;
+                if (string.IsNullOrWhiteSpace(preferenceId))
+                {
+                    // fallback: consultar merchant_order si hace falta
+                    preferenceId = await _mp.TryResolvePreferenceIdFromPaymentAsync(paymentId);
+                }
+
+                // 2) Confirmación idempotente
+                await _stockService.ConfirmarReservaAsync(preferenceId, paymentId);
+
+                return Ok();
+            }
+            catch(Exception ex){
+                _logger.LogError(ex,"Error en webhook mp");
+                return Ok();
+            }
+        }
+        */
         // Métodos auxiliares para el webhook
         private async Task<string?> ObtenerPreferenceIdPorExternalReference(string externalReference)
         {
@@ -1117,6 +1163,22 @@ public async Task<IActionResult> ListarReservasPendientes()
         return StatusCode(500, new { error = ex.Message });
     }
 }
+
+        // Método auxiliar para obtener URLs de callback usando configuración de entorno
+        private string GetCallbackUrl(string action)
+        {
+            var isDevelopment = _configuration.GetValue<bool>("Development") ||
+                               Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+                               
+            var ngrokUrl = _configuration.GetValue<string>("NGROK_BASE_URL");
+            var productionUrl = _configuration.GetValue<string>("PRODUCTION_BASE_URL");
+            
+            var baseUrl = isDevelopment 
+                ? ngrokUrl ?? "http://localhost:5000" 
+                : productionUrl ?? $"{Request.Scheme}://{Request.Host}";
+                
+            return $"{baseUrl}/Pagos/{action}";
+        }
     }
     
     
