@@ -59,7 +59,7 @@ namespace DrCell_V02.Data
                 entity.Property(e => e.Nombre).HasMaxLength(100).IsRequired();
                 entity.Property(e => e.Activa).HasDefaultValue(true);
                 
-                // Índices
+                // Índices3
                 entity.HasIndex(e => e.Nombre).IsUnique();
                 entity.HasIndex(e => e.Activa);
             });

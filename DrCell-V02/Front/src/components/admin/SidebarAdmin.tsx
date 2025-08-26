@@ -12,6 +12,7 @@ import {
   ShoppingCart,
   Receipt,
   Tags,
+  BarChart3,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -22,6 +23,7 @@ const links = [
   { to: "/admin/reparaciones", label: "Reparaciones", icon: Settings },
   { to: "/admin/categorias", label: "Categorias", icon: Tags },
   { to: "/admin/ventas", label: "Ventas", icon: Receipt },
+  { to: "/admin/analiticas", label: "Analíticas", icon: BarChart3 },
 ];
 
 interface SidebarAdminProps {

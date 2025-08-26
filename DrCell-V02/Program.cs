@@ -483,6 +483,8 @@ try
     builder.Services.AddScoped<ICategoriaService, CategoriasService>();
     builder.Services.AddScoped<IStockService, StockService>();
     builder.Services.AddScoped<IVentaService, VentaService>();
+    builder.Services.AddScoped<IGananciasService, GananciasService>();
+    builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
     builder.Services.AddHostedService<StockCleanupJob>();
     
     var app = builder.Build();

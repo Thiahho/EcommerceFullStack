@@ -18,6 +18,21 @@ export function absoluteUrl(path: string) {
   return `${process.env.NEXT_PUBLIC_APP_URL}${path}`
 }
 
+export function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS'
+  }).format(value)
+}
+
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat('es-AR').format(value)
+}
+
+export function formatPercentage(value: number): string {
+  return `${value > 0 ? '+' : ''}${value.toFixed(1)}%`
+}
+
 export async function toWebpBase64(
   file: File,
   size = 400, // Puedes cambiar a 500 si prefieres más grande
