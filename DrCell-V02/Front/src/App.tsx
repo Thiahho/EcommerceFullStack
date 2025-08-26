@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from '@/pages/Home';
@@ -15,6 +16,7 @@ import DashboardAdmin from '@/components/admin/DasboardAdmin';
 import PrivateRoute from '@/components/admin/PrivateRoute';
 import ReparacionesConfig from '@/components/admin/ReparacionesConfig';
 import Categorias from '@/components/admin/Categorias';
+import VentasGrid from '@/components/admin/VentasGrid';
 import { Toaster } from 'sonner';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/auth-store';
@@ -28,6 +30,17 @@ import Checkout from '@/pages/Checkout';
 import FloatingCheckout from '@/components/FloatingCheckout';
 
 const UserDashboard = () => <div>Panel de Usuario</div>;
+
+// Crear instancia de QueryClient
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 60_000, // 1 minuto
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Componente de carga mientras se inicializa la autenticación
 const LoadingScreen = () => (
@@ -60,7 +73,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Toaster position="top-right" richColors />
       <BrowserRouter>
         <Navbar />
@@ -84,6 +97,7 @@ export default function App() {
             <Route path="variantes" element={<Variantes />} />
             <Route path="reparaciones" element={<ReparacionesConfig />} />
             <Route path="categorias" element={<Categorias />} />
+            <Route path="ventas" element={<VentasGrid />} />
             <Route path="usuarios" element={<Usuarios />} />
           </Route>
           <Route
@@ -112,6 +126,6 @@ export default function App() {
         </div>
         <Footer />
       </BrowserRouter>
-    </>
+    </QueryClientProvider>
   );
 } 

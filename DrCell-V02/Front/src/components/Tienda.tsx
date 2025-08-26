@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import SidebarFilters from './SidebarFilters';
 import { useCategorias } from '../hooks/useCategorias';
 import { toast } from 'sonner';
+import { useCartStore } from '../store/cart-store';
 
 const Shop: React.FC = () => {
   const [productos, setProductos] = useState<any[]>([]);
@@ -18,6 +19,7 @@ const Shop: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { clearCart } = useCartStore();
 
   // Usar el hook personalizado para categorías
   const { categoriasNombres, loading: categoriasLoading, error: categoriasError } = useCategorias();
@@ -30,8 +32,10 @@ const Shop: React.FC = () => {
     if (estadoPago) {
       switch (estadoPago) {
         case 'exitoso':
+          // Vaciar el carrito cuando el pago es exitoso
+          clearCart();
           toast.success('¡Pago procesado exitosamente!', {
-            description: paymentId ? `ID de pago: ${paymentId}` : 'Tu compra ha sido confirmada.',
+            description: paymentId ? `ID de pago: ${paymentId}` : 'Tu compra ha sido confirmada. El carrito ha sido vaciado.',
             icon: <CheckCircle className="h-4 w-4" />,
             duration: 5000,
           });

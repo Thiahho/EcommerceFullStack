@@ -23,6 +23,7 @@ namespace DrCell_V02.Controllers
         private readonly ILogger<PagosController> _logger;
         private readonly IStockService _stockService;
 
+
         public PagosController(ApplicationDbContext context, IConfiguration configuration, ILogger<PagosController> logger, IStockService stockService)
         {
             _stockService = stockService;
@@ -206,7 +207,6 @@ namespace DrCell_V02.Controllers
                     Id = item.ProductoId.ToString(),
                     Title = $"{item.Marca} {item.Modelo}",
                     Description = $"RAM: {item.Ram}, Almacenamiento: {item.Almacenamiento}, Color: {item.Color}",
-                    CategoryId = "phones",
                     Quantity = item.Cantidad,
                     CurrencyId = "ARS",
                     UnitPrice = item.Precio
@@ -221,7 +221,7 @@ namespace DrCell_V02.Controllers
                            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
                 
                 // Configurar back URLs desde variables de entorno
-                var ngrokUrl = _configuration.GetValue<string>("NGROK_BASE_URL");
+                var ngrokUrl = _configuration.GetValue<string>("ngrok:BaseUrl");
                 var productionUrl = _configuration.GetValue<string>("PRODUCTION_BASE_URL");
                 
                 var baseUrl = isDevelopment 
@@ -260,12 +260,14 @@ namespace DrCell_V02.Controllers
                 
                 _logger.LogInformation("🔗 BackUrls configuradas - Success: {success}, Failure: {failure}, Pending: {pending}", 
                     backUrls.Success, backUrls.Failure, backUrls.Pending);
+                _logger.LogInformation("🔔 NotificationUrl configurada: {notificationUrl}", $"{baseUrl}/Pagos/webhooks/mercadopago");
                 
-                // Crear request CON BackUrls (sin AutoReturn para evitar conflictos)
+                // Crear request CON BackUrls Y NotificationUrl para webhooks automáticos
                 var request = new PreferenceRequest
                 {
                     Items = items,
                     BackUrls = backUrls,
+                    NotificationUrl = $"{baseUrl}/Pagos/webhooks/mercadopago", // 🔔 WEBHOOK AUTOMÁTICO
                     // AutoReturn = "all", // Comentado - MercadoPago tiene problemas con AutoReturn y BackUrls juntos
                     PaymentMethods = new PreferencePaymentMethodsRequest
                     {
@@ -373,8 +375,8 @@ namespace DrCell_V02.Controllers
                     _logger.LogWarning("⚠️ No se recibió PreferenceId - no se puede procesar el stock");
                 }
 
-                // Redirigir a la tienda con parámetros de éxito
-                var redirectUrl = $"/tienda?pago=exitoso&payment_id={payment_id}";
+                // Redirigir al frontend con parámetros de éxito
+                var redirectUrl = $"http://localhost:3000/tienda?pago=exitoso&payment_id={payment_id}";
                 _logger.LogInformation("🔀 Redirigiendo a: {url}", redirectUrl);
                 return Redirect(redirectUrl);
             }
@@ -382,8 +384,8 @@ namespace DrCell_V02.Controllers
             {
                 _logger.LogError(ex, "❌ ERROR CRÍTICO al procesar resultado del pago exitoso");
                 _logger.LogError("❌ Stack trace: {stackTrace}", ex.StackTrace);
-                // En caso de error, también redirigir a la tienda pero con parámetro de error
-                return Redirect("/tienda?pago=error");
+                // En caso de error, también redirigir al frontend pero con parámetro de error
+                return Redirect("http://localhost:3000/tienda?pago=error");
             }
         }
 
@@ -410,15 +412,15 @@ namespace DrCell_V02.Controllers
                     _logger.LogInformation("Reservas liberadas por pago fallido - PreferenceId: {preferenceId}", preference_id);
                 }
 
-                // Redirigir a la tienda con parámetros de fallo
-                var redirectUrl = $"/tienda?pago=fallido&payment_id={payment_id}";
+                // Redirigir al frontend con parámetros de fallo
+                var redirectUrl = $"http://localhost:3000/tienda?pago=fallido&payment_id={payment_id}";
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al procesar fallo del pago");
-                // En caso de error, redirigir a la tienda con parámetro de error
-                return Redirect("/tienda?pago=error");
+                // En caso de error, redirigir al frontend con parámetro de error
+                return Redirect("http://localhost:3000/tienda?pago=error");
             }
         }
 
@@ -433,15 +435,15 @@ namespace DrCell_V02.Controllers
                 // Para pagos pendientes, mantenemos las reservas activas
                 // El StockCleanupJob se encargará de liberarlas si expiran
 
-                // Redirigir a la tienda con parámetros de pendiente
-                var redirectUrl = $"/tienda?pago=pendiente&payment_id={payment_id}";
+                // Redirigir al frontend con parámetros de pendiente
+                var redirectUrl = $"http://localhost:3000/tienda?pago=pendiente&payment_id={payment_id}";
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al procesar pago pendiente");
-                // En caso de error, redirigir a la tienda con parámetro de error
-                return Redirect("/tienda?pago=error");
+                // En caso de error, redirigir al frontend con parámetro de error
+                return Redirect("http://localhost:3000/tienda?pago=error");
             }
         }
 
@@ -720,46 +722,133 @@ namespace DrCell_V02.Controllers
         }
         */
 
-       /* [HttpPost("Webook")]
-        public async Task<IActionResult> Webhook([FromQuery(Name="type")] string type)
+        [HttpPost("webhooks/mercadopago")]
+        public async Task<IActionResult> WebhookMercadoPago([FromBody] object notification)
         {
             try
             {
-                using var reader = new StreamReader(Request.Body);
-                var body= await reader.ReadToEndAsync();
-                
-                _logger.LogInformation("Weebhook MP: type={type} body={body}", type, body);
+                _logger.LogInformation("🔔 Webhook MercadoPago recibido: {notification}", JsonSerializer.Serialize(notification));
 
-                if (!string.Equals(type, "payment", StringComparison.OrdinalIgnoreCase))
-                return Ok(); // ignorar otros tipos
+                // Parsear la notificación JSON
+                var notificationJson = JsonSerializer.Serialize(notification);
+                var notificationData = JsonSerializer.Deserialize<MercadoPagoNotification>(notificationJson);
 
-                var paymentId = Request.Query["data.id"].ToString();
-                if (string.IsNullOrWhiteSpace(paymentId)) return Ok();
-
-                // 1) Traer pago real desde MP
-                var pago = await _mp.GetPaymentAsync(paymentId); // debe traer status y preference_id
-
-                if (!string.Equals(pago.Status, "approved", StringComparison.OrdinalIgnoreCase))
-                    return Ok(); // solo confirmamos en approved
-
-                var preferenceId = pago.PreferenceId;
-                if (string.IsNullOrWhiteSpace(preferenceId))
+                // Validar que sea una notificación de payment
+                if (notificationData?.Type != "payment" || notificationData?.Data?.Id == null)
                 {
-                    // fallback: consultar merchant_order si hace falta
-                    preferenceId = await _mp.TryResolvePreferenceIdFromPaymentAsync(paymentId);
+                    _logger.LogWarning("⚠️ Notificación ignorada - Tipo: {type}, DataId: {dataId}", 
+                        notificationData?.Type, notificationData?.Data?.Id);
+                    return Ok(); // Responder 200 para que MP no reintente
                 }
 
-                // 2) Confirmación idempotente
-                await _stockService.ConfirmarReservaAsync(preferenceId, paymentId);
+                var paymentId = notificationData.Data.Id;
+                _logger.LogInformation("💳 Procesando payment ID: {paymentId}", paymentId);
 
+                // Configurar MercadoPago API
+                var accessToken = GetAccessToken();
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    _logger.LogError("❌ AccessToken no configurado");
+                    return StatusCode(500);
+                }
+
+                MercadoPagoConfig.AccessToken = accessToken;
+                var paymentClient = new PaymentClient();
+
+                // Obtener información completa del pago desde MercadoPago
+                var payment = await paymentClient.GetAsync(long.Parse(paymentId));
+                
+                if (payment == null)
+                {
+                    _logger.LogWarning("⚠️ No se pudo obtener información del pago: {paymentId}", paymentId);
+                    return Ok();
+                }
+
+                _logger.LogInformation("📊 Pago obtenido - Status: {status}, ExternalRef: {externalRef}", 
+                    payment.Status, payment.ExternalReference);
+
+                // Buscar las reservas asociadas a este pago
+                // Usamos external_reference o preference_id para encontrar nuestras reservas
+                var preferenceId = payment.AdditionalInfo?.Items?.FirstOrDefault()?.Id ?? 
+                                 await BuscarPreferenceIdPorFecha(payment.DateCreated);
+
+                if (string.IsNullOrEmpty(preferenceId))
+                {
+                    _logger.LogWarning("⚠️ No se encontró PreferenceId para el pago: {paymentId}", paymentId);
+                    return Ok();
+                }
+
+                _logger.LogInformation("🎯 PreferenceId encontrado: {preferenceId}", preferenceId);
+
+                // Procesar según el estado del pago
+                await ProcesarCambioEstadoPago(payment.Status, preferenceId, paymentId);
+
+                _logger.LogInformation("✅ Webhook procesado exitosamente - PaymentId: {paymentId}", paymentId);
                 return Ok();
             }
-            catch(Exception ex){
-                _logger.LogError(ex,"Error en webhook mp");
-                return Ok();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ ERROR procesando webhook MercadoPago");
+                // Siempre devolver 200 para evitar reintentos infinitos de MP
+                return Ok(); 
             }
         }
-        */
+
+        // Método auxiliar para procesar el cambio de estado
+        private async Task ProcesarCambioEstadoPago(string? status, string preferenceId, string paymentId)
+        {
+            switch (status?.ToLower())
+            {
+                case "approved":
+                    _logger.LogInformation("✅ Pago APROBADO - Confirmando reservas...");
+                    
+                    var reservasConfirmadas = await _stockService.ConfirmarReservaAsync(preferenceId);
+                    if (reservasConfirmadas)
+                    {
+                        await CrearRegistroVentaAsync(preferenceId, paymentId);
+                        _logger.LogInformation("🎉 Stock descontado y venta registrada para PreferenceId: {preferenceId}", preferenceId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("⚠️ No se encontraron reservas pendientes para confirmar");
+                    }
+                    break;
+
+                case "rejected":
+                case "cancelled":
+                    _logger.LogInformation("❌ Pago {status} - Liberando reservas...", status?.ToUpper());
+                    await LiberarReservasPorPreferenceId(preferenceId, $"Pago {status}");
+                    break;
+
+                case "pending":
+                case "in_process":
+                case "in_mediation":
+                    _logger.LogInformation("⏳ Pago {status} - Manteniendo reservas activas", status?.ToUpper());
+                    // No hacer nada, las reservas se mantienen hasta que expiren o se confirme/rechace
+                    break;
+
+                default:
+                    _logger.LogWarning("❓ Estado de pago desconocido: {status}", status);
+                    break;
+            }
+        }
+
+        // Método auxiliar para buscar PreferenceId por fecha (fallback)
+        private async Task<string?> BuscarPreferenceIdPorFecha(DateTime? fechaPago)
+        {
+            if (!fechaPago.HasValue) return null;
+
+            var reserva = await _context.StockReserva
+                .Where(r => r.FechaCreacion >= fechaPago.Value.AddMinutes(-10) && 
+                           r.FechaCreacion <= fechaPago.Value.AddMinutes(10) &&
+                           r.Estado == "PENDIENTE")
+                .OrderBy(r => Math.Abs((r.FechaCreacion - fechaPago.Value).TotalMinutes))
+                .FirstOrDefaultAsync();
+
+            return reserva?.PreferenceId;
+        }
+
+        
         // Métodos auxiliares para el webhook
         private async Task<string?> ObtenerPreferenceIdPorExternalReference(string externalReference)
         {
@@ -1170,7 +1259,7 @@ public async Task<IActionResult> ListarReservasPendientes()
             var isDevelopment = _configuration.GetValue<bool>("Development") ||
                                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
                                
-            var ngrokUrl = _configuration.GetValue<string>("NGROK_BASE_URL");
+            var ngrokUrl = _configuration.GetValue<string>("ngrok:BaseUrl");
             var productionUrl = _configuration.GetValue<string>("PRODUCTION_BASE_URL");
             
             var baseUrl = isDevelopment 

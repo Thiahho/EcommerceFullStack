@@ -22,7 +22,7 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ onSuccess, onError }) => {
 
   // Inicializar MercadoPago SDK
   useEffect(() => {
-    initMercadoPago("APP_USR-577a322a-6a01-4928-92bd-dbed5e7ed551");
+    initMercadoPago("APP_USR-baf89209-c1ff-40d2-9acd-3833dd94c61e");
     setSdkLoaded(true);
   }, []);
 

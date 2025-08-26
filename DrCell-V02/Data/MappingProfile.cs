@@ -47,5 +47,20 @@ public class MappingProfile : Profile
         // ✅ MAPEO REVERSO: CategoriaDto -> Categoria
         CreateMap<CategoriaDto, Categorias>()
             .ForMember(dest => dest.Productos, opt => opt.Ignore());     // No mapear colección
+
+        // ✅ MAPEO: Venta -> VentaDto
+        CreateMap<Venta, VentaDto>();
+
+        // ✅ MAPEO REVERSO: VentaDto -> Venta
+        CreateMap<VentaDto, Venta>()
+            .ForMember(dest => dest.Items, opt => opt.Ignore());         // No mapear colección
+
+        // ✅ MAPEO: VentaItem -> VentaItemDto
+        CreateMap<VentaItem, VentaItemDto>();
+
+        // ✅ MAPEO REVERSO: VentaItemDto -> VentaItem
+        CreateMap<VentaItemDto, VentaItem>()
+            .ForMember(dest => dest.Venta, opt => opt.Ignore())          // No mapear navegación
+            .ForMember(dest => dest.Variante, opt => opt.Ignore());      // No mapear navegación
     }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Home,
   Clipboard,
@@ -8,15 +8,20 @@ import {
   Menu,
   X,
   LogOut,
-} from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+  Settings,
+  ShoppingCart,
+  Receipt,
+  Tags,
+} from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const links = [
-  { to: '/admin', label: 'Dashboard', icon: Home },
-  { to: '/admin/productos', label: 'Productos', icon: Package },
-  { to: '/admin/variantes', label: 'Variantes', icon: Package },
-  { to: '/admin/reparaciones', label: 'Reparaciones', icon: Package },
-  { to: '/admin/categorias', label: 'Categorias', icon: Package },
+  { to: "/admin", label: "Dashboard", icon: Home },
+  { to: "/admin/productos", label: "Productos", icon: Package },
+  { to: "/admin/variantes", label: "Variantes", icon: ShoppingCart },
+  { to: "/admin/reparaciones", label: "Reparaciones", icon: Settings },
+  { to: "/admin/categorias", label: "Categorias", icon: Tags },
+  { to: "/admin/ventas", label: "Ventas", icon: Receipt },
 ];
 
 interface SidebarAdminProps {
@@ -25,13 +30,17 @@ interface SidebarAdminProps {
   isMobile: boolean;
 }
 
-const SidebarAdmin: React.FC<SidebarAdminProps> = ({ open, setOpen, isMobile }) => {
-  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+const SidebarAdmin: React.FC<SidebarAdminProps> = ({
+  open,
+  setOpen,
+  isMobile,
+}) => {
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    window.location.href = '/login';
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
+    window.location.href = "/login";
   };
 
   const handleNavClick = () => {
@@ -54,28 +63,29 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({ open, setOpen, isMobile }) 
       <aside
         className={`
           fixed lg:relative z-50 h-full bg-white shadow-2xl flex flex-col transition-all duration-300 ease-in-out
-          ${isMobile
-            ? `top-0 left-0 transform ${open ? 'translate-x-0' : '-translate-x-full'} w-64`
-            : `w-64 my-6 ml-6 rounded-3xl`
+          ${
+            isMobile
+              ? `top-0 left-0 transform ${open ? "translate-x-0" : "-translate-x-full"} w-64`
+              : `w-64 my-6 ml-6 rounded-3xl`
           }
-          ${!isMobile && !open ? 'w-20' : ''}
+          ${!isMobile && !open ? "w-20" : ""}
         `}
       >
         {/* Header del sidebar */}
         <div className="flex items-center justify-between h-20 border-b px-4 flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <img
-              src={`https://ui-avatars.com/api/?name=${usuario.email || 'Admin'}`}
+              src={`https://ui-avatars.com/api/?name=${usuario.email || "Admin"}`}
               alt="Avatar"
               className="w-10 h-10 rounded-full flex-shrink-0"
             />
             {(open || !isMobile) && (
               <div className="min-w-0 flex-1">
                 <div className="font-bold text-gray-800 text-sm truncate">
-                  {usuario.rol || 'Admin'}
+                  {usuario.rol || "Admin"}
                 </div>
                 <div className="text-xs text-gray-500 truncate">
-                  {usuario.email || 'admin@demo.com'}
+                  {usuario.email || "admin@demo.com"}
                 </div>
               </div>
             )}
@@ -113,18 +123,16 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({ open, setOpen, isMobile }) 
               onClick={handleNavClick}
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 rounded-lg transition-colors font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 gap-3
-                ${open || isMobile ? 'justify-start' : 'justify-center'}
-                ${isActive ? 'bg-blue-100 text-blue-700' : ''}
-                ${!open && !isMobile ? 'px-2' : ''}
+                ${open || isMobile ? "justify-start" : "justify-center"}
+                ${isActive ? "bg-blue-100 text-blue-700" : ""}
+                ${!open && !isMobile ? "px-2" : ""}
                 `
               }
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: "none" }}
               title={!open && !isMobile ? label : undefined}
             >
               <Icon className="h-6 w-6 flex-shrink-0" />
-              {(open || isMobile) && (
-                <span className="truncate">{label}</span>
-              )}
+              {(open || isMobile) && <span className="truncate">{label}</span>}
             </NavLink>
           ))}
         </nav>
@@ -134,11 +142,11 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({ open, setOpen, isMobile }) 
           <button
             className={`
               flex items-center w-full px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 gap-3 font-medium transition-colors
-              ${open || isMobile ? 'justify-start' : 'justify-center'}
-              ${!open && !isMobile ? 'px-2' : ''}
+              ${open || isMobile ? "justify-start" : "justify-center"}
+              ${!open && !isMobile ? "px-2" : ""}
             `}
             onClick={handleLogout}
-            title={!open && !isMobile ? 'Logout' : undefined}
+            title={!open && !isMobile ? "Logout" : undefined}
           >
             <LogOut className="h-6 w-6 flex-shrink-0" />
             {(open || isMobile) && <span>Logout</span>}

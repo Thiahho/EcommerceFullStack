@@ -463,6 +463,7 @@ try
         c.DocumentFilter<SwaggerSecurityFilter>();
     });
 
+
     // 9. Configuración de Health Checks
     builder.Services.AddHealthChecks()
         .AddCheck("self", () => HealthCheckResult.Healthy("API is running"))
@@ -481,9 +482,14 @@ try
     builder.Services.AddScoped<IProductoService, ProductosService>();
     builder.Services.AddScoped<ICategoriaService, CategoriasService>();
     builder.Services.AddScoped<IStockService, StockService>();
+    builder.Services.AddScoped<IVentaService, VentaService>();
     builder.Services.AddHostedService<StockCleanupJob>();
     
     var app = builder.Build();
+
+
+    var ngrokurl= Environment.GetEnvironmentVariable("NGROK_BASE_URL")
+        ?? builder.Configuration["ngrok:BaseUrl"];
 
     // 11. Configuración de Swagger por entorno
     var enableSwagger = builder.Configuration.GetValue<bool>("Swagger:EnabledInProduction", false);
