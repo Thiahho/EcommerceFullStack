@@ -1,4 +1,4 @@
-import api from '../config/axios';
+/* import api from '../config/axios';
 
 export interface DashboardKpiDto {
   metricasGenerales: MetricasGeneralesDto;
@@ -360,4 +360,41 @@ class AnalyticsService {
   }
 }
 
-export const analyticsService = new AnalyticsService();
+export const analyticsService = new AnalyticsService(); */
+
+// src/services/analyticsService.ts
+import axios from "axios";
+
+const API_URL = "http:localhost:5000"; // ej: https://api.tu-dominio.com
+export type AnalyticsSummary = {
+  date: string; // ISO de la fecha
+  ordersCount: number;
+  totalAmount: number;
+  avgTicket: number;
+  byStatus: Record<string, number>;
+};
+
+export type RecentActivity = {
+  orderId: string;
+  createdAtLocal: string; // ISO local ya convertido por el back
+  customerName?: string | null;
+  status: string;
+  total: number;
+};
+
+export async function fetchDailySummary(dateISO?: string) {
+  const params = dateISO ? { date: dateISO } : {};
+  const { data } = await axios.get<AnalyticsSummary>(
+    `${API_URL}/admin/ventas/analytics/summary`,
+    { params, withCredentials: true }
+  );
+  return data;
+}
+
+export async function fetchRecentToday(limit = 20) {
+  const { data } = await axios.get<RecentActivity[]>(
+    `${API_URL}/admin/ventas/analytics/recent`,
+    { params: { limit }, withCredentials: true }
+  );
+  return data;
+}

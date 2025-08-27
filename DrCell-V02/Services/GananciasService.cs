@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DrCell_V02.Services
 {
-    public class GananciasService : IGananciasService
+    // TEMPORALMENTE COMENTADO - FALTA TABLA CostoProductos EN LA BASE DE DATOS
+    /*public class GananciasService : IGananciasService
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
@@ -39,16 +40,16 @@ namespace DrCell_V02.Services
 
             var ventaItems = await query.ToListAsync();
 
-            // Obtener costos actuales para cada variante
-            var varianteIds = ventaItems.Select(vi => vi.VarianteId).Distinct();
-            var costos = await _context.CostoProductos
-                .Where(cp => varianteIds.Contains(cp.VarianteId) && cp.EsVigente)
-                .GroupBy(cp => cp.VarianteId)
-                .Select(g => new { VarianteId = g.Key, Costo = g.OrderByDescending(c => c.FechaVigencia).First().CostoCompra })
-                .ToDictionaryAsync(x => x.VarianteId, x => x.Costo);
+            // Obtener costos actuales para cada variante - TEMPORALMENTE COMENTADO
+            // var varianteIds = ventaItems.Select(vi => vi.VarianteId).Distinct();
+            // var costos = await _context.CostoProductos
+            //     .Where(cp => varianteIds.Contains(cp.VarianteId) && cp.EsVigente)
+            //     .GroupBy(cp => cp.VarianteId)
+            //     .Select(g => new { VarianteId = g.Key, Costo = g.OrderByDescending(c => c.FechaVigencia).First().CostoCompra })
+            //     .ToDictionaryAsync(x => x.VarianteId, x => x.Costo);
 
             var totalVentas = ventaItems.Sum(vi => vi.Subtotal);
-            var totalCostos = ventaItems.Sum(vi => costos.GetValueOrDefault(vi.VarianteId, 0) * vi.Cantidad);
+            var totalCostos = 0m; // Temporalmente en 0 - falta tabla CostoProductos
             var gananciaBruta = totalVentas - totalCostos;
             var productosVendidos = ventaItems.Sum(vi => vi.Cantidad);
 
@@ -534,5 +535,85 @@ namespace DrCell_V02.Services
 
             return escenarios;
         }
-    }
+    }*/
+
+    // Implementación temporal simplificada sin CostoProductos - COMENTADA COMPLETAMENTE
+    /*public class GananciasService : IGananciasService
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+
+        public GananciasService(ApplicationDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task<GananciasGeneralesDto> CalcularGananciasGeneralesAsync(FiltroGananciasDto filtro)
+        {
+            return new GananciasGeneralesDto
+            {
+                GananciaBruta = 0,
+                GananciaNeta = 0,
+                MargenGanancia = 0,
+                ProductosVendidos = 0,
+                VentasConGanancia = 0,
+                VentasConPerdida = 0,
+                VentasSinGanancia = 0,
+                Productos = new List<ProductoGananciasDto>()
+            };
+        }
+
+        public async Task<List<ProductoGananciasDto>> AnalisisGananciasProductosAsync(FiltroGananciasDto filtro)
+        {
+            return new List<ProductoGananciasDto>();
+        }
+
+        public async Task<List<TendenciaGananciasDto>> TendenciasGananciasAsync(int diasAnalisis = 30)
+        {
+            return new List<TendenciaGananciasDto>();
+        }
+
+        public async Task<OptimizacionPreciosDto> OptimizacionPreciosAsync(int varianteId)
+        {
+            return new OptimizacionPreciosDto
+            {
+                PrecioActual = 0,
+                PrecioOptimoSugerido = 0,
+                ImpactoEnGanancias = 0,
+                Escenarios = new List<EscenarioPrecioDto>()
+            };
+        }
+
+        public async Task<List<AlertaGananciasDto>> AlertasGananciasAsync()
+        {
+            return new List<AlertaGananciasDto>();
+        }
+
+        public async Task<EstadisticasCostosDto> EstadisticasCostosAsync(DateTime fechaInicio, DateTime fechaFin)
+        {
+            return new EstadisticasCostosDto
+            {
+                CostoTotalPeriodo = 0,
+                CostoPromedioPorProducto = 0,
+                VariacionCostos = 0,
+                ProductosMayorCosto = new List<ProductoCostoDto>()
+            };
+        }
+
+        public async Task<bool> ActualizarCostoAsync(ActualizarCostoDto dto)
+        {
+            return true; // No hace nada por ahora
+        }
+
+        public async Task<List<ProductoRentabilidadDto>> ProductosMasRentablesAsync(int cantidad = 10)
+        {
+            return new List<ProductoRentabilidadDto>();
+        }
+
+        public async Task<bool> ImportarCostosAsync(List<ImportarCostoDto> costos)
+        {
+            return true; // No hace nada por ahora
+        }
+    }*/
 }

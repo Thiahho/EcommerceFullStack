@@ -137,6 +137,9 @@ namespace DrCell_V02.Data.Dtos
         public int VarianteId { get; set; }
         public string ProductoNombre { get; set; } = string.Empty;
         public int StockActual { get; set; }
+        public int DiasSinVentas { get; set; }
+        public int CantidadVendida { get; set; }
+        public int VelocidadRotacion { get; set; }
         public decimal RotacionAnual { get; set; }
         public int DiasPromedioPermanencia { get; set; }
         public decimal ValorInventario { get; set; }
@@ -173,6 +176,12 @@ namespace DrCell_V02.Data.Dtos
         public string MesMasVentas { get; set; } = string.Empty;
         public string DiaMasVentas { get; set; } = string.Empty;
         public string HoraMasVentas { get; set; } = string.Empty;
+        public int MesesAnalizados { get; set; }
+        public decimal PromedioVentasMensual { get; set; }
+        public List<PatronEstacionalDto> PatronesEstacionales { get; set; } = new();
+        public string MesMayorVenta { get; set; } = string.Empty;
+        public string MesMenorVenta { get; set; } = string.Empty;
+        public decimal VariacionEstacional { get; set; }
     }
 
     public class EstacionalidadMesDto
@@ -181,6 +190,15 @@ namespace DrCell_V02.Data.Dtos
         public string NombreMes { get; set; } = string.Empty;
         public decimal VentasPromedio { get; set; }
         public decimal IndiceEstacionalidad { get; set; }
+    }
+
+    public class PatronEstacionalDto
+    {
+        public int Mes { get; set; }
+        public string NombreMes { get; set; } = string.Empty;
+        public decimal Ventas { get; set; }
+        public decimal IndiceEstacionalidad { get; set; }
+        public int NumeroTransacciones { get; set; }
     }
 
     public class EstacionalidadDiaDto

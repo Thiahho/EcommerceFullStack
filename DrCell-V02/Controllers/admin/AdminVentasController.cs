@@ -27,15 +27,15 @@ namespace DrCell_V02.Controllers.admin
         private readonly IConfiguration _configuration;
         private readonly ILogger<AdminVentasController> _logger;
         private readonly IVentaService _ventaService;
-        private readonly IGananciasService _gananciasService;
+        // private readonly IGananciasService _gananciasService; // TEMPORALMENTE COMENTADO
         private readonly IAnalyticsService _analyticsService;
-        public AdminVentasController(ApplicationDbContext context, IConfiguration configuration, ILogger<AdminVentasController> logger, IVentaService ventaService, IGananciasService gananciasService, IAnalyticsService analyticsService)
+        public AdminVentasController(ApplicationDbContext context, IConfiguration configuration, ILogger<AdminVentasController> logger, IVentaService ventaService, /*IGananciasService gananciasService,*/ IAnalyticsService analyticsService)
         {
             _context = context;
             _configuration = configuration;
             _logger = logger;
             _ventaService = ventaService;
-            _gananciasService = gananciasService;
+            // _gananciasService = gananciasService; // TEMPORALMENTE COMENTADO
             _analyticsService = analyticsService;
         }
 
@@ -232,7 +232,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var reporte = await _gananciasService.GenerarReporteGananciasAsync(filtro);
+                // var reporte = await _gananciasService.GenerarReporteGananciasAsync(filtro); // TEMPORALMENTE COMENTADO
+                var reporte = new { mensaje = "Funcionalidad temporalmente deshabilitada - falta tabla CostoProductos" };
                 return Ok(reporte);
             }
             catch (Exception ex)
@@ -250,7 +251,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var productos = await _gananciasService.GetProductosMasRentablesAsync(cantidad, filtro);
+                // var productos = await _gananciasService.GetProductosMasRentablesAsync(cantidad, filtro); // TEMPORALMENTE COMENTADO
+                var productos = new List<object>();
                 return Ok(productos);
             }
             catch (Exception ex)
@@ -268,7 +270,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var productos = await _gananciasService.GetProductosMenosRentablesAsync(cantidad, filtro);
+                // var productos = await _gananciasService.GetProductosMenosRentablesAsync(cantidad, filtro); // TEMPORALMENTE COMENTADO
+                var productos = new List<object>();
                 return Ok(productos);
             }
             catch (Exception ex)
@@ -285,7 +288,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var rentabilidad = await _gananciasService.GetRentabilidadPorCategoriaAsync(filtro);
+                // var rentabilidad = await _gananciasService.GetRentabilidadPorCategoriaAsync(filtro); // TEMPORALMENTE COMENTADO
+                var rentabilidad = new List<object>();
                 return Ok(rentabilidad);
             }
             catch (Exception ex)
@@ -302,7 +306,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var comparativa = await _gananciasService.GetComparativaGananciasAsync(periodo);
+                // var comparativa = await _gananciasService.GetComparativaGananciasAsync(periodo); // TEMPORALMENTE COMENTADO
+                var comparativa = new { mensaje = "Funcionalidad temporalmente deshabilitada" };
                 return Ok(comparativa);
             }
             catch (Exception ex)
@@ -319,7 +324,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var alertas = await _gananciasService.GetAlertasRentabilidadAsync(margenMinimo);
+                // var alertas = await _gananciasService.GetAlertasRentabilidadAsync(margenMinimo); // TEMPORALMENTE COMENTADO
+                var alertas = new List<object>();
                 return Ok(alertas);
             }
             catch (Exception ex)
@@ -335,7 +341,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var analisis = await _gananciasService.AnalisisMargenProductoAsync(varianteId);
+                // var analisis = await _gananciasService.AnalisisMargenProductoAsync(varianteId); // TEMPORALMENTE COMENTADO
+                var analisis = new { mensaje = "Funcionalidad temporalmente deshabilitada" };
                 return Ok(analisis);
             }
             catch (ArgumentException ex)
@@ -358,7 +365,7 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                await _gananciasService.ActualizarCostosProductoAsync(varianteId, request.NuevoCosto, request.Usuario);
+                // await _gananciasService.ActualizarCostosProductoAsync(varianteId, request.NuevoCosto, request.Usuario); // TEMPORALMENTE COMENTADO
                 _logger.LogInformation($"Costo actualizado para variante {varianteId} por {request.Usuario}");
                 return Ok(new { mensaje = "Costo actualizado correctamente" });
             }
@@ -375,7 +382,8 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                var resultado = await _gananciasService.RecalcularMargenesVentasAsync(fechaInicio);
+                // var resultado = await _gananciasService.RecalcularMargenesVentasAsync(fechaInicio); // TEMPORALMENTE COMENTADO
+                var resultado = true;
                 _logger.LogInformation($"Márgenes recalculados desde {fechaInicio ?? DateTime.UtcNow.AddMonths(-1)}");
                 return Ok(new { mensaje = "Márgenes recalculados correctamente", exito = resultado });
             }
@@ -661,7 +669,7 @@ namespace DrCell_V02.Controllers.admin
                 // Ventas de hoy (si no hay, mostrar datos del último mes para demo)
                 var ventasHoy = await _context.Ventas
                     .Where(v => v.FechaVenta.Date == hoy)
-                    .SumAsync(v => v.Total);
+                    .SumAsync(v => v.MontoTotal);
 
                 // Si no hay ventas hoy, tomar un ejemplo del último mes
                 if (ventasHoy == 0)
@@ -670,18 +678,18 @@ namespace DrCell_V02.Controllers.admin
                     ventasHoy = await _context.Ventas
                         .Where(v => v.FechaVenta >= ultimoMes)
                         .Take(3)
-                        .SumAsync(v => v.Total);
+                        .SumAsync(v => v.MontoTotal);
                 }
 
                 var ventasAyer = await _context.Ventas
                     .Where(v => v.FechaVenta.Date == ayer)
-                    .SumAsync(v => v.Total);
+                    .SumAsync(v => v.MontoTotal);
 
                 // Total de ventas del mes actual
                 var inicioMes = new DateTime(hoy.Year, hoy.Month, 1);
                 var ventasMes = await _context.Ventas
                     .Where(v => v.FechaVenta >= inicioMes)
-                    .SumAsync(v => v.Total);
+                    .SumAsync(v => v.MontoTotal);
 
                 // Total de productos vendidos hoy (cantidad)
                 var productosVendidosHoy = await _context.VentaItems
@@ -705,19 +713,19 @@ namespace DrCell_V02.Controllers.admin
                     .Where(u => u.Rol != "ADMIN")
                     .CountAsync();
 
-                var clientesHoy = await _context.Usuarios
+                /*var clientesHoy = await _context.Usuarios
                     .Where(u => u.FechaRegistro.Date == hoy)
                     .CountAsync();
-
+                */
                 // Productos activos
-                var productosActivos = await _context.VariantesProductos
+                var productosActivos = await _context.ProductosVariantes
                     .Where(v => v.Stock > 0)
                     .CountAsync();
 
-                var productosTotales = await _context.VariantesProductos.CountAsync();
+                var productosTotales = await _context.ProductosVariantes.CountAsync();
 
                 // Alertas activas (productos con stock bajo)
-                var alertasActivas = await _context.VariantesProductos
+                var alertasActivas = await _context.ProductosVariantes
                     .Where(v => v.Stock <= 5)
                     .CountAsync();
 
@@ -773,14 +781,14 @@ namespace DrCell_V02.Controllers.admin
                         Titulo = "Nueva venta registrada",
                         Descripcion = GetTiempoTranscurrido(v.FechaVenta),
                         Fecha = v.FechaVenta,
-                        Valor = v.Total
+                        Valor = v.MontoTotal
                     })
                     .ToListAsync();
 
                 actividades.AddRange(ultimasVentas);
 
                 // Últimos 2 clientes registrados
-                var ultimosClientes = await _context.Usuarios
+                /*var ultimosClientes = await _context.Usuarios
                     .Where(u => u.Rol != "ADMIN")
                     .OrderByDescending(u => u.FechaRegistro)
                     .Take(2)
@@ -795,9 +803,9 @@ namespace DrCell_V02.Controllers.admin
                     .ToListAsync();
 
                 actividades.AddRange(ultimosClientes);
-
+                */
                 // Productos con stock bajo
-                var productosStockBajo = await _context.VariantesProductos
+                var productosStockBajo = await _context.ProductosVariantes
                     .Include(v => v.Producto)
                     .Where(v => v.Stock <= 5 && v.Stock > 0)
                     .OrderBy(v => v.Stock)
@@ -807,7 +815,7 @@ namespace DrCell_V02.Controllers.admin
                         Id = v.Id.ToString(),
                         Tipo = "alerta",
                         Titulo = "Stock bajo detectado",
-                        Descripcion = $"{v.Producto.Nombre} - {v.Stock} unidades",
+                        Descripcion = $"{v.Producto.Modelo} - {v.Stock} unidades",
                         Fecha = DateTime.UtcNow.AddHours(-1), // Simular detección hace 1 hora
                         Accion = "Ver"
                     })

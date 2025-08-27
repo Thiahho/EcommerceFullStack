@@ -113,7 +113,8 @@ namespace DrCell_V02.Data.Dtos
         MargenBajo,
         SinGanancia,
         CostoAlto,
-        ProductoNoRentable
+        ProductoNoRentable,
+        VentasBajas
     }
 
     public enum OrdenamientoGanancias

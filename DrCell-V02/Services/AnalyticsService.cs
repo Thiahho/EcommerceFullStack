@@ -23,8 +23,8 @@ namespace DrCell_V02.Services
         {
             var metricas = await GetMetricasGeneralesAsync();
             var kpis = await CalcularKpisPrincipalesAsync();
-            var tendencias = await AnaliarTendenciasAsync(30);
-            var alertas = await GenerarAlertasInteligenitesAsync();
+            var tendencias = await AnalizarTendenciasAsync(30);
+            var alertas = await GenerarAlertasInteligentesAsync();
 
             return new DashboardKpiDto
             {
@@ -228,7 +228,7 @@ namespace DrCell_V02.Services
             return kpis;
         }
 
-        public async Task<List<TendenciaDto>> AnaliarTendenciasAsync(int diasAnalisis = 30)
+        public async Task<List<TendenciaDto>> AnalizarTendenciasAsync(int diasAnalisis = 30)
         {
             var fechaInicio = DateTime.Today.AddDays(-diasAnalisis);
             var tendencias = new List<TendenciaDto>();
@@ -410,7 +410,7 @@ namespace DrCell_V02.Services
             return escenarios;
         }
 
-        public async Task<List<AlertaDto>> GenerarAlertasInteligenitesAsync()
+        public async Task<List<AlertaDto>> GenerarAlertasInteligentesAsync()
         {
             var alertas = new List<AlertaDto>();
 
@@ -572,7 +572,7 @@ namespace DrCell_V02.Services
                     Cantidad = clientesVip.Count,
                     PorcentajeTotal = totalClientes > 0 ? (decimal)clientesVip.Count / totalClientes * 100 : 0,
                     TicketPromedio = clientesVip.Average(c => c.TicketPromedio),
-                    FrecuenciaCompra = clientesVip.Average(c => c.NumeroCompras),
+                    FrecuenciaCompra = (decimal)clientesVip.Average(c => c.NumeroCompras),
                     Caracteristicas = "Clientes de alto valor con compras frecuentes"
                 });
             }
@@ -585,7 +585,7 @@ namespace DrCell_V02.Services
                     Cantidad = clientesRegulares.Count,
                     PorcentajeTotal = totalClientes > 0 ? (decimal)clientesRegulares.Count / totalClientes * 100 : 0,
                     TicketPromedio = clientesRegulares.Average(c => c.TicketPromedio),
-                    FrecuenciaCompra = clientesRegulares.Average(c => c.NumeroCompras),
+                    FrecuenciaCompra = (decimal)clientesRegulares.Average(c => c.NumeroCompras),
                     Caracteristicas = "Clientes con compras moderadas y cierta lealtad"
                 });
             }
@@ -679,7 +679,245 @@ namespace DrCell_V02.Services
             };
         }
 
+        public async Task<List<ProductoRotacionDto>> ProductosLentaRotacionAsync(int cantidad = 10)
+        {
+            // Obtener productos con poca rotación en los últimos 90 días
+            var fechaLimite = DateTime.Today.AddDays(-90);
+            
+            var productosRotacion = await _context.ProductosVariantes
+                .Include(pv => pv.Producto)
+                .Where(pv => pv.Activa && pv.Stock > 0)
+                .Select(pv => new 
+                {
+                    pv.Id,
+                    Nombre = $"{pv.Producto.Marca} {pv.Producto.Modelo}",
+                    pv.Stock,
+                    pv.Precio,
+                    VentasRecientes = _context.VentaItems
+                        .Where(vi => vi.VarianteId == pv.Id && vi.Venta.FechaVenta >= fechaLimite && vi.Venta.Estado == "APPROVED")
+                        .Sum(vi => vi.Cantidad)
+                })
+                .ToListAsync();
+
+            return productosRotacion
+                .Where(p => p.VentasRecientes < 5) // Menos de 5 vendidos en 90 días
+                .OrderBy(p => p.VentasRecientes)
+                .ThenByDescending(p => p.Stock)
+                .Take(cantidad)
+                .Select(p => new ProductoRotacionDto
+                {
+                    VarianteId = p.Id,
+                    ProductoNombre = p.Nombre,
+                    StockActual = p.Stock,
+                    CantidadVendida = p.VentasRecientes,
+                    DiasSinVentas = (DateTime.Today - fechaLimite).Days,
+                    ValorInventario = p.Stock * p.Precio,
+                    VelocidadRotacion = (int)(p.VentasRecientes / 90m * 30), // Proyección mensual
+                    RotacionAnual = p.VentasRecientes / 90m * 365,
+                    DiasPromedioPermanencia = p.VentasRecientes > 0 ? (int)(90 / p.VentasRecientes * 30) : 999,
+                    Recomendacion = p.VentasRecientes < 2 ? "Considerar liquidación" : "Revisar estrategia de marketing"
+                })
+                .ToList();
+        }
+
+        public async Task<List<AlertaInventarioDto>> AlertasInventarioAsync()
+        {
+            var alertas = new List<AlertaInventarioDto>();
+            
+            // Stock bajo
+            var productosStockBajo = await _context.ProductosVariantes
+                .Include(pv => pv.Producto)
+                .Where(pv => pv.Activa && pv.Stock <= 5 && pv.Stock > 0)
+                .Take(20)
+                .ToListAsync();
+
+            foreach (var producto in productosStockBajo)
+            {
+                alertas.Add(new AlertaInventarioDto
+                {
+                    VarianteId = producto.Id,
+                    ProductoNombre = $"{producto.Producto.Marca} {producto.Producto.Modelo}",
+                    StockActual = producto.Stock,
+                    StockMinimo = 5,
+                    Tipo = TipoAlertaInventario.StockBajo,
+                    Mensaje = $"Quedan {producto.Stock} unidades",
+                    DiasStock = producto.Stock <= 2 ? 1 : 3
+                });
+            }
+
+            // Sin stock
+            var productosSinStock = await _context.ProductosVariantes
+                .Include(pv => pv.Producto)
+                .Where(pv => pv.Activa && pv.Stock == 0)
+                .Take(10)
+                .ToListAsync();
+
+            foreach (var producto in productosSinStock)
+            {
+                alertas.Add(new AlertaInventarioDto
+                {
+                    VarianteId = producto.Id,
+                    ProductoNombre = $"{producto.Producto.Marca} {producto.Producto.Modelo}",
+                    StockActual = 0,
+                    StockMinimo = 1,
+                    Tipo = TipoAlertaInventario.SinStock,
+                    Mensaje = "Producto agotado",
+                    DiasStock = 0
+                });
+            }
+
+            return alertas;
+        }
+
+        public async Task<List<MetricasTemporalesDto>> AnalisisTemporalAsync(DateTime fechaInicio, DateTime fechaFin, string agrupacion = "dia")
+        {
+            var ventas = await _context.Ventas
+                .Where(v => v.FechaVenta >= fechaInicio && v.FechaVenta <= fechaFin && v.Estado == "APPROVED")
+                .ToListAsync();
+
+            var metricas = new List<MetricasTemporalesDto>();
+
+            switch (agrupacion.ToLower())
+            {
+                case "dia":
+                    metricas = ventas
+                        .GroupBy(v => v.FechaVenta.Date)
+                        .Select(g => new MetricasTemporalesDto
+                        {
+                            Fecha = g.Key,
+                            Ventas = g.Sum(v => v.MontoTotal),
+                            Ganancias = g.Sum(v => v.Margen ?? 0),
+                            Transacciones = g.Count(),
+                            TicketPromedio = g.Average(v => v.MontoTotal),
+                            MargenPromedio = g.Sum(v => v.MontoTotal) > 0 ? g.Sum(v => v.Margen ?? 0) / g.Sum(v => v.MontoTotal) * 100 : 0
+                        })
+                        .OrderBy(m => m.Fecha)
+                        .ToList();
+                    break;
+
+                case "semana":
+                    metricas = ventas
+                        .GroupBy(v => GetWeekOfYear(v.FechaVenta))
+                        .Select(g => new MetricasTemporalesDto
+                        {
+                            Fecha = g.Min(v => v.FechaVenta.Date),
+                            Ventas = g.Sum(v => v.MontoTotal),
+                            Ganancias = g.Sum(v => v.Margen ?? 0),
+                            Transacciones = g.Count(),
+                            TicketPromedio = g.Average(v => v.MontoTotal),
+                            MargenPromedio = g.Sum(v => v.MontoTotal) > 0 ? g.Sum(v => v.Margen ?? 0) / g.Sum(v => v.MontoTotal) * 100 : 0
+                        })
+                        .OrderBy(m => m.Fecha)
+                        .ToList();
+                    break;
+
+                case "mes":
+                    metricas = ventas
+                        .GroupBy(v => new { v.FechaVenta.Year, v.FechaVenta.Month })
+                        .Select(g => new MetricasTemporalesDto
+                        {
+                            Fecha = new DateTime(g.Key.Year, g.Key.Month, 1),
+                            Ventas = g.Sum(v => v.MontoTotal),
+                            Ganancias = g.Sum(v => v.Margen ?? 0),
+                            Transacciones = g.Count(),
+                            TicketPromedio = g.Average(v => v.MontoTotal),
+                            MargenPromedio = g.Sum(v => v.MontoTotal) > 0 ? g.Sum(v => v.Margen ?? 0) / g.Sum(v => v.MontoTotal) * 100 : 0
+                        })
+                        .OrderBy(m => m.Fecha)
+                        .ToList();
+                    break;
+            }
+
+            return metricas;
+        }
+
+        public async Task<AnalisisEstacionalidadDto> AnalisisEstacionalidadAsync(int mesesAnalisis = 12)
+        {
+            var fechaInicio = DateTime.Today.AddMonths(-mesesAnalisis);
+            
+            var ventasPorMes = await _context.Ventas
+                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APPROVED")
+                .GroupBy(v => v.FechaVenta.Month)
+                .Select(g => new 
+                {
+                    Mes = g.Key,
+                    Ventas = g.Sum(v => v.MontoTotal),
+                    Transacciones = g.Count()
+                })
+                .ToListAsync();
+
+            var promedioVentas = ventasPorMes.Count > 0 ? ventasPorMes.Average(v => v.Ventas) : 0;
+            
+            var patronesEstacionales = ventasPorMes
+                .Select(v => new PatronEstacionalDto
+                {
+                    Mes = v.Mes,
+                    NombreMes = new DateTime(2024, v.Mes, 1).ToString("MMMM", new CultureInfo("es-ES")),
+                    Ventas = v.Ventas,
+                    IndiceEstacionalidad = promedioVentas > 0 ? v.Ventas / promedioVentas : 0,
+                    NumeroTransacciones = v.Transacciones
+                })
+                .OrderBy(p => p.Mes)
+                .ToList();
+
+            return new AnalisisEstacionalidadDto
+            {
+                MesesAnalizados = mesesAnalisis,
+                PromedioVentasMensual = promedioVentas,
+                PatronesEstacionales = patronesEstacionales,
+                MesMayorVenta = patronesEstacionales.OrderByDescending(p => p.Ventas).FirstOrDefault()?.NombreMes ?? "N/A",
+                MesMenorVenta = patronesEstacionales.OrderBy(p => p.Ventas).FirstOrDefault()?.NombreMes ?? "N/A",
+                VariacionEstacional = patronesEstacionales.Count > 0 ? 
+                    patronesEstacionales.Max(p => p.Ventas) - patronesEstacionales.Min(p => p.Ventas) : 0
+            };
+        }
+
+        public async Task<List<AlertaDto>> AlertasTendenciasNegativasAsync()
+        {
+            var alertas = new List<AlertaDto>();
+            var fechaLimite = DateTime.Today.AddDays(-14);
+            
+            // Analizar tendencia de ventas últimas 2 semanas
+            var ventasUltimos14Dias = await _context.Ventas
+                .Where(v => v.FechaVenta >= fechaLimite && v.Estado == "APPROVED")
+                .GroupBy(v => v.FechaVenta.Date)
+                .Select(g => g.Sum(v => v.MontoTotal))
+                .ToListAsync();
+
+            if (ventasUltimos14Dias.Count >= 7)
+            {
+                var primera = ventasUltimos14Dias.Take(7).Average();
+                var segunda = ventasUltimos14Dias.Skip(7).Average();
+                var tendencia = primera > 0 ? ((segunda - primera) / primera) * 100 : 0;
+
+                if (tendencia < -15)
+                {
+                    alertas.Add(new AlertaDto
+                    {
+                        Titulo = "Tendencia Negativa en Ventas",
+                        Mensaje = $"Las ventas han disminuido {Math.Abs(tendencia):F1}% en la última semana",
+                        Tipo = TipoAlertaEnum.VentasBajas,
+                        Nivel = NivelAlertaEnum.Advertencia,
+                        Accion = "Implementar estrategias de marketing o promociones",
+                        Datos = new Dictionary<string, object>
+                        {
+                            { "tendenciaPorcentual", tendencia },
+                            { "ventasSemanaPasada", primera },
+                            { "ventasSemanaActual", segunda }
+                        }
+                    });
+                }
+            }
+
+            return alertas;
+        }
+
         // Métodos auxiliares privados
+        private int GetWeekOfYear(DateTime date)
+        {
+            var culture = CultureInfo.CurrentCulture;
+            return culture.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        }
         private decimal CalcularCrecimiento(decimal valorAnterior, decimal valorActual)
         {
             if (valorAnterior == 0) return valorActual > 0 ? 100 : 0;
@@ -692,8 +930,7 @@ namespace DrCell_V02.Services
             {
                 > 5 => TipoTendenciaKpi.Subiendo,
                 < -5 => TipoTendenciaKpi.Bajando,
-                >= -5 and <= 5 => TipoTendenciaKpi.Estable,
-                _ => TipoTendenciaKpi.Volatil
+                _ => TipoTendenciaKpi.Estable
             };
         }
 
@@ -739,11 +976,5 @@ namespace DrCell_V02.Services
             };
         }
 
-        // Implementaciones stub para los métodos restantes
-        public Task<List<ProductoRotacionDto>> ProductosLentaRotacionAsync(int cantidad = 10) => Task.FromResult(new List<ProductoRotacionDto>());
-        public Task<List<AlertaInventarioDto>> AlertasInventarioAsync() => Task.FromResult(new List<AlertaInventarioDto>());
-        public Task<List<MetricasTemporalesDto>> AnalisisTemporalAsync(DateTime fechaInicio, DateTime fechaFin, string agrupacion = "dia") => Task.FromResult(new List<MetricasTemporalesDto>());
-        public Task<AnalisisEstacionalidadDto> AnalisisEstacionalidadAsync(int mesesAnalisis = 12) => Task.FromResult(new AnalisisEstacionalidadDto());
-        public Task<List<AlertaDto>> AlertasTendenciasNegativasAsync() => Task.FromResult(new List<AlertaDto>());
     }
 }
