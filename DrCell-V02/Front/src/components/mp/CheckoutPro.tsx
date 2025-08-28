@@ -29,13 +29,18 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ onSuccess, onError }) => {
   // Detectar parámetros de retorno de MercadoPago en la URL
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const status = urlParams.get('collection_status') || urlParams.get('status');
-    const paymentId = urlParams.get('collection_id') || urlParams.get('payment_id');
-    
-    if (status === 'approved' && paymentId) {
-      console.log("🎉 Pago exitoso detectado desde URL params:", { status, paymentId });
+    const status =
+      urlParams.get("collection_status") || urlParams.get("status");
+    const paymentId =
+      urlParams.get("collection_id") || urlParams.get("payment_id");
+
+    if (status === "approved" && paymentId) {
+      console.log("🎉 Pago exitoso detectado desde URL params:", {
+        status,
+        paymentId,
+      });
       handlePaymentSuccess();
-      
+
       // Limpiar URL parameters
       const newUrl = window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
@@ -70,22 +75,26 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ onSuccess, onError }) => {
 
       // Solo crear si no hay una preferencia existente y no se está cargando
       if (preferenceId || loading || hasCreatedPreference) {
-        console.log("⚠️ Ya existe preferencia o se está procesando, ignorando:", { 
-          preferenceId: !!preferenceId, 
-          loading, 
-          hasCreatedPreference 
-        });
+        console.log(
+          "⚠️ Ya existe preferencia o se está procesando, ignorando:",
+          {
+            preferenceId: !!preferenceId,
+            loading,
+            hasCreatedPreference,
+          }
+        );
         return;
       }
 
       const checkoutItems = convertCartToCheckoutItems();
-      
+
       try {
         setLoading(true);
         setHasCreatedPreference(true);
         console.log("🔧 Creando preferencia con items:", checkoutItems);
 
-        const preference = await checkoutProService.createPreference(checkoutItems);
+        const preference =
+          await checkoutProService.createPreference(checkoutItems);
         setPreferenceId(preference.preferenceId);
 
         console.log("✅ Preferencia creada:", preference.preferenceId);

@@ -8,7 +8,7 @@ import {
 import { z } from "zod";
 export type VentasQuery = {
   q?: string;
-  estado?: "APROBADO" | "PENDIENTE" | "RECHAZADO" | "all";
+  estado?: "APPROVED" | "PENDIENTE" | "RECHAZADO" | "all";
   page?: number;
   pageSize?: number;
 };

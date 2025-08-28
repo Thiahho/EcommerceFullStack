@@ -26,11 +26,12 @@ namespace DrCell_V02.Data
         public DbSet<vCelularM> vCelularM => Set<vCelularM>();
         public DbSet<vCelularB> vCelularB => Set<vCelularB>();
         public DbSet<vCelularP> vCelularP => Set<vCelularP>();
+        public DbSet<VwVentaProducto> VwVentaProducto => Set<VwVentaProducto>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             modelBuilder.Entity<Usuario>()
                 .ToTable("usuarios")
                 .HasKey(x => x.Id);
@@ -58,7 +59,7 @@ namespace DrCell_V02.Data
                 entity.ToTable("categorias");
                 entity.Property(e => e.Nombre).HasMaxLength(100).IsRequired();
                 entity.Property(e => e.Activa).HasDefaultValue(true);
-                
+
                 // Índices3
                 entity.HasIndex(e => e.Nombre).IsUnique();
                 entity.HasIndex(e => e.Activa);
@@ -74,19 +75,19 @@ namespace DrCell_V02.Data
                 entity.Property(e => e.CategoriaId).IsRequired(); // ✅ IMPORTANTE: FK requerida
                 entity.Property(e => e.Img).HasMaxLength(255);
                 entity.Property(e => e.Activo).HasDefaultValue(true);
-                
+
                 // ✅ RELACIÓN CON CATEGORIAS
                 entity.HasOne(e => e.Categoria)
                     .WithMany(c => c.Productos)
                     .HasForeignKey(e => e.CategoriaId)
                     .OnDelete(DeleteBehavior.Restrict); // No permitir eliminar categoría si tiene productos
-                
+
                 // ✅ RELACIÓN CON VARIANTES (ya la tenías, pero la mejoro)
                 entity.HasMany(e => e.Variantes)
                     .WithOne(v => v.Producto)
                     .HasForeignKey(v => v.ProductoId)
                     .OnDelete(DeleteBehavior.Cascade);
-                
+
                 // Índices
                 entity.HasIndex(e => e.CategoriaId);
                 entity.HasIndex(e => new { e.Marca, e.Modelo });
@@ -95,7 +96,7 @@ namespace DrCell_V02.Data
 
             // ✅ CONFIGURACIÓN COMPLETA DE PRODUCTOS VARIANTES
             modelBuilder.Entity<ProductosVariantes>(entity =>
-            {   
+            {
                 entity.HasKey(e => e.Id);
                 entity.ToTable("productos_variantes");
                 entity.Property(e => e.Precio).HasPrecision(18, 2).IsRequired();
@@ -105,13 +106,13 @@ namespace DrCell_V02.Data
                 entity.Property(e => e.Stock).HasDefaultValue(0);
                 entity.Property(e => e.StockReservado).HasDefaultValue(0);
                 entity.Property(e => e.Activa).HasDefaultValue(true);
-                
+
                 // Relación con Productos (ya configurada arriba, pero por claridad)
                 entity.HasOne(e => e.Producto)
                     .WithMany(p => p.Variantes)
                     .HasForeignKey(e => e.ProductoId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 // Índices
                 entity.HasIndex(e => e.ProductoId);
                 entity.HasIndex(e => e.Activa);
@@ -132,7 +133,7 @@ namespace DrCell_V02.Data
                     .WithMany(v => v.Reservas)
                     .HasForeignKey(e => e.VarianteId)
                     .OnDelete(DeleteBehavior.Restrict);
-                                        
+
                 // Índices para optimizar consultas
                 entity.HasIndex(e => e.SessionId);
                 entity.HasIndex(e => e.PreferenceId);
@@ -149,13 +150,13 @@ namespace DrCell_V02.Data
                 entity.Property(e => e.PaymentId).HasMaxLength(255).IsRequired();
                 entity.Property(e => e.Estado).HasMaxLength(20).IsRequired();
                 entity.Property(e => e.MontoTotal).HasPrecision(18, 2);
-                
+
                 // Relación con VentaItem
                 entity.HasMany(e => e.Items)
                     .WithOne(i => i.Venta)
                     .HasForeignKey(i => i.VentaId)
                     .OnDelete(DeleteBehavior.Cascade);
-                    
+
                 // Índices
                 entity.HasIndex(e => e.PreferenceId);
                 entity.HasIndex(e => e.PaymentId);
@@ -169,14 +170,14 @@ namespace DrCell_V02.Data
                 entity.ToTable("venta_item");
                 entity.Property(e => e.PrecioUnitario).HasPrecision(18, 2);
                 entity.Property(e => e.Subtotal).HasPrecision(18, 2);
-                
+
                 // Relación con ProductosVariantes
                 entity.HasOne(e => e.Variante)
                     .WithMany(v => v.VentaItems)
                     .HasForeignKey(e => e.VarianteId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
-        
+
             // Configuración de las vistas (sin cambios)
             modelBuilder.Entity<vCelularesMBP>()
                 .HasNoKey()
@@ -193,6 +194,24 @@ namespace DrCell_V02.Data
             modelBuilder.Entity<vCelularP>()
                 .HasNoKey()
                 .ToView("vcelularp");
+                
+             modelBuilder.Entity<VwVentaProducto>(eb =>
+            {
+                eb.HasNoKey();                                  // keyless
+                eb.ToView("vw_ventas_productos", "public");     // nombre y esquema de la vista
+                eb.Metadata.SetIsTableExcludedFromMigrations(true); // que EF no intente crearla
+
+                // Tipos explícitos opcionales si lo necesitas
+                eb.Property(p => p.venta_total).HasColumnType("numeric");
+                eb.Property(p => p.venta_costo_total).HasColumnType("numeric");
+                eb.Property(p => p.venta_margen_total).HasColumnType("numeric");
+                eb.Property(p => p.precio_unitario).HasColumnType("numeric");
+                eb.Property(p => p.linea_total).HasColumnType("numeric");
+                eb.Property(p => p.precio_lista_actual).HasColumnType("numeric");
+                eb.Property(p => p.proporcion_venta).HasColumnType("numeric");
+                eb.Property(p => p.costo_linea_estimado).HasColumnType("numeric");
+                eb.Property(p => p.margen_linea_estimado).HasColumnType("numeric");
+            });   
         }
     }
 }

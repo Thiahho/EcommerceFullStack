@@ -53,6 +53,158 @@ namespace DrCell_V02.Controllers.admin
             }
         }
 
+        [HttpGet("GetAllWithProducts")]
+        [EnableRateLimiting("CriticalPolicy")]
+        public virtual async Task<ActionResult<object>> GetAllWithProducts()
+        {
+            try
+            {
+                var ventas = await _context.Ventas
+                    .Include(v => v.Items)
+                        .ThenInclude(i => i.Variante)
+                        .ThenInclude(v => v.Producto)
+                    .OrderByDescending(v => v.FechaVenta)
+                    .ToListAsync();
+
+                var result = ventas.Select(v => new
+                {
+                    id = v.Id,
+                    preferenceId = v.PreferenceId,
+                    paymentId = v.PaymentId,
+                    montoTotal = v.MontoTotal,
+                    costoTotal = v.CostoTotal,
+                    margen = v.Margen,
+                    estado = v.Estado,
+                    fechaVenta = v.FechaVenta,
+                    usuarioId = v.UsuarioId,
+                    observaciones = v.Observaciones,
+                    metodoEnvio = v.MetodoEnvio,
+                    direccionEnvio = v.DireccionEnvio,
+                    numeroSeguimiento = v.NumeroSeguimiento,
+                    items = v.Items.Select(item => new
+                    {
+                        id = item.Id,
+                        ventaId = item.VentaId,
+                        varianteId = item.VarianteId,
+                        cantidad = item.Cantidad,
+                        precioUnitario = item.PrecioUnitario,
+                        subtotal = item.Subtotal,
+                        // Datos del producto desde la variante
+                        marca = item.Variante?.Producto?.Marca ?? "",
+                        modelo = item.Variante?.Producto?.Modelo ?? "",
+                        categoria = item.Variante?.Producto?.CategoriaId ?? 0,
+                        color = item.Variante?.Color ?? "",
+                        ram = item.Variante?.Ram ?? "",
+                        almacenamiento = item.Variante?.Almacenamiento ?? "",
+                        stock = item.Variante?.Stock ?? 0
+                    }).ToList()
+                }).ToList();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener las ventas con productos: {Message}", ex.Message);
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
+        [HttpGet("ventas-detalladas")]
+        [EnableRateLimiting("CriticalPolicy")]
+        public virtual async Task<ActionResult<object>> GetVentasDetalladas()
+        {
+            try
+            {
+                // Primero verificar si hay datos en la vista
+                var ventasDetalladas = await _context.VwVentaProducto.ToListAsync();
+                
+                _logger.LogInformation($"Encontradas {ventasDetalladas.Count} filas en VwVentaProducto");
+
+                if (!ventasDetalladas.Any())
+                {
+                    // Si no hay datos en la vista, usar la consulta directa
+                    var ventasDirectas = await _context.Ventas
+                        .Include(v => v.Items)
+                        .ThenInclude(i => i.Variante)
+                        .ThenInclude(v => v.Producto)
+                        .OrderByDescending(v => v.FechaVenta)
+                        .ToListAsync();
+
+                    var result = ventasDirectas.Select(v => new
+                    {
+                        VentaId = v.Id,
+                        PreferenceId = v.PreferenceId,
+                        PaymentId = v.PaymentId,
+                        FechaVenta = v.FechaVenta,
+                        Estado = v.Estado,
+                        VentaTotal = v.MontoTotal,
+                        CostoTotal = v.CostoTotal,
+                        MargenTotal = v.Margen,
+                        Items = v.Items.Select(item => new
+                        {
+                            VentaItemId = item.Id,
+                            VarianteId = item.VarianteId,
+                            Cantidad = item.Cantidad,
+                            PrecioUnitario = item.PrecioUnitario,
+                            LineaTotal = item.Subtotal,
+                            ProductoId = item.Variante?.ProductoId ?? 0,
+                            Marca = item.Variante?.Producto?.Marca ?? "",
+                            Modelo = item.Variante?.Producto?.Modelo ?? "",
+                            Color = item.Variante?.Color ?? "",
+                            Ram = item.Variante?.Ram ?? "",
+                            Almacenamiento = item.Variante?.Almacenamiento ?? ""
+                        }).ToList()
+                    }).ToList();
+
+                    return Ok(result);
+                }
+
+                // Si hay datos en la vista, usarla
+                var resultFromView = ventasDetalladas.GroupBy(v => v.venta_id)
+                    .Select(g => new
+                    {
+                        VentaId = g.Key,
+                        PreferenceId = g.First().preference_id,
+                        PaymentId = g.First().payment_id,
+                        FechaVenta = g.First().fecha_venta ?? DateTime.MinValue,
+                        Estado = g.First().estado ?? "UNKNOWN",
+                        VentaTotal = g.First().venta_total ?? 0,
+                        CostoTotal = g.First().venta_costo_total,
+                        MargenTotal = g.First().venta_margen_total,
+                        UsuarioId = g.First().usuario_id,
+                        MetodoEnvio = g.First().metodo_envio,
+                        DireccionEnvio = g.First().direccion_envio,
+                        NumeroSeguimiento = g.First().numero_seguimiento,
+                        Items = g.Select(item => new
+                        {
+                            VentaItemId = item.venta_item_id,
+                            VarianteId = item.variante_id,
+                            Cantidad = item.cantidad,
+                            PrecioUnitario = item.precio_unitario,
+                            LineaTotal = item.linea_total,
+                            ProductoId = item.producto_id,
+                            Marca = item.marca,
+                            Modelo = item.modelo,
+                            Categoria = item.categoria,
+                            Color = item.color,
+                            Ram = item.ram,
+                            Almacenamiento = item.almacenamiento,
+                            Stock = item.stock,
+                            CostoLineaEstimado = item.costo_linea_estimado,
+                            MargenLineaEstimado = item.margen_linea_estimado
+                        }).ToList()
+                    })
+                    .ToList();
+
+                return Ok(resultFromView);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener las ventas detalladas: {Message}", ex.Message);
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
         [HttpGet("GetById/{id}")]
         [EnableRateLimiting("CriticalPolicy")]
         public virtual async Task<ActionResult<VentaDto>> GetById(int id)
@@ -845,7 +997,7 @@ namespace DrCell_V02.Controllers.admin
             {
                 var hoy = DateTime.Today;
                 var ventas = await _context.Ventas
-                    .Where(v => v.FechaVenta.Date == hoy && v.Estado == "APROBADO")
+                    .Where(v => v.FechaVenta.Date == hoy && v.Estado == "APPROVED")
                     .OrderByDescending(v => v.FechaVenta)
                     .Take(limit)
                     .Select(v => new RecentActivityDto
@@ -881,7 +1033,7 @@ namespace DrCell_V02.Controllers.admin
                 }
 
                 var ventas = await _context.Ventas
-                    .Where(v => v.FechaVenta.Date == fechaConsulta && v.Estado == "APROBADO")
+                    .Where(v => v.FechaVenta.Date == fechaConsulta && v.Estado == "APPROVED")
                     .ToListAsync();
 
                 var resumen = new AnalyticsSummaryDto
@@ -971,5 +1123,41 @@ namespace DrCell_V02.Controllers.admin
         public decimal TotalAmount { get; set; }
         public decimal AvgTicket { get; set; }
         public Dictionary<string, int> ByStatus { get; set; } = new();
+    }
+
+    public class VentaDetalladaDto
+    {
+        public int VentaId { get; set; }
+        public string? PreferenceId { get; set; }
+        public string? PaymentId { get; set; }
+        public DateTime FechaVenta { get; set; }
+        public string Estado { get; set; } = string.Empty;
+        public decimal VentaTotal { get; set; }
+        public decimal? CostoTotal { get; set; }
+        public decimal? MargenTotal { get; set; }
+        public string? UsuarioId { get; set; }
+        public string? MetodoEnvio { get; set; }
+        public string? DireccionEnvio { get; set; }
+        public string? NumeroSeguimiento { get; set; }
+        public List<VentaItemDetalladoDto> Items { get; set; } = new();
+    }
+
+    public class VentaItemDetalladoDto
+    {
+        public int VentaItemId { get; set; }
+        public int VarianteId { get; set; }
+        public int Cantidad { get; set; }
+        public decimal PrecioUnitario { get; set; }
+        public decimal LineaTotal { get; set; }
+        public int ProductoId { get; set; }
+        public string? Marca { get; set; }
+        public string? Modelo { get; set; }
+        public string? Categoria { get; set; }
+        public string? Color { get; set; }
+        public string? Ram { get; set; }
+        public string? Almacenamiento { get; set; }
+        public int Stock { get; set; }
+        public decimal? CostoLineaEstimado { get; set; }
+        public decimal? MargenLineaEstimado { get; set; }
     }
 }

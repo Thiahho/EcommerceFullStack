@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const VentaEstadoSchema = z.enum(["APPROVED", "PENDING", "REJECTED"]);
+export const VentaEstadoSchema = z.enum(["APPROVED", "PENDIENTE", "RECHAZADO"]);
 export type VentaEstado = z.infer<typeof VentaEstadoSchema>;
 
 export const VentaItemSchema = z.object({

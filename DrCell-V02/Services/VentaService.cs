@@ -131,7 +131,7 @@ namespace DrCell_V02.Services
             var ventas = await query.Include(v => v.Items).ThenInclude(vi => vi.Variante).ToListAsync();
 
             var totalProductosVendidos = ventas.SelectMany(v => v.Items).Sum(vi => vi.Cantidad);
-            var ventasAprobadas = ventas.Count(v => v.Estado == "APROBADO");
+            var ventasAprobadas = ventas.Count(v => v.Estado == "APPROVED");
             var ventasPendientes = ventas.Count(v => v.Estado == "PENDIENTE");
             var ventasRechazadas = ventas.Count(v => v.Estado == "RECHAZADO");
             
@@ -193,7 +193,7 @@ namespace DrCell_V02.Services
             }
 
             var topProductos = await query
-                .Where(vi => vi.Venta.Estado == "APROBADO")
+                .Where(vi => vi.Venta.Estado == "APPROVED")
                 .Include(vi => vi.Variante)
                     .ThenInclude(v => v.Producto)
                 .GroupBy(vi => new { vi.VarianteId, vi.Variante.Producto.Marca, vi.Variante.Producto.Modelo, vi.Variante.Color, vi.Variante.Ram, vi.Variante.Almacenamiento })

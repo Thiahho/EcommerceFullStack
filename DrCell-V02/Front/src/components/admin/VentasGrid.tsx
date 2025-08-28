@@ -29,7 +29,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useVenta, useVentas } from "@/hooks/useVentas";
 import type { VentaDto } from "@/schemas/ventas";
 
-const ESTADOS = ["all", "APROBADO", "PENDIENTE", "RECHAZADO"] as const;
+const ESTADOS = ["all", "APPROVED", "PENDIENTE", "RECHAZADO"] as const;
 type EstadoFiltro = (typeof ESTADOS)[number];
 
 function formatCurrency(amount: number) {
@@ -54,7 +54,7 @@ function formatDate(dateString: string) {
 function EstadoBadge({ estado }: { estado: string }) {
   const base =
     "inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full";
-  if (estado === "APROBADO")
+  if (estado === "APPROVED")
     return (
       <span className={`${base} bg-green-100 text-green-800`}>Aprobada</span>
     );
@@ -192,7 +192,7 @@ export default function VentasGrid() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="APROBADO">Aprobadas</SelectItem>
+              <SelectItem value="APPROVED">Aprobadas</SelectItem>
               <SelectItem value="PENDIENTE">Pendientes</SelectItem>
               <SelectItem value="RECHAZADO">Rechazadas</SelectItem>
             </SelectContent>

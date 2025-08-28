@@ -376,18 +376,10 @@ namespace DrCell_V02.Controllers
                     {
                         _logger.LogInformation("✅ Reservas confirmadas exitosamente - creando registro de venta...");
                         
-                        try
-                        {
-                            // Crear registro de venta
-                            await CrearRegistroVentaAsync(preference_id, payment_id);
-                            _logger.LogInformation("✅ PROCESO COMPLETADO: Reservas confirmadas y venta registrada para PreferenceId: {preferenceId}", preference_id);
-                        }
-                        catch (Exception ventaEx)
-                        {
-                            _logger.LogError(ventaEx, "❌ ERROR ESPECÍFICO al crear registro de venta - PreferenceId: {preferenceId}", preference_id);
-                            // No hacer throw aquí porque las reservas ya están confirmadas
-                            // Continuar con la redirección pero loguear el error
-                        }
+                        // Crear registro de venta
+                        await CrearRegistroVentaAsync(preference_id, payment_id);
+
+                        _logger.LogInformation("✅ PROCESO COMPLETADO: Reservas confirmadas y venta registrada para PreferenceId: {preferenceId}", preference_id);
                     }
                     else
                     {
@@ -504,53 +496,26 @@ namespace DrCell_V02.Controllers
         {
             try
             {
-                _logger.LogInformation("🔄 =========================== CREANDO REGISTRO DE VENTA ===========================");
-                _logger.LogInformation("📝 PreferenceId: {preferenceId}, PaymentId: {paymentId}", preferenceId, paymentId);
+                _logger.LogInformation("=== CREANDO REGISTRO DE VENTA ===");
+                _logger.LogInformation("PreferenceId: {preferenceId}, PaymentId: {paymentId}", preferenceId, paymentId);
 
-                // Paso 1: Buscar reservas confirmadas
-                _logger.LogInformation("🔍 PASO 1: Buscando reservas CONFIRMADAS...");
                 var reservas = await _context.StockReserva
                     .Include(r => r.Variante)
                     .Where(r => r.PreferenceId == preferenceId && r.Estado == "CONFIRMADO")
                     .ToListAsync();
 
-                _logger.LogInformation("📊 Reservas encontradas: {count}", reservas.Count);
+                _logger.LogInformation("Reservas encontradas: {count}", reservas.Count);
 
                 if (!reservas.Any()) 
                 {
-                    _logger.LogWarning("⚠️ No se encontraron reservas CONFIRMADAS para PreferenceId: {preferenceId}", preferenceId);
-                    
-                    // Debug: Verificar si hay reservas con otros estados
-                    var todasReservas = await _context.StockReserva
-                        .Where(r => r.PreferenceId == preferenceId)
-                        .ToListAsync();
-                    _logger.LogInformation("🔍 DEBUG: Total reservas para este PreferenceId: {count}", todasReservas.Count);
-                    foreach (var res in todasReservas)
-                    {
-                        _logger.LogInformation("🔍 DEBUG: Reserva ID {id}, Estado: {estado}", res.Id, res.Estado);
-                    }
+                    _logger.LogWarning("No se encontraron reservas CONFIRMADAS para PreferenceId: {preferenceId}", preferenceId);
                     return;
                 }
 
-                // Paso 2: Calcular monto total
-                _logger.LogInformation("💰 PASO 2: Calculando monto total...");
                 var montoTotal = reservas.Sum(r => r.Variante.Precio * r.Cantidad);
-                _logger.LogInformation("💰 Monto total calculado: {montoTotal}", montoTotal);
+                _logger.LogInformation("Monto total calculado: {montoTotal}", montoTotal);
 
-                // Paso 3: Verificar si ya existe una venta para este PreferenceId
-                _logger.LogInformation("🔍 PASO 3: Verificando si ya existe una venta...");
-                var ventaExistente = await _context.Ventas
-                    .FirstOrDefaultAsync(v => v.PreferenceId == preferenceId);
-                
-                if (ventaExistente != null)
-                {
-                    _logger.LogWarning("⚠️ Ya existe una venta para PreferenceId: {preferenceId}, VentaId: {ventaId}", 
-                        preferenceId, ventaExistente.Id);
-                    return;
-                }
-
-                // Paso 4: Crear la venta
-                _logger.LogInformation("📝 PASO 4: Creando registro de venta...");
+                // Crear la venta primero
                 var venta = new Venta
                 {
                     PreferenceId = preferenceId,
@@ -560,67 +525,32 @@ namespace DrCell_V02.Controllers
                     FechaVenta = DateTime.UtcNow
                 };
 
-                _logger.LogInformation("📝 Venta creada en memoria: PreferenceId={preferenceId}, MontoTotal={monto}", 
-                    venta.PreferenceId, venta.MontoTotal);
-
                 _context.Ventas.Add(venta);
-                _logger.LogInformation("📝 Venta agregada al contexto, guardando...");
-                
-                var filasAfectadas1 = await _context.SaveChangesAsync();
-                _logger.LogInformation("✅ SaveChanges() completado - Filas afectadas: {filas}, VentaId generado: {ventaId}", 
-                    filasAfectadas1, venta.Id);
+                await _context.SaveChangesAsync(); // Guardar para obtener el VentaId
 
-                // Paso 5: Crear los items de la venta
-                _logger.LogInformation("📝 PASO 5: Creando items de venta...");
+                _logger.LogInformation("Venta creada con ID: {ventaId}", venta.Id);
+
+                // Ahora crear los items de la venta
                 var ventaItems = reservas.Select(r => new VentaItem
                 {
-                    VentaId = venta.Id,
+                    VentaId = venta.Id, // Usar el ID generado
                     VarianteId = r.VarianteId,
                     Cantidad = r.Cantidad,
                     PrecioUnitario = r.Variante.Precio,
                     Subtotal = r.Variante.Precio * r.Cantidad
                 }).ToList();
 
-                _logger.LogInformation("📝 Items creados: {count}", ventaItems.Count);
-                foreach (var item in ventaItems)
-                {
-                    _logger.LogInformation("📝 Item: VentaId={ventaId}, VarianteId={varianteId}, Cantidad={cantidad}, Precio={precio}", 
-                        item.VentaId, item.VarianteId, item.Cantidad, item.PrecioUnitario);
-                }
-
                 _context.VentaItems.AddRange(ventaItems);
-                _logger.LogInformation("📝 Items agregados al contexto, guardando...");
-                
-                var filasAfectadas2 = await _context.SaveChangesAsync();
-                _logger.LogInformation("✅ Items guardados - Filas afectadas: {filas}", filasAfectadas2);
+                await _context.SaveChangesAsync();
 
-                // Paso 6: Verificación final
-                _logger.LogInformation("🔍 PASO 6: Verificación final...");
-                var ventaGuardada = await _context.Ventas
-                    .Include(v => v.Items)
-                    .FirstOrDefaultAsync(v => v.Id == venta.Id);
-
-                if (ventaGuardada != null)
-                {
-                    _logger.LogInformation("✅ VERIFICACIÓN: Venta encontrada en BD - ID: {id}, Items: {itemsCount}", 
-                        ventaGuardada.Id, ventaGuardada.Items.Count);
-                }
-                else
-                {
-                    _logger.LogError("❌ VERIFICACIÓN FALLIDA: No se encontró la venta en la BD");
-                }
-
-                _logger.LogInformation("🎉 ======================= VENTA REGISTRADA EXITOSAMENTE =======================");
-                _logger.LogInformation("🎉 VentaId: {ventaId}, PreferenceId: {preferenceId}, MontoTotal: {monto}, Items: {itemsCount}",
+                _logger.LogInformation("✅ Venta registrada exitosamente - VentaId: {ventaId}, PreferenceId: {preferenceId}, MontoTotal: {monto}, Items: {itemsCount}",
                     venta.Id, preferenceId, montoTotal, ventaItems.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ ======================= ERROR AL CREAR REGISTRO DE VENTA =======================");
-                _logger.LogError("❌ PreferenceId: {preferenceId}", preferenceId);
-                _logger.LogError("❌ Error detalle: {message}", ex.Message);
-                _logger.LogError("❌ Inner Exception: {innerException}", ex.InnerException?.Message);
-                _logger.LogError("❌ Stack trace: {stackTrace}", ex.StackTrace);
+                _logger.LogError(ex, "❌ Error al crear registro de venta - PreferenceId: {preferenceId}", preferenceId);
+                _logger.LogError("Error detalle: {message}", ex.Message);
+                _logger.LogError("Stack trace: {stackTrace}", ex.StackTrace);
                 throw;
             }
         }
@@ -783,80 +713,7 @@ namespace DrCell_V02.Controllers
             }
         }
 
-        /*[HttpPost("webhooks/mercadopago")]
-        public async Task<IActionResult> WebhookMercadoPago([FromBody] object notification)
-        {
-            try
-            {
-                _logger.LogInformation("Webhook recibido de MercadoPago: {notification}", JsonSerializer.Serialize(notification));
-
-                // Parsear la notificación
-                var notificationJson = JsonSerializer.Serialize(notification);
-                var notificationData = JsonSerializer.Deserialize<MercadoPagoNotification>(notificationJson);
-
-                if (notificationData?.Data?.Id == null)
-                {
-                    _logger.LogWarning("Notificación inválida recibida");
-                    return BadRequest("Notificación inválida");
-                }
-
-                // Configurar MercadoPago
-                var accessToken = GetAccessToken();
-                MercadoPagoConfig.AccessToken = accessToken;
-
-                // Obtener información del pago
-                var paymentClient = new PaymentClient();
-                var payment = await paymentClient.GetAsync(long.Parse(notificationData.Data.Id));
-
-                if (payment?.ExternalReference == null)
-                {
-                    _logger.LogWarning("Payment sin ExternalReference: {paymentId}", notificationData.Data.Id);
-                    return Ok();
-                }
-
-                // Buscar la preferencia asociada
-                var preferenceId = await ObtenerPreferenceIdPorExternalReference(payment.ExternalReference);
-
-                if (string.IsNullOrEmpty(preferenceId))
-                {
-                    _logger.LogWarning("No se encontró PreferenceId para ExternalReference: {externalRef}", payment.ExternalReference);
-                    return Ok();
-                }
-
-                // Procesar según el estado del pago
-                switch (payment.Status)
-                {
-                    case "approved":
-                        await _stockService.ConfirmarReservaAsync(preferenceId);
-                        await CrearRegistroVentaAsync(preferenceId, payment.Id.ToString());
-                        _logger.LogInformation("Pago aprobado procesado - PaymentId: {paymentId}, PreferenceId: {preferenceId}",
-                            payment.Id, preferenceId);
-                        break;
-
-                    case "rejected":
-                    case "cancelled":
-                        await LiberarReservasPorPreferenceId(preferenceId, $"Pago {payment.Status}");
-                        _logger.LogInformation("Pago {status} procesado - PaymentId: {paymentId}, PreferenceId: {preferenceId}",
-                            payment.Status, payment.Id, preferenceId);
-                        break;
-
-                    case "pending":
-                    case "in_process":
-                        // No hacer nada, mantener las reservas activas
-                        _logger.LogInformation("Pago {status} - manteniendo reservas activas - PaymentId: {paymentId}, PreferenceId: {preferenceId}",
-                            payment.Status, payment.Id, preferenceId);
-                        break;
-                }
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error procesando webhook de MercadoPago");
-                return StatusCode(500);
-            }
-        }
-        */
+      
 
         [HttpPost("webhooks/mercadopago")]
         public async Task<IActionResult> WebhookMercadoPago([FromBody] object notification)
@@ -1346,43 +1203,6 @@ public async Task<IActionResult> ConfirmarPagoManual([FromBody] ConfirmarPagoMan
     }
 }
 
-[HttpPost("debug/crear-venta-directa")]
-public async Task<IActionResult> CrearVentaDirecta([FromBody] ConfirmarPagoManualDto datos)
-{
-    try
-    {
-        _logger.LogInformation("=== CREAR VENTA DIRECTA ===");
-        _logger.LogInformation("PreferenceId: {preferenceId}", datos.PreferenceId);
-
-        if (string.IsNullOrEmpty(datos.PreferenceId))
-        {
-            return BadRequest(new { success = false, message = "PreferenceId requerido" });
-        }
-
-        // Llamar directamente al método CrearRegistroVentaAsync
-        await CrearRegistroVentaAsync(datos.PreferenceId, datos.PaymentId ?? "DIRECTO-" + DateTime.Now.Ticks);
-
-        _logger.LogInformation("✅ Venta creada directamente - PreferenceId: {preferenceId}", datos.PreferenceId);
-
-        return Ok(new
-        {
-            success = true,
-            message = "Venta creada exitosamente",
-            preferenceId = datos.PreferenceId
-        });
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "❌ Error al crear venta directamente");
-        return StatusCode(500, new { 
-            success = false, 
-            message = "Error al crear venta", 
-            error = ex.Message,
-            stackTrace = ex.StackTrace?.Substring(0, Math.Min(1000, ex.StackTrace.Length))
-        });
-    }
-}
-
 public class ConfirmarPagoManualDto
 {
     public string PreferenceId { get; set; } = string.Empty;
@@ -1418,85 +1238,6 @@ public async Task<IActionResult> ListarReservasPendientes()
             success = true,
             reservasPendientes = reservasPendientes,
             total = reservasPendientes.Count
-        });
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { error = ex.Message });
-    }
-}
-
-[HttpGet("debug/listar-reservas-confirmadas")]
-public async Task<IActionResult> ListarReservasConfirmadas()
-{
-    try
-    {
-        var reservasConfirmadas = await _context.StockReserva
-            .Include(r => r.Variante)
-            .ThenInclude(v => v.Producto)
-            .Where(r => r.Estado == "CONFIRMADO")
-            .OrderByDescending(r => r.FechaCreacion)
-            .Take(10)
-            .Select(r => new {
-                r.Id,
-                r.PreferenceId,
-                r.SessionId,
-                r.VarianteId,
-                r.Cantidad,
-                r.Estado,
-                r.FechaCreacion,
-                r.FechaExpiracion,
-                Producto = $"{r.Variante.Producto.Marca} {r.Variante.Producto.Modelo}",
-                Variante = $"{r.Variante.Color} - {r.Variante.Ram}/{r.Variante.Almacenamiento}"
-            })
-            .ToListAsync();
-
-        return Ok(new {
-            success = true,
-            reservasConfirmadas = reservasConfirmadas,
-            total = reservasConfirmadas.Count
-        });
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { error = ex.Message });
-    }
-}
-
-[HttpGet("debug/listar-ventas")]
-public async Task<IActionResult> ListarVentas()
-{
-    try
-    {
-        var ventas = await _context.Ventas
-            .Include(v => v.Items)
-            .ThenInclude(i => i.Variante)
-            .ThenInclude(v => v.Producto)
-            .OrderByDescending(v => v.FechaVenta)
-            .Take(10)
-            .Select(v => new {
-                v.Id,
-                v.PreferenceId,
-                v.PaymentId,
-                v.MontoTotal,
-                v.Estado,
-                v.FechaVenta,
-                Items = v.Items.Select(i => new {
-                    i.Id,
-                    i.VarianteId,
-                    i.Cantidad,
-                    i.PrecioUnitario,
-                    i.Subtotal,
-                    Producto = $"{i.Variante.Producto.Marca} {i.Variante.Producto.Modelo}",
-                    Variante = $"{i.Variante.Color} - {i.Variante.Ram}/{i.Variante.Almacenamiento}"
-                })
-            })
-            .ToListAsync();
-
-        return Ok(new {
-            success = true,
-            ventas = ventas,
-            total = ventas.Count
         });
     }
     catch (Exception ex)

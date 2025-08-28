@@ -87,7 +87,7 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({
                   {usuario.rol || "Admin"}
                 </div>
                 <div className="text-xs text-gray-500 truncate">
-                  {usuario.email || "admin@demo.com"}
+                  {usuario.email}
                 </div>
               </div>
             )}
