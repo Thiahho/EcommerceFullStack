@@ -17,6 +17,7 @@ import PrivateRoute from '@/components/admin/PrivateRoute';
 import ReparacionesConfig from '@/components/admin/ReparacionesConfig';
 import Categorias from '@/components/admin/Categorias';
 import VentasGrid from '@/components/admin/VentasGrid';
+import AnalyticasAdmin from '@/components/admin/AnalyticasAdmin';
 import { Toaster } from 'sonner';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/auth-store';
@@ -92,6 +93,7 @@ export default function App() {
             }
           >
             <Route index element={<DashboardAdmin />} />
+            <Route path="analiticas" element={<AnalyticasAdmin />} />
             <Route path="pedidos" element={<Pedidos />} />
             <Route path="productos" element={<ProductosAdmin />} />
             <Route path="variantes" element={<Variantes />} />

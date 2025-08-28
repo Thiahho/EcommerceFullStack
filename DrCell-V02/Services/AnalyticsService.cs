@@ -44,7 +44,7 @@ namespace DrCell_V02.Services
 
             // Ventas
             var ventasHoy = await _context.Ventas
-                .Where(v => v.FechaVenta.Date == hoy && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta.Date == hoy && v.Estado == "APROBADO")
                 .SumAsync(v => v.MontoTotal);
 
             var ventasSemana = await _context.Ventas
@@ -52,12 +52,12 @@ namespace DrCell_V02.Services
                 .SumAsync(v => v.MontoTotal);
 
             var ventasMes = await _context.Ventas
-                .Where(v => v.FechaVenta >= inicioMes && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= inicioMes && v.Estado == "APROBADO")
                 .SumAsync(v => v.MontoTotal);
 
             // Ganancias
             var gananciasHoy = await _context.Ventas
-                .Where(v => v.FechaVenta.Date == hoy && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta.Date == hoy && v.Estado == "APROBADO")
                 .SumAsync(v => v.Margen ?? 0);
 
             var gananciasSemana = await _context.Ventas
@@ -65,29 +65,29 @@ namespace DrCell_V02.Services
                 .SumAsync(v => v.Margen ?? 0);
 
             var gananciasMes = await _context.Ventas
-                .Where(v => v.FechaVenta >= inicioMes && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= inicioMes && v.Estado == "APROBADO")
                 .SumAsync(v => v.Margen ?? 0);
 
             // Productos vendidos
             var productosHoy = await _context.VentaItems
-                .Where(vi => vi.Venta.FechaVenta.Date == hoy && vi.Venta.Estado == "APPROVED")
+                .Where(vi => vi.Venta.FechaVenta.Date == hoy && vi.Venta.Estado == "APROBADO")
                 .SumAsync(vi => vi.Cantidad);
 
             var productosSemana = await _context.VentaItems
-                .Where(vi => vi.Venta.FechaVenta >= inicioSemana && vi.Venta.FechaVenta <= hoy.AddDays(1) && vi.Venta.Estado == "APPROVED")
+                .Where(vi => vi.Venta.FechaVenta >= inicioSemana && vi.Venta.FechaVenta <= hoy.AddDays(1) && vi.Venta.Estado == "APROBADO")
                 .SumAsync(vi => vi.Cantidad);
 
             var productosMes = await _context.VentaItems
-                .Where(vi => vi.Venta.FechaVenta >= inicioMes && vi.Venta.Estado == "APPROVED")
+                .Where(vi => vi.Venta.FechaVenta >= inicioMes && vi.Venta.Estado == "APROBADO")
                 .SumAsync(vi => vi.Cantidad);
 
             // Ventas pendientes
             var ventasPendientes = await _context.Ventas
-                .CountAsync(v => v.Estado == "PENDING");
+                .CountAsync(v => v.Estado == "PENDIENTE");
 
             // Ticket promedio del mes
             var ventasDelMes = await _context.Ventas
-                .Where(v => v.FechaVenta >= inicioMes && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= inicioMes && v.Estado == "APROBADO")
                 .ToListAsync();
 
             var ticketPromedio = ventasDelMes.Count > 0 ? ventasDelMes.Average(v => v.MontoTotal) : 0;
@@ -115,12 +115,12 @@ namespace DrCell_V02.Services
 
             // Datos del mes actual
             var ventasMesActual = await _context.Ventas
-                .Where(v => v.FechaVenta >= mesActual && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= mesActual && v.Estado == "APROBADO")
                 .ToListAsync();
 
             // Datos del mes anterior
             var ventasMesAnterior = await _context.Ventas
-                .Where(v => v.FechaVenta >= mesAnterior && v.FechaVenta < mesActual && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= mesAnterior && v.FechaVenta < mesActual && v.Estado == "APROBADO")
                 .ToListAsync();
 
             var kpis = new List<KpiDto>();
@@ -235,7 +235,7 @@ namespace DrCell_V02.Services
 
             // Tendencia de ventas diarias
             var ventasDiarias = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APROBADO")
                 .GroupBy(v => v.FechaVenta.Date)
                 .Select(g => new PuntoTendenciaDto
                 {
@@ -261,7 +261,7 @@ namespace DrCell_V02.Services
 
             // Tendencia de ganancias diarias
             var gananciasDiarias = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APROBADO")
                 .GroupBy(v => v.FechaVenta.Date)
                 .Select(g => new PuntoTendenciaDto
                 {
@@ -287,7 +287,7 @@ namespace DrCell_V02.Services
 
             // Tendencia de productos vendidos
             var productosDiarios = await _context.VentaItems
-                .Where(vi => vi.Venta.FechaVenta >= fechaInicio && vi.Venta.Estado == "APPROVED")
+                .Where(vi => vi.Venta.FechaVenta >= fechaInicio && vi.Venta.Estado == "APROBADO")
                 .GroupBy(vi => vi.Venta.FechaVenta.Date)
                 .Select(g => new PuntoTendenciaDto
                 {
@@ -319,7 +319,7 @@ namespace DrCell_V02.Services
             // Obtener datos históricos de los últimos 90 días
             var fechaInicio = DateTime.Today.AddDays(-90);
             var ventasHistoricas = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APROBADO")
                 .GroupBy(v => v.FechaVenta.Date)
                 .Select(g => new { Fecha = g.Key, Ventas = g.Sum(v => v.MontoTotal), Ganancias = g.Sum(v => v.Margen ?? 0) })
                 .OrderBy(x => x.Fecha)
@@ -416,11 +416,11 @@ namespace DrCell_V02.Services
 
             // Alerta: Ventas por debajo del promedio
             var ventasHoy = await _context.Ventas
-                .Where(v => v.FechaVenta.Date == DateTime.Today && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta.Date == DateTime.Today && v.Estado == "APROBADO")
                 .SumAsync(v => v.MontoTotal);
 
             var promedioUltimos30Dias = await _context.Ventas
-                .Where(v => v.FechaVenta >= DateTime.Today.AddDays(-30) && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= DateTime.Today.AddDays(-30) && v.Estado == "APROBADO")
                 .GroupBy(v => v.FechaVenta.Date)
                 .Select(g => g.Sum(v => v.MontoTotal))
                 .DefaultIfEmpty(0)
@@ -467,7 +467,7 @@ namespace DrCell_V02.Services
 
             // Alerta: Ventas pendientes acumuladas
             var ventasPendientes = await _context.Ventas
-                .CountAsync(v => v.Estado == "PENDING" && v.FechaVenta <= DateTime.UtcNow.AddHours(-24));
+                .CountAsync(v => v.Estado == "PENDIENTE" && v.FechaVenta <= DateTime.UtcNow.AddHours(-24));
 
             if (ventasPendientes > 5)
             {
@@ -495,7 +495,7 @@ namespace DrCell_V02.Services
 
             var ventasConCliente = await _context.Ventas
                 .Where(v => v.FechaVenta >= fechaInicio && v.FechaVenta <= fechaFin 
-                           && v.Estado == "APPROVED" && !string.IsNullOrEmpty(v.UsuarioId))
+                           && v.Estado == "APROBADO" && v.UsuarioId.HasValue)
                 .ToListAsync();
 
             var totalClientes = ventasConCliente.Select(v => v.UsuarioId).Distinct().Count();
@@ -544,7 +544,7 @@ namespace DrCell_V02.Services
         {
             var fechaLimite = DateTime.Today.AddMonths(-6);
             var clientesConVentas = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaLimite && v.Estado == "APPROVED" && !string.IsNullOrEmpty(v.UsuarioId))
+                .Where(v => v.FechaVenta >= fechaLimite && v.Estado == "APROBADO" && v.UsuarioId.HasValue)
                 .GroupBy(v => v.UsuarioId)
                 .Select(g => new 
                 {
@@ -612,7 +612,7 @@ namespace DrCell_V02.Services
             
             // Análisis de horarios preferidos
             var ventasPorHora = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaLimite && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= fechaLimite && v.Estado == "APROBADO")
                 .ToListAsync();
 
             var patronesHorarios = ventasPorHora
@@ -626,7 +626,7 @@ namespace DrCell_V02.Services
 
             // Productos más comprados
             var productosPopulares = await _context.VentaItems
-                .Where(vi => vi.Venta.FechaVenta >= fechaLimite && vi.Venta.Estado == "APPROVED")
+                .Where(vi => vi.Venta.FechaVenta >= fechaLimite && vi.Venta.Estado == "APROBADO")
                 .Include(vi => vi.Variante)
                     .ThenInclude(v => v.Producto)
                 .GroupBy(vi => new { vi.Variante.Producto.Marca, vi.Variante.Producto.Modelo })
@@ -694,7 +694,7 @@ namespace DrCell_V02.Services
                     pv.Stock,
                     pv.Precio,
                     VentasRecientes = _context.VentaItems
-                        .Where(vi => vi.VarianteId == pv.Id && vi.Venta.FechaVenta >= fechaLimite && vi.Venta.Estado == "APPROVED")
+                        .Where(vi => vi.VarianteId == pv.Id && vi.Venta.FechaVenta >= fechaLimite && vi.Venta.Estado == "APROBADO")
                         .Sum(vi => vi.Cantidad)
                 })
                 .ToListAsync();
@@ -772,7 +772,7 @@ namespace DrCell_V02.Services
         public async Task<List<MetricasTemporalesDto>> AnalisisTemporalAsync(DateTime fechaInicio, DateTime fechaFin, string agrupacion = "dia")
         {
             var ventas = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaInicio && v.FechaVenta <= fechaFin && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= fechaInicio && v.FechaVenta <= fechaFin && v.Estado == "APROBADO")
                 .ToListAsync();
 
             var metricas = new List<MetricasTemporalesDto>();
@@ -836,7 +836,7 @@ namespace DrCell_V02.Services
             var fechaInicio = DateTime.Today.AddMonths(-mesesAnalisis);
             
             var ventasPorMes = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= fechaInicio && v.Estado == "APROBADO")
                 .GroupBy(v => v.FechaVenta.Month)
                 .Select(g => new 
                 {
@@ -879,7 +879,7 @@ namespace DrCell_V02.Services
             
             // Analizar tendencia de ventas últimas 2 semanas
             var ventasUltimos14Dias = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaLimite && v.Estado == "APPROVED")
+                .Where(v => v.FechaVenta >= fechaLimite && v.Estado == "APROBADO")
                 .GroupBy(v => v.FechaVenta.Date)
                 .Select(g => g.Sum(v => v.MontoTotal))
                 .ToListAsync();

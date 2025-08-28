@@ -131,9 +131,9 @@ namespace DrCell_V02.Services
             var ventas = await query.Include(v => v.Items).ThenInclude(vi => vi.Variante).ToListAsync();
 
             var totalProductosVendidos = ventas.SelectMany(v => v.Items).Sum(vi => vi.Cantidad);
-            var ventasAprobadas = ventas.Count(v => v.Estado == "APPROVED");
-            var ventasPendientes = ventas.Count(v => v.Estado == "PENDING");
-            var ventasRechazadas = ventas.Count(v => v.Estado == "REJECTED");
+            var ventasAprobadas = ventas.Count(v => v.Estado == "APROBADO");
+            var ventasPendientes = ventas.Count(v => v.Estado == "PENDIENTE");
+            var ventasRechazadas = ventas.Count(v => v.Estado == "RECHAZADO");
             
             return new EstadisticasPeriodoDto
             {
@@ -193,7 +193,7 @@ namespace DrCell_V02.Services
             }
 
             var topProductos = await query
-                .Where(vi => vi.Venta.Estado == "APPROVED")
+                .Where(vi => vi.Venta.Estado == "APROBADO")
                 .Include(vi => vi.Variante)
                     .ThenInclude(v => v.Producto)
                 .GroupBy(vi => new { vi.VarianteId, vi.Variante.Producto.Marca, vi.Variante.Producto.Modelo, vi.Variante.Color, vi.Variante.Ram, vi.Variante.Almacenamiento })
@@ -267,8 +267,8 @@ namespace DrCell_V02.Services
             if (!string.IsNullOrEmpty(filtro.ModificadoPor))
                 query = query.Where(v => v.ModificadoPor == filtro.ModificadoPor);
 
-            if (!string.IsNullOrEmpty(filtro.UsuarioId))
-                query = query.Where(v => v.UsuarioId == filtro.UsuarioId);
+            if (!string.IsNullOrEmpty(filtro.UsuarioId) && int.TryParse(filtro.UsuarioId, out int usuarioId))
+                query = query.Where(v => v.UsuarioId == usuarioId);
 
             if (filtro.SoloModificadas == true)
                 query = query.Where(v => v.FechaModificacion.HasValue);

@@ -10,7 +10,7 @@ namespace DrCell_V02.Data.Dtos
         public decimal MontoTotal { get; set; }
         public decimal? CostoTotal { get; set; }
         public decimal? Margen { get; set; }
-        public string Estado { get; set; } = "PENDING"; // PENDING, APPROVED, REJECTED, REFUNDED, CANCELLED, PROCESSING
+        public string Estado { get; set; } = "PENDIENTE"; // PENDING, APPROVED, REJECTED, REFUNDED, CANCELLED, PROCESSING
         public DateTime FechaVenta { get; set; } = DateTime.UtcNow;
         public string? UsuarioId { get; set; }
         public string? Observaciones { get; set; }

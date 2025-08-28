@@ -27,15 +27,13 @@ namespace DrCell_V02.Controllers.admin
         private readonly IConfiguration _configuration;
         private readonly ILogger<AdminVentasController> _logger;
         private readonly IVentaService _ventaService;
-        // private readonly IGananciasService _gananciasService; // TEMPORALMENTE COMENTADO
         private readonly IAnalyticsService _analyticsService;
-        public AdminVentasController(ApplicationDbContext context, IConfiguration configuration, ILogger<AdminVentasController> logger, IVentaService ventaService, /*IGananciasService gananciasService,*/ IAnalyticsService analyticsService)
+        public AdminVentasController(ApplicationDbContext context, IConfiguration configuration, ILogger<AdminVentasController> logger, IVentaService ventaService, IAnalyticsService analyticsService)
         {
             _context = context;
             _configuration = configuration;
             _logger = logger;
             _ventaService = ventaService;
-            // _gananciasService = gananciasService; // TEMPORALMENTE COMENTADO
             _analyticsService = analyticsService;
         }
 
@@ -838,6 +836,73 @@ namespace DrCell_V02.Controllers.admin
             }
         }
 
+        // Endpoint específico para actividades recientes del día (para componente Analytics)
+        [HttpGet("analytics/recent")]
+        [EnableRateLimiting("CriticalPolicy")]
+        public virtual async Task<ActionResult<List<RecentActivityDto>>> GetActividadesRecientesHoy([FromQuery] int limit = 20)
+        {
+            try
+            {
+                var hoy = DateTime.Today;
+                var ventas = await _context.Ventas
+                    .Where(v => v.FechaVenta.Date == hoy && v.Estado == "APROBADO")
+                    .OrderByDescending(v => v.FechaVenta)
+                    .Take(limit)
+                    .Select(v => new RecentActivityDto
+                    {
+                        OrderId = v.Id.ToString(),
+                        CreatedAtLocal = v.FechaVenta.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        CustomerName = "Cliente", // Puedes mejorar esto si tienes relación con usuarios
+                        Status = v.Estado,
+                        Total = v.MontoTotal
+                    })
+                    .ToListAsync();
+
+                return Ok(ventas);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener actividades recientes del día");
+                return StatusCode(500, "Error interno del servidor");
+            }
+        }
+
+        // Endpoint para resumen diario de analytics
+        [HttpGet("analytics/summary")]
+        [EnableRateLimiting("CriticalPolicy")]
+        public virtual async Task<ActionResult<AnalyticsSummaryDto>> GetAnalyticsSummary([FromQuery] string? date = null)
+        {
+            try
+            {
+                DateTime fechaConsulta = DateTime.Today;
+                if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out DateTime parsedDate))
+                {
+                    fechaConsulta = parsedDate.Date;
+                }
+
+                var ventas = await _context.Ventas
+                    .Where(v => v.FechaVenta.Date == fechaConsulta && v.Estado == "APROBADO")
+                    .ToListAsync();
+
+                var resumen = new AnalyticsSummaryDto
+                {
+                    Date = fechaConsulta.ToString("yyyy-MM-dd"),
+                    OrdersCount = ventas.Count,
+                    TotalAmount = ventas.Sum(v => v.MontoTotal),
+                    AvgTicket = ventas.Any() ? ventas.Average(v => v.MontoTotal) : 0,
+                    ByStatus = ventas.GroupBy(v => v.Estado)
+                                   .ToDictionary(g => g.Key, g => g.Count())
+                };
+
+                return Ok(resumen);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener resumen de analytics");
+                return StatusCode(500, "Error interno del servidor");
+            }
+        }
+
         private static string GetTiempoTranscurrido(DateTime fecha)
         {
             var ahora = DateTime.UtcNow;
@@ -888,5 +953,23 @@ namespace DrCell_V02.Controllers.admin
         public DateTime Fecha { get; set; }
         public decimal? Valor { get; set; }
         public string? Accion { get; set; }
+    }
+
+    public class RecentActivityDto
+    {
+        public string OrderId { get; set; } = string.Empty;
+        public string CreatedAtLocal { get; set; } = string.Empty;
+        public string? CustomerName { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+    }
+
+    public class AnalyticsSummaryDto
+    {
+        public string Date { get; set; } = string.Empty;
+        public int OrdersCount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal AvgTicket { get; set; }
+        public Dictionary<string, int> ByStatus { get; set; } = new();
     }
 }

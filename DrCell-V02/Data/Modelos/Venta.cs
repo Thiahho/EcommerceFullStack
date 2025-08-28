@@ -30,13 +30,13 @@ namespace DrCell_V02.Data.Modelos
 
         [Required]
         [MaxLength(20)][Column("estado")]
-        public string Estado { get; set; } = "PENDING"; // PENDING, APPROVED, REJECTED, REFUNDED, CANCELLED, PROCESSING
+        public string Estado { get; set; } = "PENDIENTE"; // PENDING, APPROVED, REJECTED, REFUNDED, CANCELLED, PROCESSING
 
         [Required][Column("fecha_venta")]
         public DateTime FechaVenta { get; set; } = DateTime.UtcNow;
 
         [Column("usuario_id")]
-        public string? UsuarioId { get; set; }
+        public int? UsuarioId { get; set; }
 
         [MaxLength(500)][Column("observaciones")]
         public string? Observaciones { get; set; }
@@ -62,8 +62,8 @@ namespace DrCell_V02.Data.Modelos
         // Items vendidos
         public ICollection<VentaItem> Items { get; set; } = new List<VentaItem>();
 
-        // Navegación al usuario (si está registrado)
-        public Usuario? Usuario { get; set; }
+        // Navegación al usuario temporalmente comentada para evitar problemas de FK
+        // public Usuario? Usuario { get; set; }
     }
 
 

@@ -29,7 +29,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useVenta, useVentas } from "@/hooks/useVentas";
 import type { VentaDto } from "@/schemas/ventas";
 
-const ESTADOS = ["all", "APPROVED", "PENDING", "REJECTED"] as const;
+const ESTADOS = ["all", "APROBADO", "PENDIENTE", "RECHAZADO"] as const;
 type EstadoFiltro = (typeof ESTADOS)[number];
 
 function formatCurrency(amount: number) {
@@ -54,15 +54,15 @@ function formatDate(dateString: string) {
 function EstadoBadge({ estado }: { estado: string }) {
   const base =
     "inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full";
-  if (estado === "APPROVED")
+  if (estado === "APROBADO")
     return (
       <span className={`${base} bg-green-100 text-green-800`}>Aprobada</span>
     );
-  if (estado === "PENDING")
+  if (estado === "PENDIENTE")
     return (
       <span className={`${base} bg-yellow-100 text-yellow-800`}>Pendiente</span>
     );
-  if (estado === "REJECTED")
+  if (estado === "RECHAZADO")
     return <span className={`${base} bg-red-100 text-red-800`}>Rechazada</span>;
   return <span className={`${base} bg-gray-100 text-gray-800`}>{estado}</span>;
 }
@@ -192,9 +192,9 @@ export default function VentasGrid() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="APPROVED">Aprobadas</SelectItem>
-              <SelectItem value="PENDING">Pendientes</SelectItem>
-              <SelectItem value="REJECTED">Rechazadas</SelectItem>
+              <SelectItem value="APROBADO">Aprobadas</SelectItem>
+              <SelectItem value="PENDIENTE">Pendientes</SelectItem>
+              <SelectItem value="RECHAZADO">Rechazadas</SelectItem>
             </SelectContent>
           </Select>
         </div>

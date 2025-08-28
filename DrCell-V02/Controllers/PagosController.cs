@@ -347,7 +347,23 @@ namespace DrCell_V02.Controllers
                 _logger.LogInformation("Status: {status}", status);
                 _logger.LogInformation("ExternalReference: {externalReference}", external_reference);
                 _logger.LogInformation("PreferenceId: {preferenceId}", preference_id);
+                
+                // Log all query parameters for debugging
+                _logger.LogInformation("🔍 ALL Query Parameters:");
+                foreach (var param in Request.Query)
+                {
+                    _logger.LogInformation("  {key}: {value}", param.Key, param.Value);
+                }
+                
                 _logger.LogInformation("==================================================================================");
+
+                // Validar que tenemos la información mínima necesaria
+                if (string.IsNullOrEmpty(payment_id) && string.IsNullOrEmpty(preference_id))
+                {
+                    _logger.LogError("❌ ERROR: No se recibió payment_id ni preference_id. Redirigiendo con error.");
+                    var errorFrontendUrl = _configuration.GetValue<string>("Frontend:BaseUrl") ?? "http://localhost:3000";
+                    return Redirect($"{errorFrontendUrl}/tienda?pago=error");
+                }
 
                 if (!string.IsNullOrEmpty(preference_id))
                 {
@@ -360,10 +376,18 @@ namespace DrCell_V02.Controllers
                     {
                         _logger.LogInformation("✅ Reservas confirmadas exitosamente - creando registro de venta...");
                         
-                        // Crear registro de venta
-                        await CrearRegistroVentaAsync(preference_id, payment_id);
-
-                        _logger.LogInformation("✅ PROCESO COMPLETADO: Reservas confirmadas y venta registrada para PreferenceId: {preferenceId}", preference_id);
+                        try
+                        {
+                            // Crear registro de venta
+                            await CrearRegistroVentaAsync(preference_id, payment_id);
+                            _logger.LogInformation("✅ PROCESO COMPLETADO: Reservas confirmadas y venta registrada para PreferenceId: {preferenceId}", preference_id);
+                        }
+                        catch (Exception ventaEx)
+                        {
+                            _logger.LogError(ventaEx, "❌ ERROR ESPECÍFICO al crear registro de venta - PreferenceId: {preferenceId}", preference_id);
+                            // No hacer throw aquí porque las reservas ya están confirmadas
+                            // Continuar con la redirección pero loguear el error
+                        }
                     }
                     else
                     {
@@ -375,8 +399,9 @@ namespace DrCell_V02.Controllers
                     _logger.LogWarning("⚠️ No se recibió PreferenceId - no se puede procesar el stock");
                 }
 
-                // Redirigir al frontend con parámetros de éxito
-                var redirectUrl = $"http://localhost:3000/tienda?pago=exitoso&payment_id={payment_id}";
+                // Determinar URL de frontend dinámicamente
+                var frontendUrl = _configuration.GetValue<string>("Frontend:BaseUrl") ?? "http://localhost:3000";
+                var redirectUrl = $"{frontendUrl}/tienda?pago=exitoso&payment_id={payment_id}";
                 _logger.LogInformation("🔀 Redirigiendo a: {url}", redirectUrl);
                 return Redirect(redirectUrl);
             }
@@ -385,7 +410,8 @@ namespace DrCell_V02.Controllers
                 _logger.LogError(ex, "❌ ERROR CRÍTICO al procesar resultado del pago exitoso");
                 _logger.LogError("❌ Stack trace: {stackTrace}", ex.StackTrace);
                 // En caso de error, también redirigir al frontend pero con parámetro de error
-                return Redirect("http://localhost:3000/tienda?pago=error");
+                var frontendUrl = _configuration.GetValue<string>("Frontend:BaseUrl") ?? "http://localhost:3000";
+                return Redirect($"{frontendUrl}/tienda?pago=error");
             }
         }
 
@@ -394,8 +420,19 @@ namespace DrCell_V02.Controllers
         {
             try
             {
-                _logger.LogWarning("Pago fallido recibido - PaymentId: {paymentId}, Status: {status}, PreferenceId: {preferenceId}",
-                    payment_id, status, preference_id);
+                _logger.LogWarning("❌ =========================== PAGO FALLIDO RECIBIDO ===========================");
+                _logger.LogWarning("PaymentId: {paymentId}", payment_id);
+                _logger.LogWarning("Status: {status}", status);
+                _logger.LogWarning("ExternalReference: {externalReference}", external_reference);
+                _logger.LogWarning("PreferenceId: {preferenceId}", preference_id);
+                
+                // Log all query parameters for debugging
+                _logger.LogWarning("🔍 ALL Query Parameters:");
+                foreach (var param in Request.Query)
+                {
+                    _logger.LogWarning("  {key}: {value}", param.Key, param.Value);
+                }
+                _logger.LogWarning("==================================================================================");
 
                 if (!string.IsNullOrEmpty(preference_id))
                 {
@@ -413,14 +450,16 @@ namespace DrCell_V02.Controllers
                 }
 
                 // Redirigir al frontend con parámetros de fallo
-                var redirectUrl = $"http://localhost:3000/tienda?pago=fallido&payment_id={payment_id}";
+                var frontendUrl = _configuration.GetValue<string>("Frontend:BaseUrl") ?? "http://localhost:3000";
+                var redirectUrl = $"{frontendUrl}/tienda?pago=fallido&payment_id={payment_id}";
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al procesar fallo del pago");
                 // En caso de error, redirigir al frontend con parámetro de error
-                return Redirect("http://localhost:3000/tienda?pago=error");
+                var frontendUrl = _configuration.GetValue<string>("Frontend:BaseUrl") ?? "http://localhost:3000";
+                return Redirect($"{frontendUrl}/tienda?pago=error");
             }
         }
 
@@ -429,21 +468,34 @@ namespace DrCell_V02.Controllers
         {
             try
             {
-                _logger.LogInformation("Pago pendiente recibido - PaymentId: {paymentId}, Status: {status}, PreferenceId: {preferenceId}",
-                    payment_id, status, preference_id);
+                _logger.LogInformation("⏳ =========================== PAGO PENDIENTE RECIBIDO ===========================");
+                _logger.LogInformation("PaymentId: {paymentId}", payment_id);
+                _logger.LogInformation("Status: {status}", status);
+                _logger.LogInformation("ExternalReference: {externalReference}", external_reference);
+                _logger.LogInformation("PreferenceId: {preferenceId}", preference_id);
+                
+                // Log all query parameters for debugging
+                _logger.LogInformation("🔍 ALL Query Parameters:");
+                foreach (var param in Request.Query)
+                {
+                    _logger.LogInformation("  {key}: {value}", param.Key, param.Value);
+                }
+                _logger.LogInformation("==================================================================================");
 
                 // Para pagos pendientes, mantenemos las reservas activas
                 // El StockCleanupJob se encargará de liberarlas si expiran
 
                 // Redirigir al frontend con parámetros de pendiente
-                var redirectUrl = $"http://localhost:3000/tienda?pago=pendiente&payment_id={payment_id}";
+                var frontendUrl = _configuration.GetValue<string>("Frontend:BaseUrl") ?? "http://localhost:3000";
+                var redirectUrl = $"{frontendUrl}/tienda?pago=pendiente&payment_id={payment_id}";
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al procesar pago pendiente");
                 // En caso de error, redirigir al frontend con parámetro de error
-                return Redirect("http://localhost:3000/tienda?pago=error");
+                var frontendUrl = _configuration.GetValue<string>("Frontend:BaseUrl") ?? "http://localhost:3000";
+                return Redirect($"{frontendUrl}/tienda?pago=error");
             }
         }
 
@@ -452,39 +504,123 @@ namespace DrCell_V02.Controllers
         {
             try
             {
+                _logger.LogInformation("🔄 =========================== CREANDO REGISTRO DE VENTA ===========================");
+                _logger.LogInformation("📝 PreferenceId: {preferenceId}, PaymentId: {paymentId}", preferenceId, paymentId);
+
+                // Paso 1: Buscar reservas confirmadas
+                _logger.LogInformation("🔍 PASO 1: Buscando reservas CONFIRMADAS...");
                 var reservas = await _context.StockReserva
                     .Include(r => r.Variante)
                     .Where(r => r.PreferenceId == preferenceId && r.Estado == "CONFIRMADO")
                     .ToListAsync();
 
-                if (!reservas.Any()) return;
+                _logger.LogInformation("📊 Reservas encontradas: {count}", reservas.Count);
 
+                if (!reservas.Any()) 
+                {
+                    _logger.LogWarning("⚠️ No se encontraron reservas CONFIRMADAS para PreferenceId: {preferenceId}", preferenceId);
+                    
+                    // Debug: Verificar si hay reservas con otros estados
+                    var todasReservas = await _context.StockReserva
+                        .Where(r => r.PreferenceId == preferenceId)
+                        .ToListAsync();
+                    _logger.LogInformation("🔍 DEBUG: Total reservas para este PreferenceId: {count}", todasReservas.Count);
+                    foreach (var res in todasReservas)
+                    {
+                        _logger.LogInformation("🔍 DEBUG: Reserva ID {id}, Estado: {estado}", res.Id, res.Estado);
+                    }
+                    return;
+                }
+
+                // Paso 2: Calcular monto total
+                _logger.LogInformation("💰 PASO 2: Calculando monto total...");
                 var montoTotal = reservas.Sum(r => r.Variante.Precio * r.Cantidad);
+                _logger.LogInformation("💰 Monto total calculado: {montoTotal}", montoTotal);
 
+                // Paso 3: Verificar si ya existe una venta para este PreferenceId
+                _logger.LogInformation("🔍 PASO 3: Verificando si ya existe una venta...");
+                var ventaExistente = await _context.Ventas
+                    .FirstOrDefaultAsync(v => v.PreferenceId == preferenceId);
+                
+                if (ventaExistente != null)
+                {
+                    _logger.LogWarning("⚠️ Ya existe una venta para PreferenceId: {preferenceId}, VentaId: {ventaId}", 
+                        preferenceId, ventaExistente.Id);
+                    return;
+                }
+
+                // Paso 4: Crear la venta
+                _logger.LogInformation("📝 PASO 4: Creando registro de venta...");
                 var venta = new Venta
                 {
                     PreferenceId = preferenceId,
                     PaymentId = paymentId ?? "",
                     MontoTotal = montoTotal,
                     Estado = "APPROVED",
-                    Items = reservas.Select(r => new VentaItem
-                    {
-                        VarianteId = r.VarianteId,
-                        Cantidad = r.Cantidad,
-                        PrecioUnitario = r.Variante.Precio,
-                        Subtotal = r.Variante.Precio * r.Cantidad
-                    }).ToList()
+                    FechaVenta = DateTime.UtcNow
                 };
 
-                _context.Ventas.Add(venta);
-                await _context.SaveChangesAsync();
+                _logger.LogInformation("📝 Venta creada en memoria: PreferenceId={preferenceId}, MontoTotal={monto}", 
+                    venta.PreferenceId, venta.MontoTotal);
 
-                _logger.LogInformation("Venta registrada exitosamente - PreferenceId: {preferenceId}, MontoTotal: {monto}",
-                    preferenceId, montoTotal);
+                _context.Ventas.Add(venta);
+                _logger.LogInformation("📝 Venta agregada al contexto, guardando...");
+                
+                var filasAfectadas1 = await _context.SaveChangesAsync();
+                _logger.LogInformation("✅ SaveChanges() completado - Filas afectadas: {filas}, VentaId generado: {ventaId}", 
+                    filasAfectadas1, venta.Id);
+
+                // Paso 5: Crear los items de la venta
+                _logger.LogInformation("📝 PASO 5: Creando items de venta...");
+                var ventaItems = reservas.Select(r => new VentaItem
+                {
+                    VentaId = venta.Id,
+                    VarianteId = r.VarianteId,
+                    Cantidad = r.Cantidad,
+                    PrecioUnitario = r.Variante.Precio,
+                    Subtotal = r.Variante.Precio * r.Cantidad
+                }).ToList();
+
+                _logger.LogInformation("📝 Items creados: {count}", ventaItems.Count);
+                foreach (var item in ventaItems)
+                {
+                    _logger.LogInformation("📝 Item: VentaId={ventaId}, VarianteId={varianteId}, Cantidad={cantidad}, Precio={precio}", 
+                        item.VentaId, item.VarianteId, item.Cantidad, item.PrecioUnitario);
+                }
+
+                _context.VentaItems.AddRange(ventaItems);
+                _logger.LogInformation("📝 Items agregados al contexto, guardando...");
+                
+                var filasAfectadas2 = await _context.SaveChangesAsync();
+                _logger.LogInformation("✅ Items guardados - Filas afectadas: {filas}", filasAfectadas2);
+
+                // Paso 6: Verificación final
+                _logger.LogInformation("🔍 PASO 6: Verificación final...");
+                var ventaGuardada = await _context.Ventas
+                    .Include(v => v.Items)
+                    .FirstOrDefaultAsync(v => v.Id == venta.Id);
+
+                if (ventaGuardada != null)
+                {
+                    _logger.LogInformation("✅ VERIFICACIÓN: Venta encontrada en BD - ID: {id}, Items: {itemsCount}", 
+                        ventaGuardada.Id, ventaGuardada.Items.Count);
+                }
+                else
+                {
+                    _logger.LogError("❌ VERIFICACIÓN FALLIDA: No se encontró la venta en la BD");
+                }
+
+                _logger.LogInformation("🎉 ======================= VENTA REGISTRADA EXITOSAMENTE =======================");
+                _logger.LogInformation("🎉 VentaId: {ventaId}, PreferenceId: {preferenceId}, MontoTotal: {monto}, Items: {itemsCount}",
+                    venta.Id, preferenceId, montoTotal, ventaItems.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear registro de venta");
+                _logger.LogError(ex, "❌ ======================= ERROR AL CREAR REGISTRO DE VENTA =======================");
+                _logger.LogError("❌ PreferenceId: {preferenceId}", preferenceId);
+                _logger.LogError("❌ Error detalle: {message}", ex.Message);
+                _logger.LogError("❌ Inner Exception: {innerException}", ex.InnerException?.Message);
+                _logger.LogError("❌ Stack trace: {stackTrace}", ex.StackTrace);
                 throw;
             }
         }
@@ -1210,6 +1346,43 @@ public async Task<IActionResult> ConfirmarPagoManual([FromBody] ConfirmarPagoMan
     }
 }
 
+[HttpPost("debug/crear-venta-directa")]
+public async Task<IActionResult> CrearVentaDirecta([FromBody] ConfirmarPagoManualDto datos)
+{
+    try
+    {
+        _logger.LogInformation("=== CREAR VENTA DIRECTA ===");
+        _logger.LogInformation("PreferenceId: {preferenceId}", datos.PreferenceId);
+
+        if (string.IsNullOrEmpty(datos.PreferenceId))
+        {
+            return BadRequest(new { success = false, message = "PreferenceId requerido" });
+        }
+
+        // Llamar directamente al método CrearRegistroVentaAsync
+        await CrearRegistroVentaAsync(datos.PreferenceId, datos.PaymentId ?? "DIRECTO-" + DateTime.Now.Ticks);
+
+        _logger.LogInformation("✅ Venta creada directamente - PreferenceId: {preferenceId}", datos.PreferenceId);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Venta creada exitosamente",
+            preferenceId = datos.PreferenceId
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "❌ Error al crear venta directamente");
+        return StatusCode(500, new { 
+            success = false, 
+            message = "Error al crear venta", 
+            error = ex.Message,
+            stackTrace = ex.StackTrace?.Substring(0, Math.Min(1000, ex.StackTrace.Length))
+        });
+    }
+}
+
 public class ConfirmarPagoManualDto
 {
     public string PreferenceId { get; set; } = string.Empty;
@@ -1245,6 +1418,85 @@ public async Task<IActionResult> ListarReservasPendientes()
             success = true,
             reservasPendientes = reservasPendientes,
             total = reservasPendientes.Count
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
+    }
+}
+
+[HttpGet("debug/listar-reservas-confirmadas")]
+public async Task<IActionResult> ListarReservasConfirmadas()
+{
+    try
+    {
+        var reservasConfirmadas = await _context.StockReserva
+            .Include(r => r.Variante)
+            .ThenInclude(v => v.Producto)
+            .Where(r => r.Estado == "CONFIRMADO")
+            .OrderByDescending(r => r.FechaCreacion)
+            .Take(10)
+            .Select(r => new {
+                r.Id,
+                r.PreferenceId,
+                r.SessionId,
+                r.VarianteId,
+                r.Cantidad,
+                r.Estado,
+                r.FechaCreacion,
+                r.FechaExpiracion,
+                Producto = $"{r.Variante.Producto.Marca} {r.Variante.Producto.Modelo}",
+                Variante = $"{r.Variante.Color} - {r.Variante.Ram}/{r.Variante.Almacenamiento}"
+            })
+            .ToListAsync();
+
+        return Ok(new {
+            success = true,
+            reservasConfirmadas = reservasConfirmadas,
+            total = reservasConfirmadas.Count
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
+    }
+}
+
+[HttpGet("debug/listar-ventas")]
+public async Task<IActionResult> ListarVentas()
+{
+    try
+    {
+        var ventas = await _context.Ventas
+            .Include(v => v.Items)
+            .ThenInclude(i => i.Variante)
+            .ThenInclude(v => v.Producto)
+            .OrderByDescending(v => v.FechaVenta)
+            .Take(10)
+            .Select(v => new {
+                v.Id,
+                v.PreferenceId,
+                v.PaymentId,
+                v.MontoTotal,
+                v.Estado,
+                v.FechaVenta,
+                Items = v.Items.Select(i => new {
+                    i.Id,
+                    i.VarianteId,
+                    i.Cantidad,
+                    i.PrecioUnitario,
+                    i.Subtotal,
+                    Producto = $"{i.Variante.Producto.Marca} {i.Variante.Producto.Modelo}",
+                    Variante = $"{i.Variante.Color} - {i.Variante.Ram}/{i.Variante.Almacenamiento}"
+                })
+            })
+            .ToListAsync();
+
+        return Ok(new {
+            success = true,
+            ventas = ventas,
+            total = ventas.Count
         });
     }
     catch (Exception ex)
