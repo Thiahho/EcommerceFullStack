@@ -25,20 +25,48 @@ export const useAuthStore = create<AuthState>()(
       
       logout: async () => {
         try {
+          console.log('🔧 DEBUG: Iniciando logout desde el store...');
+          
           // Llamar al endpoint de logout del servidor para limpiar cookies
-          await api.post('/Admin/logout');
+          const response = await api.post('/Admin/logout');
+          console.log('🔧 DEBUG: Respuesta del servidor:', response.data);
         } catch (error) {
           console.error('Error al cerrar sesión:', error);
         } finally {
+          console.log('🔧 DEBUG: Limpiando estado local...');
+          
           // Limpiar estado local
           set({ user: null });
           
-          // Limpiar cualquier dato legacy en localStorage
+          // Limpiar todos los datos de autenticación
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          localStorage.removeItem('authToken');
           
-          // Redirigir al login
-          window.location.href = '/login';
+          // Limpiar específicamente el storage de auth de Zustand
+          sessionStorage.removeItem('auth-storage');
+          localStorage.removeItem('auth-storage'); // Por si acaso se cambió a localStorage
+          
+          // También limpiar cualquier key que pueda estar en localStorage
+          Object.keys(localStorage).forEach(key => {
+            if (key.includes('auth') || key.includes('token') || key.includes('user')) {
+              localStorage.removeItem(key);
+              console.log(`🧹 Limpiado localStorage key: ${key}`);
+            }
+          });
+          
+          // Limpiar cookies desde el frontend también (para casos edge)
+          document.cookie = 'AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=localhost';
+          document.cookie = 'AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+          document.cookie = 'AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; secure; samesite=lax';
+          
+          console.log('🔧 DEBUG: Estado limpiado, redirigiendo...');
+          
+          // Esperar un poco antes de redirigir para asegurar que el estado se limpia
+          setTimeout(() => {
+            // Forzar una recarga completa para asegurar que todo se limpia
+            window.location.replace('/login');
+          }, 100);
         }
       },
       
@@ -132,6 +160,12 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user, // Solo persistir usuario, no tokens
       }),
+      onRehydrateStorage: () => (state) => {
+        // Al hidratar el estado, verificar si el usuario sigue siendo válido
+        if (state?.user) {
+          console.log('🔄 Rehidratando estado de auth:', state.user);
+        }
+      }
     }
   )
 );

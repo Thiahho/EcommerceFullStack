@@ -176,12 +176,12 @@ const CheckoutPro: React.FC<CheckoutProProps> = ({ onSuccess, onError }) => {
       </div>
 
       {/* Debug info */}
-      <div className="text-xs text-blue-500 p-2 bg-blue-50 rounded">
+      {/* <div className="text-xs text-blue-500 p-2 bg-blue-50 rounded">
         SDK Status: {sdkLoaded ? "✅ Cargado" : "❌ No cargado"} | Loading:{" "}
         {loading ? "⏳" : "✅"} | Preference ID:{" "}
         {preferenceId ? "✅ Creada" : "❌ Pendiente"} | Items:{" "}
         {cartItems.length}
-      </div>
+      </div> */}
 
       {/* Loading state */}
       {loading && (

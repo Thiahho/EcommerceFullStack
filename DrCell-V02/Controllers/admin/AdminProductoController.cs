@@ -46,18 +46,32 @@ namespace DrCell_V02.Controllers.Admin
         {
             try
             {
+                _logger.LogInformation("Creando producto: {@Producto}", producto);
+
                 if (!ModelState.IsValid)
                 {
+                    _logger.LogWarning("ModelState inválido: {@ModelState}", ModelState);
                     return BadRequest(ModelState);
                 }
 
                 var nuevoProducto = await _productoService.AddAsync(producto);
+                _logger.LogInformation("Producto creado exitosamente con ID: {Id}", nuevoProducto.Id);
                 return CreatedAtAction(nameof(GetById), new { id = nuevoProducto.Id }, nuevoProducto);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Error de validación al crear el producto: {Message}", ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, "Error de operación al crear el producto: {Message}", ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear el producto");
-                return StatusCode(500, "Error interno del servidor");
+                _logger.LogError(ex, "Error inesperado al crear el producto");
+                return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
             }
         }
 
@@ -66,25 +80,51 @@ namespace DrCell_V02.Controllers.Admin
         {
             try
             {
+                _logger.LogInformation("Actualizando producto {Id}: {@Producto}", id, productoDto);
+
                 if (id != productoDto.Id)
+                {
+                    _logger.LogWarning("ID del producto no coincide: {Id} != {DtoId}", id, productoDto.Id);
                     return BadRequest("El ID del producto no coincide");
+                }
 
                 // Obtener el producto existente
                 var existingProducto = await _productoService.GetByIdWithVarianteAsync(id);
                 if (existingProducto == null)
+                {
+                    _logger.LogWarning("No se encontró el producto con ID {Id}", id);
                     return NotFound($"No se encontró el producto con ID {id}");
+                }
+
+                _logger.LogInformation("Producto existente encontrado: {@ExistingProducto}", existingProducto);
 
                 // Si no se proporciona una nueva imagen, mantener la existente
                 if (string.IsNullOrEmpty(productoDto.Img))
+                {
+                    _logger.LogInformation("Manteniendo imagen existente del producto {Id}", id);
                     productoDto.Img = existingProducto.Img;
+                }
 
+                _logger.LogInformation("Llamando a ActualizarAsync para producto {Id}", id);
                 await _productoService.ActualizarAsync(productoDto);
+                
+                _logger.LogInformation("Producto {Id} actualizado exitosamente", id);
                 return Ok(productoDto);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Error de validación al actualizar el producto {Id}: {Message}", id, ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Producto {Id} no encontrado: {Message}", id, ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al actualizar el producto {id}");
-                return StatusCode(500, "Error interno del servidor");
+                _logger.LogError(ex, "Error inesperado al actualizar el producto {Id}: {Message}", id, ex.Message);
+                return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
             }
         }
 

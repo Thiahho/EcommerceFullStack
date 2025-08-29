@@ -15,6 +15,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuthStore } from "@/store/auth-store";
 
 const links = [
   { to: "/admin", label: "Dashboard", icon: Home },
@@ -37,12 +38,10 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({
   setOpen,
   isMobile,
 }) => {
-  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const { user, logout } = useAuthStore();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    window.location.href = "/login";
+  const handleLogout = async () => {
+    await logout();
   };
 
   const handleNavClick = () => {
@@ -68,51 +67,66 @@ const SidebarAdmin: React.FC<SidebarAdminProps> = ({
           ${
             isMobile
               ? `top-0 left-0 transform ${open ? "translate-x-0" : "-translate-x-full"} w-64`
-              : `w-64 my-6 ml-6 rounded-3xl`
+              : `my-6 ml-6 rounded-3xl ${open ? "w-64" : "w-20"}`
           }
-          ${!isMobile && !open ? "w-20" : ""}
         `}
       >
         {/* Header del sidebar */}
-        <div className="flex items-center justify-between h-20 border-b px-4 flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <img
-              src={`https://ui-avatars.com/api/?name=${usuario.email || "Admin"}`}
-              alt="Avatar"
-              className="w-10 h-10 rounded-full flex-shrink-0"
-            />
-            {(open || !isMobile) && (
-              <div className="min-w-0 flex-1">
-                <div className="font-bold text-gray-800 text-sm truncate">
-                  {usuario.rol || "Admin"}
-                </div>
-                <div className="text-xs text-gray-500 truncate">
-                  {usuario.email}
-                </div>
+        <div className={`flex items-center h-20 border-b flex-shrink-0 ${!open && !isMobile ? 'justify-center px-2' : 'justify-between px-4'}`}>
+          {/* Cuando está colapsado, solo mostrar botón de expansión */}
+          {!open && !isMobile ? (
+            <button
+              onClick={() => setOpen(true)}
+              className="p-2 rounded hover:bg-gray-100 text-gray-600 hover:text-gray-800"
+              aria-label="Expand sidebar"
+              title="Expandir menú"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          ) : (
+            <>
+              {/* Contenido normal cuando está expandido */}
+              <div className="flex items-center gap-2 min-w-0">
+                <img
+                  src={`https://ui-avatars.com/api/?name=${user?.email || "Admin"}`}
+                  alt="Avatar"
+                  className="w-10 h-10 rounded-full flex-shrink-0"
+                />
+                {(open || isMobile) && (
+                  <div className="min-w-0 flex-1">
+                    <div className="font-bold text-gray-800 text-sm truncate">
+                      {user?.role?.toUpperCase() || "ADMIN"}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {user?.email || "admin@drcell.com"}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Botón de cerrar para móviles */}
-          {isMobile && (
-            <button
-              onClick={() => setOpen(false)}
-              className="p-2 rounded hover:bg-gray-100 lg:hidden"
-              aria-label="Close sidebar"
-            >
-              <X className="h-6 w-6 text-gray-600" />
-            </button>
-          )}
+              {/* Botón de cerrar para móviles */}
+              {isMobile && (
+                <button
+                  onClick={() => setOpen(false)}
+                  className="p-2 rounded hover:bg-gray-100 lg:hidden"
+                  aria-label="Close sidebar"
+                >
+                  <X className="h-6 w-6 text-gray-600" />
+                </button>
+              )}
 
-          {/* Botón de toggle para desktop */}
-          {!isMobile && (
-            <button
-              onClick={() => setOpen(!open)}
-              className="p-2 rounded hover:bg-gray-100 hidden lg:block"
-              aria-label="Toggle sidebar"
-            >
-              <Menu className="h-6 w-6 text-gray-600" />
-            </button>
+              {/* Botón de colapsar para desktop */}
+              {!isMobile && open && (
+                <button
+                  onClick={() => setOpen(!open)}
+                  className="p-2 rounded hover:bg-gray-100 hidden lg:block"
+                  aria-label="Collapse sidebar"
+                  title="Minimizar menú"
+                >
+                  <Menu className="h-6 w-6 text-gray-600" />
+                </button>
+              )}
+            </>
           )}
         </div>
 

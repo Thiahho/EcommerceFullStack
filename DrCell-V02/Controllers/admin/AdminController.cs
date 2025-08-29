@@ -170,13 +170,64 @@ namespace DrCell_V02.Controllers.admin
         {
             try
             {
-                // Eliminar cookie de autenticación
-                Response.Cookies.Delete("AuthToken");
+                Console.WriteLine($"🔧 DEBUG: Iniciando proceso de logout");
+                Console.WriteLine($"🔧 DEBUG: Cookies antes del logout: {string.Join(", ", Request.Cookies.Select(c => c.Key))}");
 
-                return Ok(new { message = "Sesión cerrada exitosamente" });
+                // Configurar las mismas opciones de cookie que se usaron en el login
+                var environment = _configuration["ASPNETCORE_ENVIRONMENT"];
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(-1), // Fecha pasada para expirar inmediatamente
+                    Path = "/"
+                };
+
+                // Aplicar la misma configuración por ambiente que en login
+                if (environment == "Development")
+                {
+                    cookieOptions.HttpOnly = false;
+                    cookieOptions.Secure = false;
+                    cookieOptions.SameSite = SameSiteMode.Lax;
+                }
+                else
+                {
+                    cookieOptions.HttpOnly = true;
+                    cookieOptions.Secure = true;
+                    cookieOptions.SameSite = SameSiteMode.Strict;
+                }
+
+                // Eliminar cookie de autenticación con las opciones correctas
+                Response.Cookies.Delete("AuthToken", cookieOptions);
+                
+                // También intentar eliminar con configuraciones alternativas por si acaso
+                Response.Cookies.Append("AuthToken", "", new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(-1),
+                    Path = "/",
+                    HttpOnly = false,
+                    Secure = false,
+                    SameSite = SameSiteMode.None
+                });
+
+                Console.WriteLine($"🔧 DEBUG: Cookie AuthToken eliminada");
+
+                return Ok(new { 
+                    message = "Sesión cerrada exitosamente",
+                    debug = new
+                    {
+                        environment = environment,
+                        cookieDeleted = true,
+                        cookieOptions = new
+                        {
+                            httpOnly = cookieOptions.HttpOnly,
+                            secure = cookieOptions.Secure,
+                            sameSite = cookieOptions.SameSite.ToString()
+                        }
+                    }
+                });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"🔧 ERROR: Error al cerrar sesión: {ex.Message}");
                 return StatusCode(500, new { message = "Error al cerrar sesión", error = ex.Message });
             }
         }

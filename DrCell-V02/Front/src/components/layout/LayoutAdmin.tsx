@@ -52,9 +52,8 @@ const LayoutAdmin: React.FC = () => {
         
         <main
           className={`
-            flex-1 p-4 lg:p-8 w-full transition-all duration-300
-            ${!isMobile && sidebarOpen ? 'lg:ml-6' : ''}
-            ${!isMobile && !sidebarOpen ? 'lg:ml-6' : ''}
+            flex-1 p-4 lg:p-8 transition-all duration-300 min-w-0 overflow-hidden
+            ${isMobile ? 'w-full' : ''}
           `}
         >
           <Outlet />

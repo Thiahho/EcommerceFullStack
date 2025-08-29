@@ -39,7 +39,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
     setEditedProducto({
       marca: producto.marca,
       modelo: producto.modelo,
-      categoria: producto.categoria,
+      categoria: producto.categoria?.toLowerCase() || '',
       img: null
     });
     setImagePreview(null);
@@ -182,8 +182,8 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ isOpen, onClose, onSu
                     </SelectItem>
                   ) : (
                     categorias.map((categoria) => (
-                      <SelectItem key={categoria.id} value={categoria.nombre}>
-                        {categoria.nombre}
+                      <SelectItem key={categoria.id} value={categoria.nombre.toLowerCase()}>
+                        📂 {categoria.nombre}
                       </SelectItem>
                     ))
                   )}

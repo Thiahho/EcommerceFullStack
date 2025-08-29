@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
   Home,
   Package,
@@ -12,13 +12,13 @@ import {
   X,
   ShoppingCart,
   HelpCircle,
-} from 'lucide-react';
-import { useAuthStore } from '@/store/auth-store';
-import { useCartStore } from '@/store/cart-store';
+} from "lucide-react";
+import { useAuthStore } from "@/store/auth-store";
+import { useCartStore } from "@/store/cart-store";
 
 interface User {
   email: string;
-  rol?: 'ADMIN' | 'USER';
+  rol?: "ADMIN" | "USER";
 }
 
 const Navbar: React.FC = () => {
@@ -40,10 +40,10 @@ const Navbar: React.FC = () => {
       : "transition-colors duration-200";
 
     if (isActiveLink(path)) {
-      return `${baseClasses} text-[#17436b] ${isMobile ? 'bg-blue-50 font-semibold' : 'border-b-2 border-[#17436b] font-semibold'}`;
+      return `${baseClasses} text-[#17436b] ${isMobile ? "bg-blue-50 font-semibold" : "border-b-2 border-[#17436b] font-semibold"}`;
     }
 
-    return `${baseClasses} text-gray-700 hover:text-[#17436b] ${isMobile ? 'hover:bg-gray-50' : ''}`;
+    return `${baseClasses} text-gray-700 hover:text-[#17436b] ${isMobile ? "hover:bg-gray-50" : ""}`;
   };
 
   const handleLogout = () => {
@@ -63,7 +63,9 @@ const Navbar: React.FC = () => {
     <>
       {/* Barra informativa */}
       <div className="w-full bg-[#17436b] text-white py-2 px-4 text-center text-xs sm:text-sm">
-        <span className="hidden sm:inline">Lunes a Viernes de 09:00 a 19:00.</span>
+        <span className="hidden sm:inline">
+          Lunes a Viernes de 09:00 a 19:00.
+        </span>
         <span className="sm:hidden">Lun-Vie 09:00-19:00</span>
         <span className="font-bold ml-1 sm:ml-2">Cotizacion sin cargo.</span>
       </div>
@@ -72,7 +74,10 @@ const Navbar: React.FC = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 flex-shrink-0 h-full">
+            <Link
+              to="/"
+              className="flex items-center space-x-2 flex-shrink-0 h-full"
+            >
               <img
                 src="/img/Logo2.png"
                 alt="Doctor Cell Logo"
@@ -85,22 +90,13 @@ const Navbar: React.FC = () => {
 
             {/* Menú principal - Desktop */}
             <div className="hidden md:flex md:items-center md:space-x-6 lg:space-x-8">
-              <Link
-                to="/tienda"
-                className={getLinkClasses('/tienda')}
-              >
+              <Link to="/tienda" className={getLinkClasses("/tienda")}>
                 Tienda
               </Link>
-              <Link
-                to="/nosotros"
-                className={getLinkClasses('/nosotros')}
-              >
+              <Link to="/nosotros" className={getLinkClasses("/nosotros")}>
                 Sobre nosotros
               </Link>
-              <Link
-                to="/cotizacion"
-                className={getLinkClasses('/cotizacion')}
-              >
+              <Link to="/cotizacion" className={getLinkClasses("/cotizacion")}>
                 Presupuestar
               </Link>
             </div>
@@ -109,11 +105,15 @@ const Navbar: React.FC = () => {
             <div className="hidden md:flex md:items-center md:space-x-3 lg:space-x-4">
               {/* Botón del Carrito → Checkout */}
               <button
-                onClick={() => navigate('/checkout')}
+                onClick={() => navigate("/checkout")}
                 disabled={getTotalItems() === 0}
                 className="relative p-2 text-gray-700 hover:text-[#17436b] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Ir al checkout"
-                title={getTotalItems() > 0 ? `${getTotalItems()} productos - Ir al checkout` : 'Carrito vacío'}
+                title={
+                  getTotalItems() > 0
+                    ? `${getTotalItems()} productos - Ir al checkout`
+                    : "Carrito vacío"
+                }
               >
                 <ShoppingCart className="h-6 w-6" />
                 {getTotalItems() > 0 && (
@@ -125,10 +125,10 @@ const Navbar: React.FC = () => {
 
               {user ? (
                 <>
-                  {user.role === 'admin' && (
+                  {user.role === "admin" && (
                     <Button
                       className="bg-[#17436b] text-white hover:bg-[#0d2b4a] text-sm px-3 py-2"
-                      onClick={() => navigate('/admin')}
+                      onClick={() => navigate("/admin")}
                     >
                       <Clipboard className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
                       <span className="hidden lg:inline">Admin</span>
@@ -146,8 +146,8 @@ const Navbar: React.FC = () => {
                 </>
               ) : (
                 <Button
-                  className="bg-[#17436b] text-white hover:bg-[#0d2b4a] text-sm px-3 py-2"
-                  onClick={() => navigate('/login')}
+                  className="bg-[#17436b] text-white hover:bg-[#0d2b4a] text-sm px-3 py-2 rounded-2xl"
+                  onClick={() => navigate("/login")}
                 >
                   <User className="mr-1 h-4 w-4 lg:mr-2 lg:h-5 lg:w-5" />
                   <span className="hidden lg:inline">Iniciar Sesión</span>
@@ -180,21 +180,21 @@ const Navbar: React.FC = () => {
               <Link
                 to="/tienda"
                 onClick={handleNavLinkClick}
-                className={getLinkClasses('/tienda', true)}
+                className={getLinkClasses("/tienda", true)}
               >
                 Tienda
               </Link>
               <Link
                 to="/AboutUs"
                 onClick={handleNavLinkClick}
-                className={getLinkClasses('/aboutus', true)}
+                className={getLinkClasses("/aboutus", true)}
               >
                 Sobre nosotros
               </Link>
               <Link
                 to="/cotizacion"
                 onClick={handleNavLinkClick}
-                className={getLinkClasses('/cotizacion', true)}
+                className={getLinkClasses("/cotizacion", true)}
               >
                 Presupuestar
               </Link>
@@ -202,7 +202,7 @@ const Navbar: React.FC = () => {
               {/* Botón de Carrito → Checkout Móvil */}
               <button
                 onClick={() => {
-                  navigate('/checkout');
+                  navigate("/checkout");
                   setIsMobileMenuOpen(false);
                 }}
                 disabled={getTotalItems() === 0}
@@ -223,10 +223,10 @@ const Navbar: React.FC = () => {
               {/* Acciones de usuario móvil */}
               {user ? (
                 <>
-                  {user.role === 'admin' && (
+                  {user.role === "admin" && (
                     <button
                       onClick={() => {
-                        navigate('/admin');
+                        navigate("/admin");
                         handleNavLinkClick();
                       }}
                       className="w-full text-left px-3 py-2 text-gray-700 hover:text-[#17436b] hover:bg-gray-50 rounded-md transition-colors duration-200 flex items-center"
@@ -247,7 +247,7 @@ const Navbar: React.FC = () => {
               ) : (
                 <button
                   onClick={() => {
-                    navigate('/login');
+                    navigate("/login");
                     handleNavLinkClick();
                   }}
                   className="w-full text-left px-3 py-2 text-gray-700 hover:text-[#17436b] hover:bg-gray-50 rounded-md transition-colors duration-200 flex items-center"
@@ -264,4 +264,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

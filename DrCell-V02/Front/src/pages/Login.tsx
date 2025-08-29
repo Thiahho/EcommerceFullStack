@@ -1,27 +1,27 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useAuthStore } from '@/store/auth-store';
-import axios from '../config/axios';
-import { toast } from 'sonner';
-import { Label } from '@radix-ui/react-label';
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/store/auth-store";
+import axios from "../config/axios";
+import { toast } from "sonner";
+import { Label } from "@radix-ui/react-label";
 
 export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setUser } = useAuthStore();
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -30,26 +30,30 @@ export const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/Admin/login', formData);
+      const response = await axios.post("/Admin/login", formData);
       const { usuario, message, token, debug } = response.data;
 
-      console.log('🔧 DEBUG Login Response:', debug);
+      console.log("🔧 DEBUG Login Response:", debug);
 
       // 🔧 TEMP: Para desarrollo, usar token de la respuesta si no hay cookies
-      if (token && process.env.NODE_ENV === 'development') {
-        localStorage.setItem('authToken', token);
-        console.log('🔧 TEMP: Token almacenado en localStorage para desarrollo');
+      if (token && process.env.NODE_ENV === "development") {
+        localStorage.setItem("authToken", token);
+        console.log(
+          "🔧 TEMP: Token almacenado en localStorage para desarrollo"
+        );
       }
 
       // 🔍 DEBUG: Verificar cookies después del login
       setTimeout(() => {
         const cookiesAfterLogin = document.cookie;
-        console.log('🍪 Cookies después del login:', cookiesAfterLogin);
-        const hasAuthCookie = cookiesAfterLogin.includes('AuthToken');
-        console.log('🔍 Cookie AuthToken establecida:', hasAuthCookie);
+        console.log("🍪 Cookies después del login:", cookiesAfterLogin);
+        const hasAuthCookie = cookiesAfterLogin.includes("AuthToken");
+        console.log("🔍 Cookie AuthToken establecida:", hasAuthCookie);
 
         if (!hasAuthCookie) {
-          console.log('⚠️ ADVERTENCIA: Cookie no establecida, usando localStorage como respaldo');
+          console.log(
+            "⚠️ ADVERTENCIA: Cookie no establecida, usando localStorage como respaldo"
+          );
         }
       }, 100);
 
@@ -57,19 +61,19 @@ export const Login = () => {
       setUser({
         id: usuario.id,
         email: usuario.email,
-        role: usuario.rol.toLowerCase()
+        role: usuario.rol.toLowerCase(),
       });
 
       // Redirigir según el rol
-      if (usuario.rol === 'ADMIN') {
-        navigate('/admin');
+      if (usuario.rol === "ADMIN") {
+        navigate("/admin");
       } else {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
 
-      toast.success(message || 'Inicio de sesión exitoso');
+      toast.success(message || "Inicio de sesión exitoso");
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Error al iniciar sesión');
+      toast.error(err.response?.data?.message || "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -79,7 +83,7 @@ export const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-[#17436b]">
             Iniciar Sesión
           </h2>
         </div>
@@ -117,13 +121,13 @@ export const Login = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-2xl text-white bg-[#17436b] hover:bg-[#0d2b4a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#17436b]"
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
           </div>
         </form>
       </div>
     </div>
   );
-}; 
+};

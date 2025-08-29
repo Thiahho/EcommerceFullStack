@@ -17,10 +17,13 @@ namespace DrCell_V02.Services
     {   
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
-        public ProductosService(ApplicationDbContext applicationDbContext, IMapper mapper)
+        private readonly ILogger<ProductosService> _logger;
+        
+        public ProductosService(ApplicationDbContext applicationDbContext, IMapper mapper, ILogger<ProductosService> logger)
         {
             _context = applicationDbContext;
             _mapper = mapper;
+            _logger = logger;
         }
         public async Task<ProductosVariantesDto?> GetVarianteByIdAsync(int varianteId)
         {
@@ -51,10 +54,36 @@ namespace DrCell_V02.Services
         }
         public async Task<ProductoDto> AddAsync(ProductoDto productoDto)
         {
-            var entidad = _mapper.Map<Productos>(productoDto);
-            _context.Productos.Add(entidad);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<ProductoDto>(entidad);
+            try
+            {
+                // Validaciones básicas
+                if (string.IsNullOrEmpty(productoDto.Marca))
+                    throw new ArgumentException("La marca es requerida");
+                if (string.IsNullOrEmpty(productoDto.Modelo))
+                    throw new ArgumentException("El modelo es requerido");
+                if (string.IsNullOrEmpty(productoDto.Categoria))
+                    throw new ArgumentException("La categoría es requerida");
+
+                // Mapear DTO a entidad
+                var entidad = _mapper.Map<Productos>(productoDto);
+                
+                // Buscar y asignar la categoría
+                var categoria = await _context.Categorias
+                    .FirstOrDefaultAsync(c => c.Nombre.ToLower() == productoDto.Categoria.ToLower());
+                
+                if (categoria == null)
+                    throw new ArgumentException($"No existe la categoría: {productoDto.Categoria}");
+
+                entidad.CategoriaId = categoria.Id;
+
+                _context.Productos.Add(entidad);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<ProductoDto>(entidad);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error al crear el producto: {ex.Message}", ex);
+            }
         }
 
         public async Task<ProductosVariantesDto> AddVarianteAsync(ProductosVariantesDto varianteDto)
@@ -283,23 +312,65 @@ namespace DrCell_V02.Services
 
      public async Task ActualizarAsync(ProductoDto dto, CancellationToken ct = default)
     {
+        _logger.LogInformation("ActualizarAsync iniciado para producto {Id}: {@Dto}", dto.Id, dto);
+        
         var p = await _context.Productos.FirstOrDefaultAsync(x => x.Id == dto.Id, ct)
                 ?? throw new KeyNotFoundException("Producto no encontrado");
 
+        _logger.LogInformation("Producto encontrado en BD: {@Producto}", new { p.Id, p.Marca, p.Modelo, p.CategoriaId });
+
         p.Marca = dto.Marca;
         p.Modelo = dto.Modelo;
-        p.CategoriaId = dto.CategoriaId;
+
+        // Buscar y asignar la categoría por nombre si se proporciona
+        if (!string.IsNullOrEmpty(dto.Categoria))
+        {
+            _logger.LogInformation("Buscando categoría por nombre: {Categoria}", dto.Categoria);
+            
+            var categoria = await _context.Categorias
+                .FirstOrDefaultAsync(c => c.Nombre.ToLower() == dto.Categoria.ToLower(), ct);
+            
+            if (categoria == null)
+            {
+                _logger.LogWarning("No se encontró la categoría: {Categoria}", dto.Categoria);
+                throw new ArgumentException($"No existe la categoría: {dto.Categoria}");
+            }
+
+            _logger.LogInformation("Categoría encontrada: {Id} - {Nombre}", categoria.Id, categoria.Nombre);
+            p.CategoriaId = categoria.Id;
+        }
+        else if (dto.CategoriaId > 0)
+        {
+            _logger.LogInformation("Usando CategoriaId del DTO: {CategoriaId}", dto.CategoriaId);
+            p.CategoriaId = dto.CategoriaId;
+        }
 
         if (!string.IsNullOrWhiteSpace(dto.Img))
         {
-            var raw = Convert.FromBase64String(dto.Img);
-            if (!IsReasonableSize(raw, 2 * 1024 * 1024))
-                throw new InvalidOperationException("Imagen > 2MB");
+            _logger.LogInformation("Procesando nueva imagen para producto {Id}", dto.Id);
+            try 
+            {
+                var raw = Convert.FromBase64String(dto.Img);
+                if (!IsReasonableSize(raw, 2 * 1024 * 1024))
+                    throw new InvalidOperationException("Imagen > 2MB");
 
-            p.Img = toWebpp(raw, 600, 80); // siempre WebP normalizado
+                p.Img = toWebpp(raw, 600, 80); // siempre WebP normalizado
+                _logger.LogInformation("Imagen procesada exitosamente para producto {Id}", dto.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al procesar imagen para producto {Id}", dto.Id);
+                throw;
+            }
+        }
+        else
+        {
+            _logger.LogInformation("No hay nueva imagen para procesar en producto {Id}", dto.Id);
         }
 
+        _logger.LogInformation("Guardando cambios para producto {Id}", dto.Id);
         await _context.SaveChangesAsync(ct);
+        _logger.LogInformation("Producto {Id} actualizado exitosamente en BD", dto.Id);
     }
 
     public async Task<(byte[] bytes, string contentType)> ObtenerImagenAsync(int id, CancellationToken ct = default)

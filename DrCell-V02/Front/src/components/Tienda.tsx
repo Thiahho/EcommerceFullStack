@@ -1,11 +1,19 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { Menu, X, Filter, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
-import axios from '../config/axios';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import SidebarFilters from './SidebarFilters';
-import { useCategorias } from '../hooks/useCategorias';
-import { toast } from 'sonner';
-import { useCartStore } from '../store/cart-store';
+import React, { useEffect, useState, useMemo } from "react";
+import {
+  Menu,
+  X,
+  Filter,
+  CheckCircle,
+  XCircle,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
+import axios from "../config/axios";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import SidebarFilters from "./SidebarFilters";
+import { useCategorias } from "../hooks/useCategorias";
+import { toast } from "sonner";
+import { useCartStore } from "../store/cart-store";
 
 const Shop: React.FC = () => {
   const [productos, setProductos] = useState<any[]>([]);
@@ -22,41 +30,49 @@ const Shop: React.FC = () => {
   const { clearCart } = useCartStore();
 
   // Usar el hook personalizado para categorías
-  const { categoriasNombres, loading: categoriasLoading, error: categoriasError } = useCategorias();
+  const {
+    categoriasNombres,
+    loading: categoriasLoading,
+    error: categoriasError,
+  } = useCategorias();
 
   // Verificar parámetros de pago al cargar el componente
   useEffect(() => {
-    const estadoPago = searchParams.get('pago');
-    const paymentId = searchParams.get('payment_id');
+    const estadoPago = searchParams.get("pago");
+    const paymentId = searchParams.get("payment_id");
 
     if (estadoPago) {
       switch (estadoPago) {
-        case 'exitoso':
+        case "exitoso":
           // Vaciar el carrito cuando el pago es exitoso
           clearCart();
-          toast.success('¡Pago procesado exitosamente!', {
-            description: paymentId ? `ID de pago: ${paymentId}` : 'Tu compra ha sido confirmada. El carrito ha sido vaciado.',
+          toast.success("¡Pago procesado exitosamente!", {
+            description: paymentId
+              ? `ID de pago: ${paymentId}`
+              : "Tu compra ha sido confirmada. El carrito ha sido vaciado.",
             icon: <CheckCircle className="h-4 w-4" />,
             duration: 5000,
           });
           break;
-        case 'fallido':
-          toast.error('Pago rechazado', {
-            description: 'El pago no pudo ser procesado. Puedes intentar nuevamente.',
+        case "fallido":
+          toast.error("Pago rechazado", {
+            description:
+              "El pago no pudo ser procesado. Puedes intentar nuevamente.",
             icon: <XCircle className="h-4 w-4" />,
             duration: 5000,
           });
           break;
-        case 'pendiente':
-          toast.info('Pago pendiente', {
-            description: 'Tu pago está pendiente de confirmación. Te notificaremos cuando se procese.',
+        case "pendiente":
+          toast.info("Pago pendiente", {
+            description:
+              "Tu pago está pendiente de confirmación. Te notificaremos cuando se procese.",
             icon: <Clock className="h-4 w-4" />,
             duration: 5000,
           });
           break;
-        case 'error':
-          toast.error('Error en el procesamiento', {
-            description: 'Ocurrió un error al procesar el pago. Contacta con soporte si persiste.',
+        case "error":
+          toast.error("Error en el procesamiento", {
+            description: "q",
             icon: <AlertTriangle className="h-4 w-4" />,
             duration: 5000,
           });
@@ -72,17 +88,19 @@ const Shop: React.FC = () => {
     const fetchProductos = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('/Productos/GetAll');
+        const response = await axios.get("/Productos/GetAll");
         setProductos(response.data);
 
         // Calcular rango de precios inicial
-        const precios = response.data.flatMap((p: any) => p.variantes?.map((v: any) => v.precio) || []);
+        const precios = response.data.flatMap(
+          (p: any) => p.variantes?.map((v: any) => v.precio) || []
+        );
         const min = precios.length ? Math.min(...precios) : 0;
         const max = precios.length ? Math.max(...precios) : 0;
         setRangoPrecio([min, max]);
-        setFiltros(f => ({ ...f, precio: [min, max] }));
+        setFiltros((f) => ({ ...f, precio: [min, max] }));
       } catch (error) {
-        console.error('Error al cargar productos:', error);
+        console.error("Error al cargar productos:", error);
         setProductos([]);
       } finally {
         setLoading(false);
@@ -93,18 +111,29 @@ const Shop: React.FC = () => {
   }, []);
 
   // Obtener marcas únicas de los productos
-  const marcas = useMemo(() => Array.from(new Set(productos.map(p => p.marca))).sort(), [productos]);
+  const marcas = useMemo(
+    () => Array.from(new Set(productos.map((p) => p.marca))).sort(),
+    [productos]
+  );
 
   // Filtrar productos
   const productosFiltrados = useMemo(() => {
-    return productos.filter(p => {
+    return productos.filter((p) => {
       // Marca
-      if (filtros.marcas.length && !filtros.marcas.includes(p.marca)) return false;
+      if (filtros.marcas.length && !filtros.marcas.includes(p.marca))
+        return false;
       // Categoría
-      if (filtros.categorias.length && !filtros.categorias.includes(p.categoria)) return false;
+      if (
+        filtros.categorias.length &&
+        !filtros.categorias.includes(p.categoria)
+      )
+        return false;
       // Precio (al menos una variante en rango)
       if (p.variantes && p.variantes.length > 0) {
-        const algunaEnRango = p.variantes.some((v: any) => v.precio >= filtros.precio[0] && v.precio <= filtros.precio[1]);
+        const algunaEnRango = p.variantes.some(
+          (v: any) =>
+            v.precio >= filtros.precio[0] && v.precio <= filtros.precio[1]
+        );
         if (!algunaEnRango) return false;
       } else {
         return false;
@@ -147,7 +176,9 @@ const Shop: React.FC = () => {
     <div className="container mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
       {/* Header con título y botón de filtros móvil */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Tienda</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+          Tienda
+        </h1>
 
         {/* Botón de filtros para móvil */}
         <button
@@ -213,19 +244,23 @@ const Shop: React.FC = () => {
           {/* Información de resultados */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-gray-600">
-              {productosFiltrados.length} producto{productosFiltrados.length !== 1 ? 's' : ''} encontrado{productosFiltrados.length !== 1 ? 's' : ''}
+              {productosFiltrados.length} producto
+              {productosFiltrados.length !== 1 ? "s" : ""} encontrado
+              {productosFiltrados.length !== 1 ? "s" : ""}
             </p>
 
             {/* Botón limpiar filtros */}
-            {(filtros.marcas.length > 0 || filtros.categorias.length > 0 ||
-              filtros.precio[0] !== rangoPrecio[0] || filtros.precio[1] !== rangoPrecio[1]) && (
-                <button
-                  onClick={handleLimpiarFiltros}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
-                >
-                  Limpiar filtros
-                </button>
-              )}
+            {(filtros.marcas.length > 0 ||
+              filtros.categorias.length > 0 ||
+              filtros.precio[0] !== rangoPrecio[0] ||
+              filtros.precio[1] !== rangoPrecio[1]) && (
+              <button
+                onClick={handleLimpiarFiltros}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+              >
+                Limpiar filtros
+              </button>
+            )}
           </div>
 
           {/* Grid de productos */}
@@ -244,16 +279,28 @@ const Shop: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {productosFiltrados.map((p: any) => (
-                <div key={p.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border overflow-hidden">
+                <div
+                  key={p.id}
+                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border overflow-hidden"
+                >
                   {/* Imagen del producto */}
                   <div className="aspect-square overflow-hidden">
                     <img
-                      src={p.img && p.img !== 'System.Byte[]' ? `data:image/webp;base64,${p.img}` : '/placeholder-image.jpg'}
+                      src={
+                        p.img && p.img !== "System.Byte[]"
+                          ? `data:image/webp;base64,${p.img}`
+                          : "/placeholder-image.jpg"
+                      }
                       alt={`${p.marca} ${p.modelo}`}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
-                        console.log('Error loading image for product:', p.id, 'img value:', p.img);
-                        e.currentTarget.src = '/placeholder-image.jpg';
+                        console.log(
+                          "Error loading image for product:",
+                          p.id,
+                          "img value:",
+                          p.img
+                        );
+                        e.currentTarget.src = "/placeholder-image.jpg";
                       }}
                     />
                   </div>
@@ -270,11 +317,11 @@ const Shop: React.FC = () => {
                     <div className="text-green-600 font-semibold text-lg">
                       {p.variantes && p.variantes.length > 0
                         ? `$${Math.min(...p.variantes.map((v: any) => v.precio)).toLocaleString()}`
-                        : 'Sin stock'}
+                        : "Sin stock"}
                     </div>
 
                     <button
-                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium rounded-xl"
                       onClick={() => navigate(`/tienda/${p.id}`)}
                     >
                       Ver más

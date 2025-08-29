@@ -25,7 +25,7 @@ public class MappingProfile : Profile
         // ✅ MAPEO REVERSO: ProductoDto -> Productos (para crear/actualizar)
         CreateMap<ProductoDto, Productos>()
             .ForMember(dest => dest.Img, opt => opt.MapFrom(src => 
-                !string.IsNullOrEmpty(src.Img) ? Convert.FromBase64String(src.Img) : null))  // Convertir base64 a byte[]
+                ConvertBase64ToByteArray(src.Img)))  // Usar método seguro para conversión
             .ForMember(dest => dest.Categoria, opt => opt.Ignore())     // No mapear la navegación
             .ForMember(dest => dest.Variantes, opt => opt.Ignore());    // No mapear la colección
 
@@ -62,5 +62,37 @@ public class MappingProfile : Profile
         CreateMap<VentaItemDto, VentaItem>()
             .ForMember(dest => dest.Venta, opt => opt.Ignore())          // No mapear navegación
             .ForMember(dest => dest.Variante, opt => opt.Ignore());      // No mapear navegación
+    }
+
+    // Método seguro para convertir base64 a byte array
+    private static byte[]? ConvertBase64ToByteArray(string? base64String)
+    {
+        if (string.IsNullOrEmpty(base64String) || string.IsNullOrWhiteSpace(base64String))
+            return null;
+
+        try
+        {
+            // Limpiar la cadena base64 (remover posibles prefijos de data URL)
+            var cleanBase64 = base64String;
+            if (cleanBase64.Contains(','))
+            {
+                cleanBase64 = cleanBase64.Split(',')[1];
+            }
+
+            // Validar que la cadena tenga longitud válida para base64
+            if (cleanBase64.Length % 4 != 0)
+                return null;
+
+            return Convert.FromBase64String(cleanBase64);
+        }
+        catch (FormatException)
+        {
+            // Si hay error en la conversión, retornar null en lugar de fallar
+            return null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

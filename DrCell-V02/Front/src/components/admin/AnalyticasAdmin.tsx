@@ -336,111 +336,111 @@ const AnalyticasAdmin: React.FC = () => {
       const sheetName = "";
 
       switch (activeSection) {
-        case "dashboard":
-          if (dashboardData) {
-            // Hoja 1: Métricas generales
-            const metricas = [
-              ["Métrica", "Valor"],
-              [
-                "Ventas Hoy",
-                formatCurrency(dashboardData.metricasGenerales.ventasHoy),
-              ],
-              [
-                "Ventas Semana",
-                formatCurrency(dashboardData.metricasGenerales.ventasSemana),
-              ],
-              [
-                "Ganancias Hoy",
-                formatCurrency(dashboardData.metricasGenerales.gananciasHoy),
-              ],
-              [
-                "Ganancias Semana",
-                formatCurrency(dashboardData.metricasGenerales.gananciasSemana),
-              ],
-              [
-                "Productos Vendidos Hoy",
-                dashboardData.metricasGenerales.productosVendidosHoy,
-              ],
-              [
-                "Productos Vendidos Mes",
-                dashboardData.metricasGenerales.productosVendidosMes,
-              ],
-              [
-                "Ticket Promedio Mes",
-                formatCurrency(
-                  dashboardData.metricasGenerales.ticketPromedioMes
-                ),
-              ],
-              [
-                "Ventas Pendientes",
-                dashboardData.metricasGenerales.ventasPendientes,
-              ],
-            ];
+        // case "dashboard":
+        //   if (dashboardData) {
+        //     // Hoja 1: Métricas generales
+        //     // const metricas = [
+        //     //   ["Métrica", "Valor"],
+        //     //   [
+        //     //     "Ventas Hoy",
+        //     //     formatCurrency(dashboardData.metricasGenerales.ventasHoy),
+        //     //   ],
+        //     //   [
+        //     //     "Ventas Semana",
+        //     //     formatCurrency(dashboardData.metricasGenerales.ventasSemana),
+        //     //   ],
+        //     //   [
+        //     //     "Ganancias Hoy",
+        //     //     formatCurrency(dashboardData.metricasGenerales.gananciasHoy),
+        //     //   ],
+        //     //   [
+        //     //     "Ganancias Semana",
+        //     //     formatCurrency(dashboardData.metricasGenerales.gananciasSemana),
+        //     //   ],
+        //     //   [
+        //     //     "Productos Vendidos Hoy",
+        //     //     dashboardData.metricasGenerales.productosVendidosHoy,
+        //     //   ],
+        //     //   [
+        //     //     "Productos Vendidos Mes",
+        //     //     dashboardData.metricasGenerales.productosVendidosMes,
+        //     //   ],
+        //     //   [
+        //     //     "Ticket Promedio Mes",
+        //     //     formatCurrency(
+        //     //       dashboardData.metricasGenerales.ticketPromedioMes
+        //     //     ),
+        //     //   ],
+        //     //   [
+        //     //     "Ventas Pendientes",
+        //     //     dashboardData.metricasGenerales.ventasPendientes,
+        //     //   ],
+        //     // ];
 
-            // Hoja 2: KPIs
-            const kpis = [
-              [
-                "Nombre",
-                "Valor",
-                "Unidad",
-                "Tendencia",
-                "Cambio %",
-                "Descripción",
-                "Es Crítico",
-              ],
-              ...dashboardData.kpisPrincipales.map((kpi) => [
-                kpi.nombre,
-                kpi.valor,
-                kpi.unidad || "",
-                kpi.tendencia,
-                kpi.cambioPorcentual,
-                kpi.descripcion || "",
-                kpi.esCritico ? "Sí" : "No",
-              ]),
-            ];
+        //     // Hoja 2: KPIs
+        //     const kpis = [
+        //       [
+        //         "Nombre",
+        //         "Valor",
+        //         "Unidad",
+        //         "Tendencia",
+        //         "Cambio %",
+        //         "Descripción",
+        //         "Es Crítico",
+        //       ],
+        //       ...dashboardData.kpisPrincipales.map((kpi) => [
+        //         kpi.nombre,
+        //         kpi.valor,
+        //         kpi.unidad || "",
+        //         kpi.tendencia,
+        //         kpi.cambioPorcentual,
+        //         kpi.descripcion || "",
+        //         kpi.esCritico ? "Sí" : "No",
+        //       ]),
+        //     ];
 
-            // Hoja 3: Actividades recientes
-            const actividadesData = [
-              ["ID Orden", "Cliente", "Estado", "Total", "Fecha"],
-              ...actividades.map((act) => [
-                act.orderId,
-                act.customerName || "N/A",
-                act.status,
-                formatCurrency(act.total),
-                new Date(act.createdAtLocal).toLocaleString("es-AR"),
-              ]),
-            ];
+        //     // Hoja 3: Actividades recientes
+        //     const actividadesData = [
+        //       ["ID Orden", "Cliente", "Estado", "Total", "Fecha"],
+        //       ...actividades.map((act) => [
+        //         act.orderId,
+        //         act.customerName || "N/A",
+        //         act.status,
+        //         formatCurrency(act.total),
+        //         new Date(act.createdAtLocal).toLocaleString("es-AR"),
+        //       ]),
+        //     ];
 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(
-              wb,
-              XLSX.utils.aoa_to_sheet(metricas),
-              "Métricas Generales"
-            );
-            XLSX.utils.book_append_sheet(
-              wb,
-              XLSX.utils.aoa_to_sheet(kpis),
-              "KPIs"
-            );
-            XLSX.utils.book_append_sheet(
-              wb,
-              XLSX.utils.aoa_to_sheet(actividadesData),
-              "Actividades Recientes"
-            );
+        //     const wb = XLSX.utils.book_new();
+        //     XLSX.utils.book_append_sheet(
+        //       wb,
+        //       XLSX.utils.aoa_to_sheet(metricas),
+        //       "Métricas Generales"
+        //     );
+        //     XLSX.utils.book_append_sheet(
+        //       wb,
+        //       XLSX.utils.aoa_to_sheet(kpis),
+        //       "KPIs"
+        //     );
+        //     XLSX.utils.book_append_sheet(
+        //       wb,
+        //       XLSX.utils.aoa_to_sheet(actividadesData),
+        //       "Actividades Recientes"
+        //     );
 
-            const excelBuffer = XLSX.write(wb, {
-              bookType: "xlsx",
-              type: "array",
-            });
-            const data = new Blob([excelBuffer], {
-              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            });
-            saveAs(
-              data,
-              `Dashboard_Analytics_${currentDate.replace(/\//g, "-")}.xlsx`
-            );
-          }
-          break;
+        //     const excelBuffer = XLSX.write(wb, {
+        //       bookType: "xlsx",
+        //       type: "array",
+        //     });
+        //     const data = new Blob([excelBuffer], {
+        //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //     });
+        //     saveAs(
+        //       data,
+        //       `Dashboard_Analytics_${currentDate.replace(/\//g, "-")}.xlsx`
+        //     );
+        //   }
+        //   break;
 
         case "ventas":
           if (ventasData && ventasData.ventas.length > 0) {
@@ -528,127 +528,127 @@ const AnalyticasAdmin: React.FC = () => {
           }
           break;
 
-        case "proyecciones":
-          if (proyeccion) {
-            const proyeccionData = [
-              ["Métrica", "Valor"],
-              [
-                "Ventas Proyectadas",
-                formatCurrency(proyeccion.ventasProyectadas),
-              ],
-              [
-                "Ganancias Proyectadas",
-                formatCurrency(proyeccion.gananciasProyectadas),
-              ],
-              [
-                "Margen de Confianza",
-                `${proyeccion.margenConfianza.toFixed(1)}%`,
-              ],
-            ];
+        // case "proyecciones":
+        //   if (proyeccion) {
+        //     const proyeccionData = [
+        //       ["Métrica", "Valor"],
+        //       [
+        //         "Ventas Proyectadas",
+        //         formatCurrency(proyeccion.ventasProyectadas),
+        //       ],
+        //       [
+        //         "Ganancias Proyectadas",
+        //         formatCurrency(proyeccion.gananciasProyectadas),
+        //       ],
+        //       [
+        //         "Margen de Confianza",
+        //         `${proyeccion.margenConfianza.toFixed(1)}%`,
+        //       ],
+        //     ];
 
-            const escenariosData = [
-              [
-                "Escenario",
-                "Probabilidad %",
-                "Ventas Proyectadas",
-                "Ganancias Proyectadas",
-                "Descripción",
-              ],
-              ...proyeccion.escenarios.map((esc) => [
-                esc.nombre,
-                esc.probabilidad.toFixed(0),
-                formatCurrency(esc.ventasProyectadas),
-                formatCurrency(esc.gananciasProyectadas),
-                esc.descripcion || "",
-              ]),
-            ];
+        //     const escenariosData = [
+        //       [
+        //         "Escenario",
+        //         "Probabilidad %",
+        //         "Ventas Proyectadas",
+        //         "Ganancias Proyectadas",
+        //         "Descripción",
+        //       ],
+        //       ...proyeccion.escenarios.map((esc) => [
+        //         esc.nombre,
+        //         esc.probabilidad.toFixed(0),
+        //         formatCurrency(esc.ventasProyectadas),
+        //         formatCurrency(esc.gananciasProyectadas),
+        //         esc.descripcion || "",
+        //       ]),
+        //     ];
 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(
-              wb,
-              XLSX.utils.aoa_to_sheet(proyeccionData),
-              "Proyección"
-            );
-            XLSX.utils.book_append_sheet(
-              wb,
-              XLSX.utils.aoa_to_sheet(escenariosData),
-              "Escenarios"
-            );
+        //     const wb = XLSX.utils.book_new();
+        //     XLSX.utils.book_append_sheet(
+        //       wb,
+        //       XLSX.utils.aoa_to_sheet(proyeccionData),
+        //       "Proyección"
+        //     );
+        //     XLSX.utils.book_append_sheet(
+        //       wb,
+        //       XLSX.utils.aoa_to_sheet(escenariosData),
+        //       "Escenarios"
+        //     );
 
-            const excelBuffer = XLSX.write(wb, {
-              bookType: "xlsx",
-              type: "array",
-            });
-            const data = new Blob([excelBuffer], {
-              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            });
-            saveAs(
-              data,
-              `Proyecciones_${currentDate.replace(/\//g, "-")}.xlsx`
-            );
-          }
-          break;
+        //     const excelBuffer = XLSX.write(wb, {
+        //       bookType: "xlsx",
+        //       type: "array",
+        //     });
+        //     const data = new Blob([excelBuffer], {
+        //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //     });
+        //     saveAs(
+        //       data,
+        //       `Proyecciones_${currentDate.replace(/\//g, "-")}.xlsx`
+        //     );
+        //   }
+        //   break;
 
-        case "clientes":
-          if (analisisClientes) {
-            const clientesResumen = [
-              ["Métrica", "Valor"],
-              ["Total Clientes", analisisClientes.totalClientes],
-              ["Clientes Nuevos", analisisClientes.clientesNuevos],
-              [
-                "Tasa Retención",
-                `${analisisClientes.tasaRetencion.toFixed(1)}%`,
-              ],
-              [
-                "Valor Vida Promedio",
-                formatCurrency(analisisClientes.valorVidaPromedio),
-              ],
-            ];
+        // case "clientes":
+        //   if (analisisClientes) {
+        //     const clientesResumen = [
+        //       ["Métrica", "Valor"],
+        //       ["Total Clientes", analisisClientes.totalClientes],
+        //       ["Clientes Nuevos", analisisClientes.clientesNuevos],
+        //       [
+        //         "Tasa Retención",
+        //         `${analisisClientes.tasaRetencion.toFixed(1)}%`,
+        //       ],
+        //       [
+        //         "Valor Vida Promedio",
+        //         formatCurrency(analisisClientes.valorVidaPromedio),
+        //       ],
+        //     ];
 
-            const segmentosData = [
-              [
-                "Segmento",
-                "Cantidad",
-                "% del Total",
-                "Ticket Promedio",
-                "Frecuencia Compra",
-                "Características",
-              ],
-              ...analisisClientes.segmentos.map((seg) => [
-                seg.nombre,
-                seg.cantidad,
-                `${seg.porcentajeTotal.toFixed(1)}%`,
-                formatCurrency(seg.ticketPromedio),
-                `${seg.frecuenciaCompra.toFixed(1)}/mes`,
-                seg.caracteristicas || "",
-              ]),
-            ];
+        //     const segmentosData = [
+        //       [
+        //         "Segmento",
+        //         "Cantidad",
+        //         "% del Total",
+        //         "Ticket Promedio",
+        //         "Frecuencia Compra",
+        //         "Características",
+        //       ],
+        //       ...analisisClientes.segmentos.map((seg) => [
+        //         seg.nombre,
+        //         seg.cantidad,
+        //         `${seg.porcentajeTotal.toFixed(1)}%`,
+        //         formatCurrency(seg.ticketPromedio),
+        //         `${seg.frecuenciaCompra.toFixed(1)}/mes`,
+        //         seg.caracteristicas || "",
+        //       ]),
+        //     ];
 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(
-              wb,
-              XLSX.utils.aoa_to_sheet(clientesResumen),
-              "Resumen Clientes"
-            );
-            XLSX.utils.book_append_sheet(
-              wb,
-              XLSX.utils.aoa_to_sheet(segmentosData),
-              "Segmentos"
-            );
+        //     const wb = XLSX.utils.book_new();
+        //     XLSX.utils.book_append_sheet(
+        //       wb,
+        //       XLSX.utils.aoa_to_sheet(clientesResumen),
+        //       "Resumen Clientes"
+        //     );
+        //     XLSX.utils.book_append_sheet(
+        //       wb,
+        //       XLSX.utils.aoa_to_sheet(segmentosData),
+        //       "Segmentos"
+        //     );
 
-            const excelBuffer = XLSX.write(wb, {
-              bookType: "xlsx",
-              type: "array",
-            });
-            const data = new Blob([excelBuffer], {
-              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            });
-            saveAs(
-              data,
-              `Analisis_Clientes_${currentDate.replace(/\//g, "-")}.xlsx`
-            );
-          }
-          break;
+        //     const excelBuffer = XLSX.write(wb, {
+        //       bookType: "xlsx",
+        //       type: "array",
+        //     });
+        //     const data = new Blob([excelBuffer], {
+        //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //     });
+        //     saveAs(
+        //       data,
+        //       `Analisis_Clientes_${currentDate.replace(/\//g, "-")}.xlsx`
+        //     );
+        //   }
+        //   break;
 
         case "inventario":
           if (analisisInventario) {
@@ -736,9 +736,9 @@ const AnalyticasAdmin: React.FC = () => {
   }
 
   const sections = [
-    { id: "dashboard", name: "Dashboard", icon: BarChart3 },
-    { id: "proyecciones", name: "Proyecciones", icon: Target },
-    { id: "clientes", name: "Clientes", icon: Users },
+    // { id: "dashboard", name: "Dashboard", icon: BarChart3 },
+    // { id: "proyecciones", name: "Proyecciones", icon: Target },
+    // { id: "clientes", name: "Clientes", icon: Users },
     { id: "inventario", name: "Inventario", icon: Package },
     { id: "ventas", name: "Ventas", icon: ShoppingCart },
   ];
@@ -811,7 +811,7 @@ const AnalyticasAdmin: React.FC = () => {
         <div className="space-y-6">
           {/* Métricas Principales */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+            {/* <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Ventas Hoy
@@ -847,9 +847,9 @@ const AnalyticasAdmin: React.FC = () => {
                   esta semana
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
 
-            <Card>
+            {/* <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Productos Vendidos
@@ -869,9 +869,9 @@ const AnalyticasAdmin: React.FC = () => {
                   este mes
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
 
-            <Card>
+            {/* <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Ticket Promedio
@@ -889,11 +889,11 @@ const AnalyticasAdmin: React.FC = () => {
                   pendientes
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           {/* KPIs Principales */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>KPIs Principales</CardTitle>
               <CardDescription>
@@ -945,7 +945,7 @@ const AnalyticasAdmin: React.FC = () => {
                 )}
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Actividades recientes (hoy) */}
           <Card>

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import axios from '../../config/axios';
 import { toast } from 'sonner';
+import { useCategorias } from "@/hooks/useCategorias";
 
 interface ProductFormProps {
   isOpen: boolean;
@@ -75,6 +76,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
   });
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
+  // Hook para obtener categorías dinámicamente
+  const { categorias, loading: categoriasLoading } = useCategorias();
 
   const handleProductoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -101,6 +105,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
       return;
     }
 
+    // Verificar que la categoría seleccionada exista
+    const categoriaValida = categorias.find(cat => cat.nombre.toLowerCase() === producto.categoria);
+    if (!categoriaValida) {
+      toast.error('Por favor selecciona una categoría válida');
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -116,7 +127,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
         img: imgBase64
       };
 
-      await axios.post('/admin/Productos', productoPayload);
+      await axios.post('/admin/productos', productoPayload);
 
       toast.success('¡Producto creado exitosamente!', {
         description: 'El producto se ha guardado en el sistema.',
@@ -210,14 +221,23 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
               <Select
                 value={producto.categoria}
                 onValueChange={(value) => setProducto(prev => ({ ...prev, categoria: value }))}
+                disabled={categoriasLoading}
               >
                 <SelectTrigger className="w-full bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Selecciona una categoría" />
+                  <SelectValue placeholder={categoriasLoading ? "Cargando categorías..." : "Selecciona una categoría"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="celular">📱 Celular</SelectItem>
-                  <SelectItem value="tablet">📱 Tablet</SelectItem>
-                  <SelectItem value="laptop">💻 Laptop</SelectItem>
+                  {categorias.length > 0 ? (
+                    categorias.map((categoria) => (
+                      <SelectItem key={categoria.id} value={categoria.nombre.toLowerCase()}>
+                        📂 {categoria.nombre}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>
+                      {categoriasLoading ? "Cargando..." : "No hay categorías disponibles"}
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -316,7 +336,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ isOpen, onClose, onSuccess })
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={loading || !producto.marca || !producto.modelo || !producto.categoria}
+            disabled={loading || categoriasLoading || !producto.marca || !producto.modelo || !producto.categoria || categorias.length === 0}
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400"
           >
             {loading ? (
